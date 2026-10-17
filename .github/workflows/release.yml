@@ -1,0 +1,226 @@
+# Release pipeline for the Copilot Tauri app.
+#
+# Builds signed installers on macOS (arm64 + x64) and Windows (x64), produces the
+# Tauri updater artifacts (.sig), assembles the updater manifest (latest.json), and
+# publishes everything to a GitHub Release for the tag. Once a release exists, the
+# updater endpoint in tauri.conf.json (releases/latest/download/latest.json)
+# resolves and clients update on next launch.
+#
+# Signing is done by the repo's own scripts (app/scripts/sign-notarize-macos.sh and
+# app/scripts/sign-windows.ps1), not by a generic action, so CI matches the proven
+# local path. Everything up to code-signing runs without secrets; the signing +
+# notarization + updater-signing steps need the secrets listed in GATE below and
+# are skipped (the build still runs unsigned) when they are absent.
+#
+# GATE — repository secrets/variables this workflow expects (set by the owner):
+#   Updater signing (minisign; required for working auto-update):
+#     secret TAURI_SIGNING_PRIVATE_KEY          contents of ~/.tauri/copilot-updater.key
+#     secret TAURI_SIGNING_PRIVATE_KEY_PASSWORD "" (this key has no password)
+#   macOS code signing + notarization (app/scripts/sign-notarize-macos.sh):
+#     secret APPLE_DEV_ID_KEY_PEM        Developer ID Application cert PRIVATE key (PEM)
+#     secret APPLE_DEV_ID_CERT_BASE64    that certificate (DER or PEM), base64-encoded
+#     secret APPLE_NOTARY_API_KEY_P8     App Store Connect API key (.p8 contents)
+#     secret APPLE_NOTARY_KEY_ID         App Store Connect key id (e.g. G63MAFDGA5)
+#     secret APPLE_NOTARY_ISSUER_ID      App Store Connect issuer id
+#     var    APPLE_SIGNING_IDENTITY      "Developer ID Application: Nathan Zhao (G7P6939437)"
+#   Windows code signing (app/scripts/sign-windows.ps1, Azure Artifact Signing):
+#     var    ICU_ARTIFACT_ENDPOINT      e.g. https://eus.codesigning.azure.net/
+#     var    ICU_ARTIFACT_ACCOUNT       the Artifact Signing account name (e.g. nzhaosigning)
+#     var    ICU_ARTIFACT_PROFILE       the certificate profile name (e.g. taiku-release-signing)
+#     secret AZURE_TENANT_ID / AZURE_CLIENT_ID / AZURE_CLIENT_SECRET  signer service principal
+#   Publishing target (the updater endpoint repo):
+#     The endpoint is github.com/nathanjzhao/invisible-computer-use, which does not exist yet.
+#     Either create that PUBLIC repo and run this workflow there, or set repository variable
+#     RELEASE_REPO to the repo that should host releases and update tauri.conf.json's endpoint
+#     to match. Without a resolving endpoint, clients cannot auto-update.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build/publish (e.g. v0.2.0)"
+        required: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # The vendored cua-driver source the native patch applies to. apply-and-build.sh
+  # expects vendor-cua/ to be this repo at this ref before the driver is built.
+  VENDOR_CUA_REPO: https://github.com/trycua/cua.git
+  VENDOR_CUA_REF: 00678fa8e
+  NODE_VERSION: "22"
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            platform: darwin-aarch64
+            rust_target: aarch64-apple-darwin
+          - os: macos-15-intel
+            platform: darwin-x86_64
+            rust_target: x86_64-apple-darwin
+          - os: windows-latest
+            platform: windows-x86_64
+            rust_target: x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout vendored cua-driver
+        shell: bash
+        run: |
+          git clone --no-checkout "$VENDOR_CUA_REPO" vendor-cua
+          git -C vendor-cua checkout "$VENDOR_CUA_REF"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            app/src-tauri/target
+            vendor-cua/libs/cua-driver/rust/target
+          key: ${{ matrix.platform }}-cargo-${{ hashFiles('app/src-tauri/Cargo.lock') }}
+
+      - name: Install frontend deps
+        working-directory: app
+        run: npm ci
+
+      - name: Windows build prerequisites
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install 7zip -y --no-progress
+          # The Azure Artifact Signing client needs the .NET 8 runtime (x64).
+          choco install dotnet-8.0-runtime -y --no-progress
+
+      # ---- macOS: build, Developer ID sign + notarize + staple, then the updater artifact ----
+      - name: Build + sign (macOS)
+        if: runner.os == 'macOS'
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ vars.APPLE_SIGNING_IDENTITY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_DEV_ID_KEY_PEM: ${{ secrets.APPLE_DEV_ID_KEY_PEM }}
+          APPLE_DEV_ID_CERT_BASE64: ${{ secrets.APPLE_DEV_ID_CERT_BASE64 }}
+          APPLE_NOTARY_API_KEY_P8: ${{ secrets.APPLE_NOTARY_API_KEY_P8 }}
+          APPLE_NOTARY_KEY_ID: ${{ secrets.APPLE_NOTARY_KEY_ID }}
+          APPLE_NOTARY_ISSUER_ID: ${{ secrets.APPLE_NOTARY_ISSUER_ID }}
+          RUST_TARGET: ${{ matrix.rust_target }}
+          PLATFORM: ${{ matrix.platform }}
+        run: bash .github/scripts/build-macos.sh
+
+      # ---- Windows: build NSIS + MSI, Authenticode sign every PE, emit updater artifacts ----
+      - name: Build + sign (Windows)
+        if: runner.os == 'Windows'
+        working-directory: ${{ github.workspace }}
+        shell: pwsh
+        env:
+          ICU_WIN_SIGN_PROVIDER: artifact
+          ICU_ARTIFACT_ENDPOINT: ${{ vars.ICU_ARTIFACT_ENDPOINT }}
+          ICU_ARTIFACT_ACCOUNT: ${{ vars.ICU_ARTIFACT_ACCOUNT }}
+          ICU_ARTIFACT_PROFILE: ${{ vars.ICU_ARTIFACT_PROFILE }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          if (-not $env:AZURE_CLIENT_SECRET) {
+            Write-Host "::warning::Windows signing secrets absent — building unsigned installers."
+            npm --prefix app run tauri build -- --bundles nsis,msi
+          } else {
+            powershell -ExecutionPolicy Bypass -File app/scripts/sign-windows.ps1 build
+          }
+
+      - name: Collect release artifacts
+        shell: bash
+        run: bash .github/scripts/collect-artifacts.sh "${{ matrix.platform }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: dist-release/${{ matrix.platform }}
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: staged
+          pattern: release-*
+          merge-multiple: true
+
+      - name: Resolve tag + version
+        id: meta
+        shell: bash
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Assemble latest.json (updater manifest)
+        shell: bash
+        env:
+          RELEASE_REPO: ${{ vars.RELEASE_REPO || github.repository }}
+        run: |
+          BASE="https://github.com/${RELEASE_REPO}/releases/download/${{ steps.meta.outputs.tag }}"
+          node app/scripts/build-latest-json.mjs \
+            --version "${{ steps.meta.outputs.version }}" \
+            --notes "Copilot ${{ steps.meta.outputs.tag }}" \
+            --base-url "$BASE" \
+            --assets-dir staged \
+            --out staged/latest.json
+          echo "---- latest.json ----"; cat staged/latest.json
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Publish where latest.json's URLs point. Defaults to this repo; set the
+          # RELEASE_REPO variable to publish elsewhere (needs a RELEASE_TOKEN PAT
+          # with write access to that repo, since GITHUB_TOKEN is scoped to this one).
+          repository: ${{ vars.RELEASE_REPO || github.repository }}
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: Copilot ${{ steps.meta.outputs.tag }}
+          files: |
+            staged/**/*
+          fail_on_unmatched_files: true

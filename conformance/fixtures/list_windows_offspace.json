@@ -1,0 +1,66 @@
+{
+ "current_space_id": 15,
+ "windows": [
+  {
+   "app_name": "Calculator",
+   "bounds": {
+    "height": 408.0,
+    "width": 230.0,
+    "x": 414.0,
+    "y": 559.0
+   },
+   "current_space_id": 15,
+   "is_on_screen": false,
+   "layer": 0,
+   "on_current_space": false,
+   "pid": 23759,
+   "space_ids": [
+    1
+   ],
+   "title": "Calculator",
+   "window_id": 26366,
+   "z_index": 275
+  },
+  {
+   "app_name": "Clock",
+   "bounds": {
+    "height": 640.0,
+    "width": 600.0,
+    "x": 100.0,
+    "y": 150.0
+   },
+   "current_space_id": 15,
+   "is_on_screen": false,
+   "layer": 0,
+   "on_current_space": false,
+   "pid": 26765,
+   "space_ids": [
+    1
+   ],
+   "title": "Clock",
+   "window_id": 25427,
+   "z_index": 259
+  },
+  {
+   "app_name": "Warp",
+   "bounds": {
+    "height": 1084.0,
+    "width": 1728.0,
+    "x": 0.0,
+    "y": 33.0
+   },
+   "current_space_id": 15,
+   "is_on_screen": true,
+   "layer": 0,
+   "on_current_space": true,
+   "pid": 723,
+   "space_ids": [
+    15
+   ],
+   "title": "chips",
+   "window_id": 85,
+   "z_index": 73
+  }
+ ],
+ "_fixture_note": "real cua list_windows entries captured 2026-09-11: Clock/Calculator live on Space 1 while the display currently shows Space 15 (off-Space, the user was on the Warp desktop), Warp is on the current Space"
+}

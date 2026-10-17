@@ -1,0 +1,18 @@
+FIX 2 / FIX 5 live evidence — 2026-09-12, user-authorized bounded run
+Harness: ICU_BOUNDED_TEST=1 python3 impl/native/macos-drive/fix2-fix5-live.py
+Target: TextEdit doc "icu-fix5.txt" containing "the quick brown fox jumps over the lazy dog"
+
+FIX 5 (spec 06 select_text WRITE + reader):
+  select_text {text:"quick"} (focused-element fallback, no element_index) ->
+    selected: true, location: 4, length: 5   (UTF-16 units; "the " = 4, "quick" = 5)
+  reader (get_window_state.accessibility.selected_text) read back: "quick"
+  => AXSelectedTextRange was set and the reader read the exact run back. PASS.
+
+FIX 2 (spec 07 transient z-ordered capture):
+  get_window_state include_screenshot -> screenshots[] length 2:
+    [0] id=screenshot-0 zIndex 0 origin (185,83)  1312x844   (the window)
+    [1] id=screenshot-1 zIndex 1 origin (336,197) 452x1038   (the transient surface)
+  screenshot-1 decoded to fix2-context-menu-z1.png (63 KB): a real macOS right-click
+  context menu (Look Up / Translate / Search With Google / Cut / Copy / Paste /
+  Share / Font > / Show Writing Tools / Spelling and Grammar > / Services >).
+  => the open context menu is captured as a z-ordered transient surface. PASS.

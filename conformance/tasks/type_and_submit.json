@@ -1,0 +1,11 @@
+{
+  "id": "type_and_submit",
+  "description": "Focus the text field, type 'hello', click the button. End state: field holds 'hello' and buttonPressed fired.",
+  "fixture": "fixture2.py",
+  "steps": [
+    {"tool": "set_value", "args_template": {"element_role": "text", "value": "hello"}},
+    {"tool": "click", "args_template": {"element_role": "push button"}}
+  ],
+  "oracle": {"field_value": "hello", "button_pressed": true},
+  "note": "Both real Codex and our layer run this; assert identical end state via the fixture's own event log (ground truth, not the driver's OK)."
+}

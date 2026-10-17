@@ -1,0 +1,154 @@
+{
+ "_note": "Read `elements` for input targets and `passive_elements` for read-only text. `tree_markdown` will continue to work but new fields will only be added to the structured side. Use `max_elements` / `max_depth` to bound the AT-SPI walk on apps with very large trees.",
+ "app_name": "Idfixture.py",
+ "diff": {
+  "_note": "Stable ids persist across get_window_state calls for this (pid, window_id); `elements[].stable_id` maps them to the current element_index. Pass disable_diff:true for a full tree in `text`, cumulative_diff:true for the diff from the initial tree.",
+  "accessibility_revision": 4,
+  "accessibility_snapshot_count": 4,
+  "baseline": "previous",
+  "kind": "diff",
+  "text": "The following is a diff from the previous accessibility tree\nwith ~, +, and - representing changed, added, and removed elements, respectively.\n+ [14] text = \"seed\"\n+ [15] text = \"second\"\n- [12]\n- [13]"
+ },
+ "element_count": 6,
+ "elements": [
+  {
+   "actions": [
+    "click"
+   ],
+   "depth": 2,
+   "element_index": 0,
+   "element_token": "s00000004:0",
+   "enabled": true,
+   "frame": {
+    "h": 34,
+    "w": 300,
+    "x": 61,
+    "y": 80
+   },
+   "label": "Charlie",
+   "role": "push button",
+   "stable_id": 4
+  },
+  {
+   "actions": [
+    "click"
+   ],
+   "depth": 2,
+   "element_index": 1,
+   "element_token": "s00000004:1",
+   "enabled": true,
+   "frame": {
+    "h": 34,
+    "w": 300,
+    "x": 61,
+    "y": 114
+   },
+   "label": "Play",
+   "role": "push button",
+   "stable_id": 11
+  },
+  {
+   "actions": [
+    "click"
+   ],
+   "depth": 2,
+   "element_index": 2,
+   "element_token": "s00000004:2",
+   "enabled": true,
+   "frame": {
+    "h": 34,
+    "w": 300,
+    "x": 61,
+    "y": 148
+   },
+   "label": "Bravo",
+   "role": "push button",
+   "stable_id": 3
+  },
+  {
+   "actions": [
+    "click"
+   ],
+   "depth": 2,
+   "element_index": 3,
+   "element_token": "s00000004:3",
+   "enabled": true,
+   "frame": {
+    "h": 34,
+    "w": 300,
+    "x": 61,
+    "y": 182
+   },
+   "identifier": "btn-keep",
+   "label": "Kept",
+   "role": "push button",
+   "stable_id": 5
+  },
+  {
+   "actions": [
+    "activate"
+   ],
+   "depth": 2,
+   "element_index": 4,
+   "element_token": "s00000004:4",
+   "enabled": true,
+   "frame": {
+    "h": 34,
+    "w": 300,
+    "x": 61,
+    "y": 216
+   },
+   "label": "seed",
+   "role": "text",
+   "stable_id": 14,
+   "value": "seed"
+  },
+  {
+   "actions": [
+    "activate"
+   ],
+   "depth": 2,
+   "element_index": 5,
+   "element_token": "s00000004:5",
+   "enabled": true,
+   "frame": {
+    "h": 34,
+    "w": 300,
+    "x": 61,
+    "y": 250
+   },
+   "label": "second",
+   "role": "text",
+   "stable_id": 15,
+   "value": "second"
+  }
+ ],
+ "elements_complete": false,
+ "passive_elements": [
+  {
+   "enabled": true,
+   "label": "IdFixture",
+   "read_only": true,
+   "role": "frame"
+  },
+  {
+   "enabled": true,
+   "label": "Pad",
+   "read_only": true,
+   "role": "label"
+  }
+ ],
+ "pid": 32,
+ "returned_element_count": 6,
+ "snapshot_id": "s00000004",
+ "total_element_count": 6,
+ "tree_markdown": "- frame = \"IdFixture\"\n    - [0] push button \"Charlie\" [actions=[click]]\n    - [1] push button \"Play\" [actions=[click]]\n    - [2] push button \"Bravo\" [actions=[click]]\n    - [3] push button \"Kept\" [actions=[click]]\n    - [4] text \"seed\" value=\"seed\" [actions=[activate]]\n    - [5] text \"second\" value=\"second\" [actions=[activate]]\n      - label = \"Pad\"\n",
+ "window_bounds": {
+  "height": 300,
+  "width": 300,
+  "x": 61,
+  "y": 80
+ },
+ "window_id": 4194307,
+ "window_title": "IdFixture"
+}

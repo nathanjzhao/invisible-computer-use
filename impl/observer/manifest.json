@@ -1,0 +1,32 @@
+{
+  "version": "1.0.32",
+  "files": [
+    {
+      "path": "taiku-observer/src/main.rs",
+      "base_sha256": "a046988a9e32cc59a4ec228e034d5d6a5a4d9ec85298867585e638030cae4593",
+      "patched_sha256": "25f92e365ab799abb39ceaf36da1e11fe1d5c3587f36779ede0a5b16220ef801"
+    },
+    {
+      "path": "taiku-observer/src/ui_ax_macos.rs",
+      "base_sha256": "2b7f452ecb5a092513023381a7f855f3727cc690fa6174df647ff3536c8edbaf",
+      "patched_sha256": "2617f70132eb5be2af82b85439c63c4d2c8b5d890f9ab3d3ad968c866c8b6632"
+    },
+    {
+      "path": "taiku-observer/src/ui_uia_windows.rs",
+      "base_sha256": "fd24c121ea6265e04b97c0fab856336e433318b77d7c08f5a895a88557df86e4",
+      "patched_sha256": "25d9020890fe1be998bb73c3d44c3a354d86483732ad0f3f8a8bf70c7c130218"
+    },
+    {
+      "path": "taiku-observer/src/ui_pointer.rs",
+      "base_sha256": null,
+      "patched_sha256": "e13e7aa7d99be5070addfa00300726584cec7c9765aa5493a4b20415118505f9"
+    },
+    {
+      "path": "taiku-observer/src/window_focus_backend.rs",
+      "base_sha256": "148272423ecd60239e569dcddd7f0f2fec07c0a6358c7eefb93ee1e59dd475b0",
+      "patched_sha256": "35388e8af98e9cd167e8a822a71850ec48dd80ee59b61d06ca4bc448d88f1542"
+    }
+  ],
+  "validation": "round-three implementation; live acceptance still in progress",
+  "audit": "../../study/audit/paired-round3-2026-10-09/PLAN.md"
+}

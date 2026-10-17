@@ -1,0 +1,332 @@
+{
+  "version": "1.0.32",
+  "applies_after": "taiku-observer-clicks.patch",
+  "files": [
+    {
+      "path": "taiku-observer/src/main.rs",
+      "base_sha256": "25f92e365ab799abb39ceaf36da1e11fe1d5c3587f36779ede0a5b16220ef801",
+      "patched_sha256": "70bd3b4ee3db86f24ce8d9360b5d9db6072e8e7d7a04847f89c602a7ecf9f92d"
+    },
+    {
+      "path": "taiku-observer/src/audio_backend.rs",
+      "base_sha256": "d2f0fb7918156555053ebef7f093edbaf9af5c52f1abef9a03192111817429fe",
+      "patched_sha256": "ce639d7cbfb44ac252365d6d7fed894d1cc163e442874a0cc5688d7432304dce"
+    },
+    {
+      "path": "taiku-observer/src/audio_only.rs",
+      "base_sha256": null,
+      "patched_sha256": "7f1ec1b8d1ab743733b16397299ae92855b742b740f7067de648b3f2392b246b"
+    },
+    {
+      "path": "taiku-observer/Cargo.lock",
+      "base_sha256": "f3382b12cffc23d4da260a1e49eb7f5b5b62bf5eae181e51d3fe2f64080779c6",
+      "patched_sha256": "f3382b12cffc23d4da260a1e49eb7f5b5b62bf5eae181e51d3fe2f64080779c6"
+    },
+    {
+      "path": "taiku-observer/Cargo.toml",
+      "base_sha256": "150190d067da029a079ea0cfbdea432d2af124211e22deb0a0e3ff2fa28aec89",
+      "patched_sha256": "150190d067da029a079ea0cfbdea432d2af124211e22deb0a0e3ff2fa28aec89"
+    },
+    {
+      "path": "taiku-observer/build.rs",
+      "base_sha256": "679eeb111aa6ca9801d7ad9270b27c880b8409d6ed64ed40fb44822a7b7dee9a",
+      "patched_sha256": "679eeb111aa6ca9801d7ad9270b27c880b8409d6ed64ed40fb44822a7b7dee9a"
+    },
+    {
+      "path": "taiku-observer/src/audio_loopback_linux.rs",
+      "base_sha256": "b145be2307009706ab6eb360c146885f2cf7371ce96b0c654192f322e17796ff",
+      "patched_sha256": "b145be2307009706ab6eb360c146885f2cf7371ce96b0c654192f322e17796ff"
+    },
+    {
+      "path": "taiku-observer/src/audio_loopback_macos.rs",
+      "base_sha256": "e163ea433db4cacd7c771b4ba1075484439e844a12940d90e3c123abaddccbad",
+      "patched_sha256": "e163ea433db4cacd7c771b4ba1075484439e844a12940d90e3c123abaddccbad"
+    },
+    {
+      "path": "taiku-observer/src/audio_loopback_windows.rs",
+      "base_sha256": "bbc2cdc9ccf4e3cc681933a9e456d1e727c3a1f6eef2b7e0bd23c921a746e4f6",
+      "patched_sha256": "bbc2cdc9ccf4e3cc681933a9e456d1e727c3a1f6eef2b7e0bd23c921a746e4f6"
+    },
+    {
+      "path": "taiku-observer/src/audio_opus_ogg.rs",
+      "base_sha256": "93dbe29dddff3530b8fc84b66f66b2620d8cbad02cc2f0a9c3c002b4f3e1befa",
+      "patched_sha256": "93dbe29dddff3530b8fc84b66f66b2620d8cbad02cc2f0a9c3c002b4f3e1befa"
+    },
+    {
+      "path": "taiku-observer/src/bin/ax_probe.rs",
+      "base_sha256": "80e55b5f55265ec51cf510854eec2af2eb329af9293bcb7072a26ff3c22a5d18",
+      "patched_sha256": "80e55b5f55265ec51cf510854eec2af2eb329af9293bcb7072a26ff3c22a5d18"
+    },
+    {
+      "path": "taiku-observer/src/bin/gtmarker.rs",
+      "base_sha256": "e7bfd06e08277ef24f84515f220bbbd1aaecc6a7b910036781afed09379cdfd0",
+      "patched_sha256": "e7bfd06e08277ef24f84515f220bbbd1aaecc6a7b910036781afed09379cdfd0"
+    },
+    {
+      "path": "taiku-observer/src/capture_env.rs",
+      "base_sha256": "6339debf11b5967da116641f10977f98a8675896d4080d14591411b8a364e6dd",
+      "patched_sha256": "6339debf11b5967da116641f10977f98a8675896d4080d14591411b8a364e6dd"
+    },
+    {
+      "path": "taiku-observer/src/clock.rs",
+      "base_sha256": "d573ad327cbb441104c2eff44d7c2b8329035f52ba0f94e9dc97fb46956577b9",
+      "patched_sha256": "d573ad327cbb441104c2eff44d7c2b8329035f52ba0f94e9dc97fb46956577b9"
+    },
+    {
+      "path": "taiku-observer/src/config.rs",
+      "base_sha256": "916d4d9b02ec4a917e7b9e09107957dd9c116924ae09d635f2b0afb09a029f05",
+      "patched_sha256": "916d4d9b02ec4a917e7b9e09107957dd9c116924ae09d635f2b0afb09a029f05"
+    },
+    {
+      "path": "taiku-observer/src/device_backend.rs",
+      "base_sha256": "ad0e88d0f7f7107ccfccc66a04e95bd6b5c47c8524cae5a0b5dc84627ec59555",
+      "patched_sha256": "ad0e88d0f7f7107ccfccc66a04e95bd6b5c47c8524cae5a0b5dc84627ec59555"
+    },
+    {
+      "path": "taiku-observer/src/enroll_client.rs",
+      "base_sha256": "d1b90c98aa498100dbc3d639ced53fd28723f4ededcd382637b427b301466cc4",
+      "patched_sha256": "d1b90c98aa498100dbc3d639ced53fd28723f4ededcd382637b427b301466cc4"
+    },
+    {
+      "path": "taiku-observer/src/etw_clock.rs",
+      "base_sha256": "2eccba387e097d90a9c3c33d747a231a4f04d29e9e0df6f7dbf695ac41f4361e",
+      "patched_sha256": "2eccba387e097d90a9c3c33d747a231a4f04d29e9e0df6f7dbf695ac41f4361e"
+    },
+    {
+      "path": "taiku-observer/src/flow_dedup.rs",
+      "base_sha256": "b68241d3187218c734d7421ad0bf951078c19fa86208cb3e7b19c47b71710c7d",
+      "patched_sha256": "b68241d3187218c734d7421ad0bf951078c19fa86208cb3e7b19c47b71710c7d"
+    },
+    {
+      "path": "taiku-observer/src/frame_hash.rs",
+      "base_sha256": "04a2cade8af9c51a965890d4cb504922ef2b474ea920791372a90e75125185f3",
+      "patched_sha256": "04a2cade8af9c51a965890d4cb504922ef2b474ea920791372a90e75125185f3"
+    },
+    {
+      "path": "taiku-observer/src/history_video.rs",
+      "base_sha256": "b8c9de18bb12bccb6d4c89a946d5a8cc3141fa665cd7a3ec15cf06c326ee24ab",
+      "patched_sha256": "b8c9de18bb12bccb6d4c89a946d5a8cc3141fa665cd7a3ec15cf06c326ee24ab"
+    },
+    {
+      "path": "taiku-observer/src/idle.rs",
+      "base_sha256": "36ef28bfd125b55253059252964778ddcaaa26029c32a12b93375670a709ffac",
+      "patched_sha256": "36ef28bfd125b55253059252964778ddcaaa26029c32a12b93375670a709ffac"
+    },
+    {
+      "path": "taiku-observer/src/input_backend.rs",
+      "base_sha256": "97e40b7b802e11979e234c9d1808d0379aca2452a5bd118835955ca3a53aeb80",
+      "patched_sha256": "97e40b7b802e11979e234c9d1808d0379aca2452a5bd118835955ca3a53aeb80"
+    },
+    {
+      "path": "taiku-observer/src/input_evdev_backend.rs",
+      "base_sha256": "feb1370c2defa9406fa7eac14e31c3cfc6390a1d6f1d68b6fd39615c0211a5fc",
+      "patched_sha256": "feb1370c2defa9406fa7eac14e31c3cfc6390a1d6f1d68b6fd39615c0211a5fc"
+    },
+    {
+      "path": "taiku-observer/src/input_x11_backend.rs",
+      "base_sha256": "fe186c2199b3cacd9fb8cbf6a7018b15ef463f75344059f5221239e05f0fdf68",
+      "patched_sha256": "fe186c2199b3cacd9fb8cbf6a7018b15ef463f75344059f5221239e05f0fdf68"
+    },
+    {
+      "path": "taiku-observer/src/iokit_macos.rs",
+      "base_sha256": "2f54e30b9111f80407bdadb41a523856f1542aa0c9ae57e7b9c6560e748cbeeb",
+      "patched_sha256": "2f54e30b9111f80407bdadb41a523856f1542aa0c9ae57e7b9c6560e748cbeeb"
+    },
+    {
+      "path": "taiku-observer/src/linux_ebpf_backend.rs",
+      "base_sha256": "851c47ec7304e2302632a5d0cfd9eca49b11f666082b4049633ec318184ff0c0",
+      "patched_sha256": "851c47ec7304e2302632a5d0cfd9eca49b11f666082b4049633ec318184ff0c0"
+    },
+    {
+      "path": "taiku-observer/src/metrics_backend.rs",
+      "base_sha256": "15b220947cd97a59048045bf4771edb61d882ab5d1a9c45f27384a84db91c588",
+      "patched_sha256": "15b220947cd97a59048045bf4771edb61d882ab5d1a9c45f27384a84db91c588"
+    },
+    {
+      "path": "taiku-observer/src/multitouch_backend.rs",
+      "base_sha256": "dc74d8fc5a622e5380dcd44c605c2c14771088e061d31cc54443d89b745992ba",
+      "patched_sha256": "dc74d8fc5a622e5380dcd44c605c2c14771088e061d31cc54443d89b745992ba"
+    },
+    {
+      "path": "taiku-observer/src/multitouch_linux.rs",
+      "base_sha256": "5055c495ff5bbe1bea6f655b01afec781e6c8aff42530207428ead8d474008e4",
+      "patched_sha256": "5055c495ff5bbe1bea6f655b01afec781e6c8aff42530207428ead8d474008e4"
+    },
+    {
+      "path": "taiku-observer/src/multitouch_windows.rs",
+      "base_sha256": "6904843e919735758c94136f74cb4519d449fb175b6a1d5e671881875d032592",
+      "patched_sha256": "6904843e919735758c94136f74cb4519d449fb175b6a1d5e671881875d032592"
+    },
+    {
+      "path": "taiku-observer/src/net_etw_backend.rs",
+      "base_sha256": "3bdcb0be529dc45b8e1480bc47f6eb1698df02adbe2d7dbba5592851423f02c8",
+      "patched_sha256": "3bdcb0be529dc45b8e1480bc47f6eb1698df02adbe2d7dbba5592851423f02c8"
+    },
+    {
+      "path": "taiku-observer/src/net_pktap_backend.rs",
+      "base_sha256": "5f193dfc225af4a531aa476e31885f07a4da7f94c221aa791083068081b55319",
+      "patched_sha256": "5f193dfc225af4a531aa476e31885f07a4da7f94c221aa791083068081b55319"
+    },
+    {
+      "path": "taiku-observer/src/pair_client.rs",
+      "base_sha256": "076273ec7bfcd6a7c4579b3857618d2b5116b05555f8e0a9310611b09941ca07",
+      "patched_sha256": "076273ec7bfcd6a7c4579b3857618d2b5116b05555f8e0a9310611b09941ca07"
+    },
+    {
+      "path": "taiku-observer/src/permissions.rs",
+      "base_sha256": "ed67d6c71fbeac9fa1b8f8ae9aa6ab260e9df102a07c1839e1e956634e9ce004",
+      "patched_sha256": "ed67d6c71fbeac9fa1b8f8ae9aa6ab260e9df102a07c1839e1e956634e9ce004"
+    },
+    {
+      "path": "taiku-observer/src/pnp_backend.rs",
+      "base_sha256": "2430eb13160e430ec9e4f05fe9e4cf8eb13c8c46a3bc2f728375f312686f4c3a",
+      "patched_sha256": "2430eb13160e430ec9e4f05fe9e4cf8eb13c8c46a3bc2f728375f312686f4c3a"
+    },
+    {
+      "path": "taiku-observer/src/proc_backend.rs",
+      "base_sha256": "776f6ffb1953a4f3957ccff2b3e660a03f3539b0cb97e2f006062e3e7c8b1f0e",
+      "patched_sha256": "776f6ffb1953a4f3957ccff2b3e660a03f3539b0cb97e2f006062e3e7c8b1f0e"
+    },
+    {
+      "path": "taiku-observer/src/proc_etw_backend.rs",
+      "base_sha256": "d18221297ae36561a50a3edd1d6217b9ebbe28018a6eb134f76109a9a6fcac24",
+      "patched_sha256": "d18221297ae36561a50a3edd1d6217b9ebbe28018a6eb134f76109a9a6fcac24"
+    },
+    {
+      "path": "taiku-observer/src/qos.rs",
+      "base_sha256": "921ba094db0c005861541c4291d82ce32cdaae7a547ae718111fd299aaf2cd9f",
+      "patched_sha256": "921ba094db0c005861541c4291d82ce32cdaae7a547ae718111fd299aaf2cd9f"
+    },
+    {
+      "path": "taiku-observer/src/recorder.rs",
+      "base_sha256": "d1d6f69403988e053cfeda8941dc7ec70c035ea3ba80e413820a443237918fa3",
+      "patched_sha256": "d1d6f69403988e053cfeda8941dc7ec70c035ea3ba80e413820a443237918fa3"
+    },
+    {
+      "path": "taiku-observer/src/schema.rs",
+      "base_sha256": "fe5c226fbcd07d753e3c8462bd38dea8389e98c5c980c2a5ade1c34cdc32cb81",
+      "patched_sha256": "fe5c226fbcd07d753e3c8462bd38dea8389e98c5c980c2a5ade1c34cdc32cb81"
+    },
+    {
+      "path": "taiku-observer/src/screen_backend.rs",
+      "base_sha256": "ae19a1e777cad2edba59f29486f85cc0b6efa1bc896a71b7c0e8155147415515",
+      "patched_sha256": "ae19a1e777cad2edba59f29486f85cc0b6efa1bc896a71b7c0e8155147415515"
+    },
+    {
+      "path": "taiku-observer/src/screen_macos_backend.rs",
+      "base_sha256": "f682068ed313ddb985ba5c5752f329d48b05bf34f457a22eb84657795674fe7c",
+      "patched_sha256": "f682068ed313ddb985ba5c5752f329d48b05bf34f457a22eb84657795674fe7c"
+    },
+    {
+      "path": "taiku-observer/src/screen_thumb.rs",
+      "base_sha256": "1f9ceedef7a657aebcd01e8b8d2d8f2d66d496f1a84ccc8b192d6537d6b22d91",
+      "patched_sha256": "1f9ceedef7a657aebcd01e8b8d2d8f2d66d496f1a84ccc8b192d6537d6b22d91"
+    },
+    {
+      "path": "taiku-observer/src/screen_wayland_backend.rs",
+      "base_sha256": "63af4a3429692da36c952a72e501796ad6b9bfb456e75a4baeacf6be777e1542",
+      "patched_sha256": "63af4a3429692da36c952a72e501796ad6b9bfb456e75a4baeacf6be777e1542"
+    },
+    {
+      "path": "taiku-observer/src/screen_x11_backend.rs",
+      "base_sha256": "c07af772f033f0504f13ad3c2da9dbaac02ff01e5ca0d427a720f32f919c9ffb",
+      "patched_sha256": "c07af772f033f0504f13ad3c2da9dbaac02ff01e5ca0d427a720f32f919c9ffb"
+    },
+    {
+      "path": "taiku-observer/src/self_uninstall.rs",
+      "base_sha256": "f67ea09b61b02eb52e99feed62e40883fe4de8464bed3885420c37b818798f11",
+      "patched_sha256": "f67ea09b61b02eb52e99feed62e40883fe4de8464bed3885420c37b818798f11"
+    },
+    {
+      "path": "taiku-observer/src/service.rs",
+      "base_sha256": "eff652e6905ffbec930ff3caee892e7c78ee4b899deaeb5b9c687e7745b92142",
+      "patched_sha256": "eff652e6905ffbec930ff3caee892e7c78ee4b899deaeb5b9c687e7745b92142"
+    },
+    {
+      "path": "taiku-observer/src/ui_atspi_linux.rs",
+      "base_sha256": "55891d66ed8d0f4ac0f4f6eacbb0e98cd1e05069824049e2aea678d50d64b5aa",
+      "patched_sha256": "55891d66ed8d0f4ac0f4f6eacbb0e98cd1e05069824049e2aea678d50d64b5aa"
+    },
+    {
+      "path": "taiku-observer/src/ui_ax_macos.rs",
+      "base_sha256": "2617f70132eb5be2af82b85439c63c4d2c8b5d890f9ab3d3ad968c866c8b6632",
+      "patched_sha256": "2617f70132eb5be2af82b85439c63c4d2c8b5d890f9ab3d3ad968c866c8b6632"
+    },
+    {
+      "path": "taiku-observer/src/ui_common.rs",
+      "base_sha256": "dc59577d8c5dda4d48c6bddb8ebc11a8255790e30b0ae5e091e0763fa17d0542",
+      "patched_sha256": "dc59577d8c5dda4d48c6bddb8ebc11a8255790e30b0ae5e091e0763fa17d0542"
+    },
+    {
+      "path": "taiku-observer/src/ui_pointer.rs",
+      "base_sha256": "e13e7aa7d99be5070addfa00300726584cec7c9765aa5493a4b20415118505f9",
+      "patched_sha256": "e13e7aa7d99be5070addfa00300726584cec7c9765aa5493a4b20415118505f9"
+    },
+    {
+      "path": "taiku-observer/src/ui_uia_windows.rs",
+      "base_sha256": "25d9020890fe1be998bb73c3d44c3a354d86483732ad0f3f8a8bf70c7c130218",
+      "patched_sha256": "25d9020890fe1be998bb73c3d44c3a354d86483732ad0f3f8a8bf70c7c130218"
+    },
+    {
+      "path": "taiku-observer/src/update.rs",
+      "base_sha256": "f5e52c95b2812489f80f85f69b0f3a61e70c0e20c16edb378904d04aec8644cc",
+      "patched_sha256": "f5e52c95b2812489f80f85f69b0f3a61e70c0e20c16edb378904d04aec8644cc"
+    },
+    {
+      "path": "taiku-observer/src/upload_client.rs",
+      "base_sha256": "5b02f3d43520b9537c2bbfee2643b1aeb744dd103c37443e48757875f6f2eb08",
+      "patched_sha256": "5b02f3d43520b9537c2bbfee2643b1aeb744dd103c37443e48757875f6f2eb08"
+    },
+    {
+      "path": "taiku-observer/src/verify_ui.rs",
+      "base_sha256": "0e481c8f7a14ffc458bf957170571c258ccc13c759fa4e371b3647d095a3f997",
+      "patched_sha256": "0e481c8f7a14ffc458bf957170571c258ccc13c759fa4e371b3647d095a3f997"
+    },
+    {
+      "path": "taiku-observer/src/win_service.rs",
+      "base_sha256": "36d8660303f91415599135d6e16df6710398f706ec94097d8148abdc56a1ef51",
+      "patched_sha256": "36d8660303f91415599135d6e16df6710398f706ec94097d8148abdc56a1ef51"
+    },
+    {
+      "path": "taiku-observer/src/win_session_agent.rs",
+      "base_sha256": "0a37fc1f6938f5028fd0142792e0d3b9619be62d18db5906059ced2d7431c331",
+      "patched_sha256": "0a37fc1f6938f5028fd0142792e0d3b9619be62d18db5906059ced2d7431c331"
+    },
+    {
+      "path": "taiku-observer/src/window_focus_backend.rs",
+      "base_sha256": "35388e8af98e9cd167e8a822a71850ec48dd80ee59b61d06ca4bc448d88f1542",
+      "patched_sha256": "35388e8af98e9cd167e8a822a71850ec48dd80ee59b61d06ca4bc448d88f1542"
+    },
+    {
+      "path": "taiku-observer/test/audio-windows/Cargo.lock",
+      "base_sha256": "2d81a465ea927b3e30059f5b9073f781e7844a11b8d89b20204a2f390f122f86",
+      "patched_sha256": "2d81a465ea927b3e30059f5b9073f781e7844a11b8d89b20204a2f390f122f86"
+    },
+    {
+      "path": "taiku-observer/test/audio-windows/Cargo.toml",
+      "base_sha256": "8aa703c066150c239cbbaac254e198573b9629def16e877e79242062f9bba1d5",
+      "patched_sha256": "8aa703c066150c239cbbaac254e198573b9629def16e877e79242062f9bba1d5"
+    },
+    {
+      "path": "taiku-observer/test/audio-windows/src/main.rs",
+      "base_sha256": "5693d2a9da3a3760e4071e3d528e328ec1f2e5a213308aea3abfe1ea58978c76",
+      "patched_sha256": "5693d2a9da3a3760e4071e3d528e328ec1f2e5a213308aea3abfe1ea58978c76"
+    },
+    {
+      "path": "taiku-observer-schema/Cargo.lock",
+      "base_sha256": "3d6bf110f1e0f97ce6477b008b2866920ba8a1a63f447cd622f6d07a5d18960b",
+      "patched_sha256": "3d6bf110f1e0f97ce6477b008b2866920ba8a1a63f447cd622f6d07a5d18960b"
+    },
+    {
+      "path": "taiku-observer-schema/Cargo.toml",
+      "base_sha256": "b1f08ba2204a302797a7abc8205ff1245f953bc347e7da5cca7467411ee9c5c4",
+      "patched_sha256": "b1f08ba2204a302797a7abc8205ff1245f953bc347e7da5cca7467411ee9c5c4"
+    },
+    {
+      "path": "taiku-observer-schema/src/lib.rs",
+      "base_sha256": "0ae18c3dc9c404c9fa9652cf85def6f9b6b9a75587b2a7d4ffc58d5544748b3f",
+      "patched_sha256": "0ae18c3dc9c404c9fa9652cf85def6f9b6b9a75587b2a7d4ffc58d5544748b3f"
+    }
+  ],
+  "validation": "source-specific audio capture; native acceptance in round four"
+}

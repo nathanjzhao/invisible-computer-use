@@ -1,0 +1,19 @@
+turn5 cumulative: elements=2 diff=('diff', 'initial', 2, 5)
+host before any locker: host_interactive=('pass', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+DPMS on this X server: absent
+host with the X saver blanking: host_interactive=('pass', {'active_displays': 1, 'display_asleep': True, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+locker: The screensaver is inactive
+The screensaver is not inhibited | dbus names: ['org.xfce.ScreenSaver']
+host with the locker running, unlocked: host_interactive=('pass', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+host locked: host_interactive=('fail', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': True}, None)
+click while locked: {"code": "host_not_interactive", "host": {"active_displays": 1, "display_asleep": false, "lid_closed": null, "on_console": null, "screen_locked": true}, "reasons": ["screen_locked"]}
+observe while locked: elements=2 diff=('no_change', 'previous', 2, 6)
+host after deactivate: host_interactive=('pass', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+click after unlock: {'effect': 'unverifiable', 'route': 'accessibility', 'code': None}
+host with no locker again: host_interactive=('pass', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+grab helper: grab status 0
+host with a bare keyboard grab (menu-like): host_interactive=('pass', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+host under i3lock: host_interactive=('fail', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': True}, None)
+type_text under i3lock: {"code": "host_not_interactive", "host": {"active_displays": 1, "display_asleep": false, "lid_closed": null, "on_console": null, "screen_locked": true}, "reasons": ["screen_locked"]}
+host after i3lock exits: host_interactive=('pass', {'active_displays': 1, 'display_asleep': False, 'lid_closed': None, 'on_console': None, 'screen_locked': False}, None)
+LINUX_DRIVE PASS

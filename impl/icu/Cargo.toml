@@ -1,0 +1,33 @@
+[package]
+name = "icu"
+version = "0.1.0"
+edition = "2021"
+description = "invisible-computer-use: the Codex/Sky parity layer over cua-driver as one library, one MCP server, one binary"
+
+[dependencies]
+action-outcomes = { path = "../action-outcomes" }
+semver = "1"
+tokio = { version = "1", features = ["rt", "process", "io-util", "time", "net"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png"] }
+axdiff = { path = "../axdiff" }
+app_instructions = { path = "../app-instructions" }
+window2 = { path = "../window2" }
+confirmations = { path = "../confirmations" }
+skysight = { path = "../skysight" }
+ui-readiness = { path = "../ui-readiness" }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Pipes", "Win32_System_Threading"] }
+
+[[bin]]
+name = "icu"
+path = "src/bin/icu.rs"
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,16 @@
+FIX 1 — decouple the ghost cursor from the action path (spec 08 detachComputerUseCursor)
+Live, 2026-09-12, patched daemon (CUA_DRIVER_EMBEDDED=1 serve --no-permissions-gate),
+Calculator com.apple.calculator pid 46314 window 1725 (230x408 @2x), host unlocked.
+Method: one driver session, pixel clicks alternating window-local corners (20,30)<->(440,790)
+so every click forces a real glide distance; interleaved so system drift cancels; median of 6.
+
+  ATTACHED (cursor on, animate-and-wait, the old default): median 3.04s
+  DETACHED (cursor on, MoveTo sent, action lands now):      median 1.54s
+  CURSOR OFF (no overlay at all):                            median 1.53s
+
+  glide removed by detach:            1.50s per action
+  detached vs cursor-off residual:    0.02s  (detach captures ~all of the cursor cost)
+
+The residual ~1.5s is the pixel-click background settle floor (focus-free safety), present
+with the cursor OFF too, so it is not the cursor. AX element clicks take the no-cursor-move
+path and never paid the glide. type_text and pixel/coordinate clicks did, and now do not.

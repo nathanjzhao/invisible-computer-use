@@ -1,0 +1,10 @@
+gws_len=145
+CLICK={   "delivery": {     "mode": "background"   },   "effect": "unverifiable",   "route": "accessibility" }
+SETVAL={   "delivery": {     "mode": "unknown"   },   "effect": "unverifiable",   "route": "accessibility" }
+TYPE={   "delivery": {     "mode": "background"   },   "effect": "unverifiable",   "escalation": {     "reason": "delivery_failed",     "target": "foreground"   },   "route": "synthetic_events" }
+FX={"procid":5580,"hit":"buttonPressed","v":""}; {"procid":5580,"hit":"textChanged","v":"hello windows"}
+--- raw fx.log ---
+{"procid":5580,"hit":"buttonPressed","v":""}
+{"procid":5580,"hit":"textChanged","v":"hello windows"}
+
+

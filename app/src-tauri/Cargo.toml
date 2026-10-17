@@ -1,0 +1,85 @@
+[package]
+name = "app"
+version = "0.1.0"
+description = "Desktop window control and live task monitoring"
+authors = ["Nathan Zhao"]
+edition = "2021"
+rust-version = "1.89"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+# The big, slow memory test suite (memory_tests.rs + memory_xproc_tests.rs,
+# ~5.8k lines). Off by default so a one-line change to a small module does not
+# recompile and relink them into the unit-test binary; a change to a small
+# module can be tested with a plain `cargo test` in a fraction of the time.
+# Run the memory suite explicitly with `cargo test --features heavy-tests`
+# (CI runs the full test job with this feature enabled).
+heavy-tests = []
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+action-outcomes = { path = "../../impl/action-outcomes" }
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+ureq = { version = "2", features = ["json"] }
+tauri-plugin-updater = "2.12.0"
+tauri-plugin-process = "2.3.1"
+cua-driver-contract = { path = "../../vendor-cua/libs/cua-driver/rust/crates/cua-driver-contract" }
+confirmations = { path = "../../impl/confirmations" }
+app_instructions = { path = "../../impl/app-instructions" }
+skysight = { path = "../../impl/skysight" }
+computer-history = { path = "../../impl/computer-history" }
+ui-readiness = { path = "../../impl/ui-readiness" }
+unicode-normalization = "0.1"
+unicode-security = "0.1"
+ogg = "0.9"
+opus = "0.4"
+pulldown-cmark = { version = "0.13", default-features = false }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+socket2 = "0.6"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+block2 = "0.6"
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = ["NSString"] }
+objc2-app-kit = { version = "0.3", default-features = false, features = ["NSRunningApplication", "libc"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Pipes", "Win32_System_JobObjects", "Win32_System_Threading", "Win32_System_Diagnostics_ToolHelp", "Win32_UI_Shell", "Win32_System_Registry", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gio = "0.18"
+
+[dev-dependencies]
+minisign = "0.7"
+tauri = { version = "2", features = ["test"] }
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+flate2 = "1"
+tar = "0.4"
+
+
+# Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

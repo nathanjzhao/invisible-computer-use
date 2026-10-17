@@ -1,0 +1,2508 @@
+{
+ "_note": "Read `elements` for input targets and `passive_elements` for read-only text. `tree_markdown` will continue to work but new fields will only be added to the structured side. Issue #22865: use `max_elements` / `max_depth` to bound the AX walk on apps with very large trees.",
+ "app_name": "Clock",
+ "ax_diagnostics": {
+  "ax_windows": {
+   "array_count": 1,
+   "attribute": "AXWindows",
+   "ax_error": 0,
+   "retained_window_count": 1,
+   "value_kind": "array",
+   "windows": [
+    {
+     "window_id": 462,
+     "window_id_ax_error": 0
+    }
+   ]
+  },
+  "observer_pid": 29137,
+  "observer_trusted": true,
+  "requested_window_id": 462,
+  "target_pid": 29150
+ },
+ "background_input": {
+  "exact_window": {
+   "pid": 29150,
+   "status": "matched",
+   "window_id": 462
+  },
+  "observation": {
+   "frame_freshness": "unknown",
+   "one_shot_capture": "unavailable"
+  },
+  "routes": [
+   {
+    "route": "accessibility",
+    "status": "available"
+   },
+   {
+    "route": "window_pointer",
+    "status": "available"
+   },
+   {
+    "route": "pid_keyboard",
+    "status": "available"
+   }
+  ]
+ },
+ "diff": {
+  "_note": "Stable ids persist across get_window_state calls for this (pid, window_id); `elements[].stable_id` maps them to the current element_index. Pass disable_diff:true for a full tree in `text`, cumulative_diff:true for the diff from the initial tree.",
+  "accessibility_revision": 4,
+  "accessibility_snapshot_count": 4,
+  "baseline": "previous",
+  "kind": "diff",
+  "text": "The following is a diff from the previous accessibility tree\nwith ~, +, and - representing changed, added, and removed elements, respectively.\n  ~ [143] AXGenericElement \"18.56 seconds\"\n  + [154] AXStaticText \"Lap 1, 18.58 seconds, 18.58 seconds, elapsed\"\n- [153]"
+ },
+ "element_count": 110,
+ "elements": [
+  {
+   "actions": [
+    "AXRaise"
+   ],
+   "depth": 0,
+   "element_index": 0,
+   "element_token": "s00000004:0",
+   "frame": {
+    "h": 768.0,
+    "w": 1024.0,
+    "x": 448.0,
+    "y": 109.0
+   },
+   "identifier": "SceneWindow",
+   "label": "Clock",
+   "role": "AXWindow",
+   "stable_id": 1,
+   "subrole": "AXStandardWindow",
+   "title": "Clock",
+   "tree_order": 0
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "18.56 seconds",
+   "element_index": 1,
+   "element_token": "s00000004:1",
+   "enabled": true,
+   "frame": {
+    "h": 153.0,
+    "w": 400.0,
+    "x": 760.0,
+    "y": 154.0
+   },
+   "identifier": "stopwatch-time",
+   "label": "18.56 seconds",
+   "parent_index": 0,
+   "role": "AXGenericElement",
+   "selected": false,
+   "stable_id": 143,
+   "tree_order": 1
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "Lap No.",
+   "element_index": 2,
+   "element_token": "s00000004:2",
+   "enabled": true,
+   "frame": {
+    "h": 14.0,
+    "w": 41.0,
+    "x": 800.0,
+    "y": 312.0
+   },
+   "label": "Lap No.",
+   "parent_index": 0,
+   "role": "AXStaticText",
+   "selected": false,
+   "stable_id": 144,
+   "tree_order": 2
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "Split",
+   "element_index": 3,
+   "element_token": "s00000004:3",
+   "enabled": true,
+   "frame": {
+    "h": 14.0,
+    "w": 24.0,
+    "x": 948.0,
+    "y": 312.0
+   },
+   "label": "Split",
+   "parent_index": 0,
+   "role": "AXStaticText",
+   "selected": false,
+   "stable_id": 145,
+   "tree_order": 3
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "Total",
+   "element_index": 4,
+   "element_token": "s00000004:4",
+   "enabled": true,
+   "frame": {
+    "h": 14.0,
+    "w": 26.0,
+    "x": 1094.0,
+    "y": 312.0
+   },
+   "label": "Total",
+   "parent_index": 0,
+   "role": "AXStaticText",
+   "selected": false,
+   "stable_id": 146,
+   "tree_order": 4
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "Lap 1, 18.58 seconds, 18.58 seconds, elapsed",
+   "element_index": 5,
+   "element_token": "s00000004:5",
+   "enabled": true,
+   "frame": {
+    "h": 31.0,
+    "w": 1024.0,
+    "x": 448.0,
+    "y": 333.0
+   },
+   "label": "Lap 1, 18.58 seconds, 18.58 seconds, elapsed",
+   "parent_index": 0,
+   "role": "AXStaticText",
+   "selected": false,
+   "stable_id": 154,
+   "tree_order": 5
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "Lap",
+   "element_index": 6,
+   "element_token": "s00000004:6",
+   "enabled": true,
+   "frame": {
+    "h": 40.0,
+    "w": 162.0,
+    "x": 794.0,
+    "y": 793.0
+   },
+   "identifier": "LapResetButton",
+   "label": "Lap",
+   "parent_index": 0,
+   "role": "AXButton",
+   "selected": false,
+   "stable_id": 148,
+   "tree_order": 6
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXScrollToVisible",
+    "AXCancel",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "description": "Stop",
+   "element_index": 7,
+   "element_token": "s00000004:7",
+   "enabled": true,
+   "frame": {
+    "h": 40.0,
+    "w": 162.0,
+    "x": 964.0,
+    "y": 793.0
+   },
+   "identifier": "StartStopButton",
+   "label": "Stop",
+   "parent_index": 0,
+   "role": "AXButton",
+   "selected": false,
+   "stable_id": 149,
+   "tree_order": 7
+  },
+  {
+   "actions": [
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "element_index": 8,
+   "element_token": "s00000004:8",
+   "frame": {
+    "h": 52.0,
+    "w": 1024.0,
+    "x": 448.0,
+    "y": 109.0
+   },
+   "parent_index": 0,
+   "role": "AXToolbar",
+   "stable_id": 7,
+   "tree_order": 8
+  },
+  {
+   "actions": [
+    "AXPress"
+   ],
+   "depth": 3,
+   "description": "World Clock",
+   "element_index": 9,
+   "element_token": "s00000004:9",
+   "enabled": true,
+   "frame": {
+    "h": 40.0,
+    "w": 97.0,
+    "x": 773.0,
+    "y": 115.0
+   },
+   "label": "World Clock",
+   "parent_index": 8,
+   "role": "AXRadioButton",
+   "selected": false,
+   "stable_id": 8,
+   "subrole": "AXSegment",
+   "tree_order": 9,
+   "value": "0"
+  },
+  {
+   "actions": [
+    "AXPress"
+   ],
+   "depth": 3,
+   "description": "Alarms",
+   "element_index": 10,
+   "element_token": "s00000004:10",
+   "enabled": true,
+   "frame": {
+    "h": 40.0,
+    "w": 91.0,
+    "x": 870.0,
+    "y": 115.0
+   },
+   "label": "Alarms",
+   "parent_index": 8,
+   "role": "AXRadioButton",
+   "selected": false,
+   "stable_id": 9,
+   "subrole": "AXSegment",
+   "tree_order": 10,
+   "value": "0"
+  },
+  {
+   "actions": [
+    "AXPress"
+   ],
+   "depth": 3,
+   "description": "Stopwatch",
+   "element_index": 11,
+   "element_token": "s00000004:11",
+   "enabled": true,
+   "frame": {
+    "h": 40.0,
+    "w": 91.0,
+    "x": 961.0,
+    "y": 115.0
+   },
+   "label": "Stopwatch",
+   "parent_index": 8,
+   "role": "AXRadioButton",
+   "selected": true,
+   "stable_id": 10,
+   "subrole": "AXSegment",
+   "tree_order": 11,
+   "value": "1"
+  },
+  {
+   "actions": [
+    "AXPress"
+   ],
+   "depth": 3,
+   "description": "Timers",
+   "element_index": 12,
+   "element_token": "s00000004:12",
+   "enabled": true,
+   "frame": {
+    "h": 40.0,
+    "w": 96.0,
+    "x": 1052.0,
+    "y": 115.0
+   },
+   "label": "Timers",
+   "parent_index": 8,
+   "role": "AXRadioButton",
+   "selected": false,
+   "stable_id": 11,
+   "subrole": "AXSegment",
+   "tree_order": 12,
+   "value": "0"
+  },
+  {
+   "actions": [
+    "AXPress"
+   ],
+   "depth": 1,
+   "element_index": 13,
+   "element_token": "s00000004:13",
+   "enabled": true,
+   "frame": {
+    "h": 16.0,
+    "w": 16.0,
+    "x": 466.0,
+    "y": 127.0
+   },
+   "parent_index": 0,
+   "role": "AXButton",
+   "stable_id": 14,
+   "subrole": "AXCloseButton",
+   "tree_order": 14
+  },
+  {
+   "actions": [
+    "AXPress",
+    "AXZoomWindow",
+    "AXShowMenu"
+   ],
+   "depth": 1,
+   "element_index": 14,
+   "element_token": "s00000004:14",
+   "enabled": true,
+   "frame": {
+    "h": 16.0,
+    "w": 16.0,
+    "x": 506.0,
+    "y": 127.0
+   },
+   "help": "this button also has an action to zoom the window",
+   "parent_index": 0,
+   "role": "AXButton",
+   "stable_id": 15,
+   "subrole": "AXFullScreenButton",
+   "tree_order": 15
+  },
+  {
+   "actions": [
+    "AXPress"
+   ],
+   "depth": 1,
+   "element_index": 15,
+   "element_token": "s00000004:15",
+   "enabled": true,
+   "frame": {
+    "h": 16.0,
+    "w": 16.0,
+    "x": 486.0,
+    "y": 127.0
+   },
+   "parent_index": 0,
+   "role": "AXButton",
+   "stable_id": 16,
+   "subrole": "AXMinimizeButton",
+   "tree_order": 16
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 0,
+   "element_index": 16,
+   "element_token": "s00000004:16",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 1920.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "role": "AXMenuBar",
+   "selected": false,
+   "stable_id": 17,
+   "tree_order": 17
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 1,
+   "element_index": 17,
+   "element_token": "s00000004:17",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 57.0,
+    "x": 44.0,
+    "y": 0.0
+   },
+   "identifier": "com.apple.menu.application",
+   "label": "Clock",
+   "parent_index": 16,
+   "role": "AXMenuBarItem",
+   "selected": false,
+   "stable_id": 18,
+   "title": "Clock",
+   "tree_order": 18
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 2,
+   "element_index": 18,
+   "element_token": "s00000004:18",
+   "enabled": true,
+   "parent_index": 17,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 19,
+   "tree_order": 19
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 19,
+   "element_token": "s00000004:19",
+   "enabled": true,
+   "identifier": "orderFrontStandardAboutPanel:",
+   "label": "About Clock",
+   "parent_index": 18,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 20,
+   "title": "About Clock",
+   "tree_order": 20
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 20,
+   "element_token": "s00000004:20",
+   "enabled": true,
+   "identifier": "com.apple.menu.services",
+   "label": "Services",
+   "parent_index": 18,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 21,
+   "title": "Services",
+   "tree_order": 21
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 21,
+   "element_token": "s00000004:21",
+   "enabled": true,
+   "parent_index": 20,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 22,
+   "tree_order": 22
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 22,
+   "element_token": "s00000004:22",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "Activity Monitor",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 23,
+   "title": "Activity Monitor",
+   "tree_order": 23
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 23,
+   "element_token": "s00000004:23",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "Allocations & Leaks",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 24,
+   "title": "Allocations & Leaks",
+   "tree_order": 24
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 24,
+   "element_token": "s00000004:24",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "File Activity",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 25,
+   "title": "File Activity",
+   "tree_order": 25
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 25,
+   "element_token": "s00000004:25",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "System Trace",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 26,
+   "title": "System Trace",
+   "tree_order": 26
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 26,
+   "element_token": "s00000004:26",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "Time Profile Active Application",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 27,
+   "title": "Time Profile Active Application",
+   "tree_order": 27
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 27,
+   "element_token": "s00000004:27",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "Time Profile App Under Mouse",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 28,
+   "title": "Time Profile App Under Mouse",
+   "tree_order": 28
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 28,
+   "element_token": "s00000004:28",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "Time Profile Entire System",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 29,
+   "title": "Time Profile Entire System",
+   "tree_order": 29
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 29,
+   "element_token": "s00000004:29",
+   "enabled": true,
+   "identifier": "_processRequest:",
+   "label": "Toggle Instruments Recording",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 30,
+   "title": "Toggle Instruments Recording",
+   "tree_order": 30
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 30,
+   "element_token": "s00000004:30",
+   "enabled": true,
+   "identifier": "_configureServicesMenu:",
+   "label": "Services Settings…",
+   "parent_index": 21,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 31,
+   "title": "Services Settings…",
+   "tree_order": 31
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 31,
+   "element_token": "s00000004:31",
+   "enabled": true,
+   "identifier": "hide:",
+   "label": "Hide Clock",
+   "parent_index": 18,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 32,
+   "title": "Hide Clock",
+   "tree_order": 32
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 32,
+   "element_token": "s00000004:32",
+   "enabled": true,
+   "identifier": "hideOtherApplications:",
+   "label": "Hide Others",
+   "parent_index": 18,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 33,
+   "title": "Hide Others",
+   "tree_order": 33
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 33,
+   "element_token": "s00000004:33",
+   "enabled": true,
+   "identifier": "terminate:",
+   "label": "Quit Clock",
+   "parent_index": 18,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 35,
+   "title": "Quit Clock",
+   "tree_order": 35
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 34,
+   "element_token": "s00000004:34",
+   "enabled": true,
+   "identifier": "NSAlternateQuitMenuItem",
+   "label": "Quit and Keep Windows",
+   "parent_index": 18,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 36,
+   "title": "Quit and Keep Windows",
+   "tree_order": 36
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 1,
+   "element_index": 35,
+   "element_token": "s00000004:35",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 42.0,
+    "x": 101.0,
+    "y": 0.0
+   },
+   "identifier": "com.apple.menu.file",
+   "label": "File",
+   "parent_index": 16,
+   "role": "AXMenuBarItem",
+   "selected": false,
+   "stable_id": 37,
+   "title": "File",
+   "tree_order": 37
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 2,
+   "element_index": 36,
+   "element_token": "s00000004:36",
+   "enabled": true,
+   "parent_index": 35,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 38,
+   "tree_order": 38
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 37,
+   "element_token": "s00000004:37",
+   "enabled": true,
+   "identifier": "com.apple.menu.dynamic.B9EE50C3-1822-4F24-AFB1-3EE0A64DFD25",
+   "label": "Start Recent Timer",
+   "parent_index": 36,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 39,
+   "title": "Start Recent Timer",
+   "tree_order": 39
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 38,
+   "element_token": "s00000004:38",
+   "enabled": true,
+   "parent_index": 37,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 40,
+   "tree_order": 40
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 39,
+   "element_token": "s00000004:39",
+   "enabled": true,
+   "identifier": "performClose:",
+   "label": "Close",
+   "parent_index": 36,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 42,
+   "title": "Close",
+   "tree_order": 42
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 40,
+   "element_token": "s00000004:40",
+   "enabled": true,
+   "identifier": "closeAll:",
+   "label": "Close All",
+   "parent_index": 36,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 43,
+   "title": "Close All",
+   "tree_order": 43
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 1,
+   "element_index": 41,
+   "element_token": "s00000004:41",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 44.0,
+    "x": 143.0,
+    "y": 0.0
+   },
+   "identifier": "com.apple.menu.edit",
+   "label": "Edit",
+   "parent_index": 16,
+   "role": "AXMenuBarItem",
+   "selected": false,
+   "stable_id": 48,
+   "title": "Edit",
+   "tree_order": 48
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 2,
+   "element_index": 42,
+   "element_token": "s00000004:42",
+   "enabled": true,
+   "parent_index": 41,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 49,
+   "tree_order": 49
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 43,
+   "element_token": "s00000004:43",
+   "enabled": true,
+   "identifier": "com.apple.menu.spelling",
+   "label": "Spelling and Grammar",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 63,
+   "title": "Spelling and Grammar",
+   "tree_order": 63
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 44,
+   "element_token": "s00000004:44",
+   "enabled": true,
+   "parent_index": 43,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 64,
+   "tree_order": 64
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 45,
+   "element_token": "s00000004:45",
+   "enabled": true,
+   "identifier": "showGuessPanel:",
+   "label": "Show Spelling and Grammar",
+   "parent_index": 44,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 65,
+   "title": "Show Spelling and Grammar",
+   "tree_order": 65
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 46,
+   "element_token": "s00000004:46",
+   "enabled": true,
+   "identifier": "checkSpelling:",
+   "label": "Check Document Now",
+   "parent_index": 44,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 66,
+   "title": "Check Document Now",
+   "tree_order": 66
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 47,
+   "element_token": "s00000004:47",
+   "enabled": true,
+   "identifier": "toggleContinuousSpellChecking:",
+   "label": "Check Spelling While Typing",
+   "parent_index": 44,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 67,
+   "title": "Check Spelling While Typing",
+   "tree_order": 67
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 48,
+   "element_token": "s00000004:48",
+   "enabled": true,
+   "identifier": "toggleGrammarChecking:",
+   "label": "Check Grammar With Spelling",
+   "parent_index": 44,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 68,
+   "title": "Check Grammar With Spelling",
+   "tree_order": 68
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 49,
+   "element_token": "s00000004:49",
+   "enabled": true,
+   "identifier": "toggleAutomaticSpellingCorrection:",
+   "label": "Correct Spelling Automatically",
+   "parent_index": 44,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 69,
+   "title": "Correct Spelling Automatically",
+   "tree_order": 69
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 50,
+   "element_token": "s00000004:50",
+   "enabled": true,
+   "identifier": "com.apple.menu.substitutions",
+   "label": "Substitutions",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 70,
+   "title": "Substitutions",
+   "tree_order": 70
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 51,
+   "element_token": "s00000004:51",
+   "enabled": true,
+   "parent_index": 50,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 71,
+   "tree_order": 71
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 52,
+   "element_token": "s00000004:52",
+   "enabled": true,
+   "identifier": "toggleAutomaticQuoteSubstitution:",
+   "label": "Smart Quotes",
+   "parent_index": 51,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 74,
+   "title": "Smart Quotes",
+   "tree_order": 74
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 53,
+   "element_token": "s00000004:53",
+   "enabled": true,
+   "identifier": "toggleAutomaticDashSubstitution:",
+   "label": "Smart Dashes",
+   "parent_index": 51,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 75,
+   "title": "Smart Dashes",
+   "tree_order": 75
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 54,
+   "element_token": "s00000004:54",
+   "enabled": true,
+   "identifier": "toggleAutomaticTextReplacement:",
+   "label": "Text Replacement",
+   "parent_index": 51,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 77,
+   "title": "Text Replacement",
+   "tree_order": 77
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 55,
+   "element_token": "s00000004:55",
+   "enabled": true,
+   "identifier": "com.apple.menu.transformations",
+   "label": "Transformations",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 78,
+   "title": "Transformations",
+   "tree_order": 78
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 56,
+   "element_token": "s00000004:56",
+   "enabled": true,
+   "parent_index": 55,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 79,
+   "tree_order": 79
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 57,
+   "element_token": "s00000004:57",
+   "enabled": true,
+   "identifier": "com.apple.command.speech",
+   "label": "Speech",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 83,
+   "title": "Speech",
+   "tree_order": 83
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 58,
+   "element_token": "s00000004:58",
+   "enabled": true,
+   "parent_index": 57,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 84,
+   "tree_order": 84
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 59,
+   "element_token": "s00000004:59",
+   "enabled": true,
+   "identifier": "startSpeaking:",
+   "label": "Start Speaking",
+   "parent_index": 58,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 85,
+   "title": "Start Speaking",
+   "tree_order": 85
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 60,
+   "element_token": "s00000004:60",
+   "enabled": true,
+   "identifier": "_NSMenuItemAutoFillIdentifier",
+   "label": "AutoFill",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 87,
+   "title": "AutoFill",
+   "tree_order": 87
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 61,
+   "element_token": "s00000004:61",
+   "enabled": true,
+   "parent_index": 60,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 88,
+   "tree_order": 88
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 62,
+   "element_token": "s00000004:62",
+   "enabled": true,
+   "identifier": "startDictation:",
+   "label": "Start Dictation…",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 91,
+   "title": "Start Dictation…",
+   "tree_order": 91
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 63,
+   "element_token": "s00000004:63",
+   "enabled": true,
+   "identifier": "orderFrontCharacterPalette:",
+   "label": "Emoji & Symbols",
+   "parent_index": 42,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 92,
+   "title": "Emoji & Symbols",
+   "tree_order": 92
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 1,
+   "element_index": 64,
+   "element_token": "s00000004:64",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 50.0,
+    "x": 187.0,
+    "y": 0.0
+   },
+   "identifier": "com.apple.menu.view",
+   "label": "View",
+   "parent_index": 16,
+   "role": "AXMenuBarItem",
+   "selected": false,
+   "stable_id": 93,
+   "title": "View",
+   "tree_order": 93
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 2,
+   "element_index": 65,
+   "element_token": "s00000004:65",
+   "enabled": true,
+   "parent_index": 64,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 94,
+   "tree_order": 94
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 66,
+   "element_token": "s00000004:66",
+   "enabled": true,
+   "identifier": "world_clock",
+   "label": "World Clock",
+   "parent_index": 65,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 95,
+   "title": "World Clock",
+   "tree_order": 95
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 67,
+   "element_token": "s00000004:67",
+   "enabled": true,
+   "identifier": "alarms",
+   "label": "Alarms",
+   "parent_index": 65,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 96,
+   "title": "Alarms",
+   "tree_order": 96
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 68,
+   "element_token": "s00000004:68",
+   "enabled": true,
+   "identifier": "stopwatch",
+   "label": "Stopwatch",
+   "parent_index": 65,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 97,
+   "title": "Stopwatch",
+   "tree_order": 97
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 69,
+   "element_token": "s00000004:69",
+   "enabled": true,
+   "identifier": "timers",
+   "label": "Timers",
+   "parent_index": 65,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 98,
+   "title": "Timers",
+   "tree_order": 98
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 70,
+   "element_token": "s00000004:70",
+   "enabled": true,
+   "identifier": "view_digital_stopwatch",
+   "label": "View Digital Stopwatch",
+   "parent_index": 65,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 99,
+   "title": "View Digital Stopwatch",
+   "tree_order": 99
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 71,
+   "element_token": "s00000004:71",
+   "enabled": true,
+   "identifier": "view_analog_stopwatch",
+   "label": "View Analog Stopwatch",
+   "parent_index": 65,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 100,
+   "title": "View Analog Stopwatch",
+   "tree_order": 100
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 1,
+   "element_index": 72,
+   "element_token": "s00000004:72",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 69.0,
+    "x": 237.0,
+    "y": 0.0
+   },
+   "identifier": "com.apple.menu.window",
+   "label": "Window",
+   "parent_index": 16,
+   "role": "AXMenuBarItem",
+   "selected": false,
+   "stable_id": 101,
+   "title": "Window",
+   "tree_order": 101
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 2,
+   "element_index": 73,
+   "element_token": "s00000004:73",
+   "enabled": true,
+   "parent_index": 72,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 102,
+   "tree_order": 102
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 74,
+   "element_token": "s00000004:74",
+   "enabled": true,
+   "identifier": "performMiniaturize:",
+   "label": "Minimize",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 103,
+   "title": "Minimize",
+   "tree_order": 103
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 75,
+   "element_token": "s00000004:75",
+   "enabled": true,
+   "identifier": "miniaturizeAll:",
+   "label": "Minimize All",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 104,
+   "title": "Minimize All",
+   "tree_order": 104
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 76,
+   "element_token": "s00000004:76",
+   "enabled": true,
+   "identifier": "performZoom:",
+   "label": "Zoom",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 105,
+   "title": "Zoom",
+   "tree_order": 105
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 77,
+   "element_token": "s00000004:77",
+   "enabled": true,
+   "identifier": "zoomAll:",
+   "label": "Zoom All",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 106,
+   "title": "Zoom All",
+   "tree_order": 106
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 78,
+   "element_token": "s00000004:78",
+   "enabled": true,
+   "identifier": "_zoomFill:",
+   "label": "Fill",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 107,
+   "title": "Fill",
+   "tree_order": 107
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 79,
+   "element_token": "s00000004:79",
+   "enabled": true,
+   "identifier": "_zoomCenter:",
+   "label": "Center",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 108,
+   "title": "Center",
+   "tree_order": 108
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 80,
+   "element_token": "s00000004:80",
+   "enabled": true,
+   "label": "Move & Resize",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 109,
+   "title": "Move & Resize",
+   "tree_order": 109
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 81,
+   "element_token": "s00000004:81",
+   "enabled": true,
+   "parent_index": 80,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 110,
+   "tree_order": 110
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 82,
+   "element_token": "s00000004:82",
+   "enabled": true,
+   "identifier": "_zoomLeft:",
+   "label": "Left",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 112,
+   "title": "Left",
+   "tree_order": 112
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 83,
+   "element_token": "s00000004:83",
+   "enabled": true,
+   "identifier": "_zoomRight:",
+   "label": "Right",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 113,
+   "title": "Right",
+   "tree_order": 113
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 84,
+   "element_token": "s00000004:84",
+   "enabled": true,
+   "identifier": "_zoomTop:",
+   "label": "Top",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 114,
+   "title": "Top",
+   "tree_order": 114
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 85,
+   "element_token": "s00000004:85",
+   "enabled": true,
+   "identifier": "_zoomBottom:",
+   "label": "Bottom",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 115,
+   "title": "Bottom",
+   "tree_order": 115
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 86,
+   "element_token": "s00000004:86",
+   "enabled": true,
+   "identifier": "_zoomTopLeft:",
+   "label": "Top Left",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 117,
+   "title": "Top Left",
+   "tree_order": 117
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 87,
+   "element_token": "s00000004:87",
+   "enabled": true,
+   "identifier": "_zoomTopRight:",
+   "label": "Top Right",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 118,
+   "title": "Top Right",
+   "tree_order": 118
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 88,
+   "element_token": "s00000004:88",
+   "enabled": true,
+   "identifier": "_zoomBottomLeft:",
+   "label": "Bottom Left",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 119,
+   "title": "Bottom Left",
+   "tree_order": 119
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 89,
+   "element_token": "s00000004:89",
+   "enabled": true,
+   "identifier": "_zoomBottomRight:",
+   "label": "Bottom Right",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 120,
+   "title": "Bottom Right",
+   "tree_order": 120
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 90,
+   "element_token": "s00000004:90",
+   "enabled": true,
+   "identifier": "_zoomLeftAndRight:",
+   "label": "Left & Right",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 122,
+   "title": "Left & Right",
+   "tree_order": 122
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 91,
+   "element_token": "s00000004:91",
+   "enabled": true,
+   "identifier": "_zoomLeftThreeUp:",
+   "label": "Left & Quarters",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 123,
+   "title": "Left & Quarters",
+   "tree_order": 123
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 92,
+   "element_token": "s00000004:92",
+   "enabled": true,
+   "identifier": "_zoomRightAndLeft:",
+   "label": "Right & Left",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 124,
+   "title": "Right & Left",
+   "tree_order": 124
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 93,
+   "element_token": "s00000004:93",
+   "enabled": true,
+   "identifier": "_zoomRightThreeUp:",
+   "label": "Right & Quarters",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 125,
+   "title": "Right & Quarters",
+   "tree_order": 125
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 94,
+   "element_token": "s00000004:94",
+   "enabled": true,
+   "identifier": "_zoomTopAndBottom:",
+   "label": "Top & Bottom",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 126,
+   "title": "Top & Bottom",
+   "tree_order": 126
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 95,
+   "element_token": "s00000004:95",
+   "enabled": true,
+   "identifier": "_zoomTopThreeUp:",
+   "label": "Top & Quarters",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 127,
+   "title": "Top & Quarters",
+   "tree_order": 127
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 96,
+   "element_token": "s00000004:96",
+   "enabled": true,
+   "identifier": "_zoomBottomAndTop:",
+   "label": "Bottom & Top",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 128,
+   "title": "Bottom & Top",
+   "tree_order": 128
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 97,
+   "element_token": "s00000004:97",
+   "enabled": true,
+   "identifier": "_zoomBottomThreeUp:",
+   "label": "Bottom & Quarters",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 129,
+   "title": "Bottom & Quarters",
+   "tree_order": 129
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 98,
+   "element_token": "s00000004:98",
+   "enabled": true,
+   "identifier": "_zoomQuarters:",
+   "label": "Quarters",
+   "parent_index": 81,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 130,
+   "title": "Quarters",
+   "tree_order": 130
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 99,
+   "element_token": "s00000004:99",
+   "enabled": true,
+   "label": "Full Screen Tile",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 132,
+   "title": "Full Screen Tile",
+   "tree_order": 132
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 4,
+   "element_index": 100,
+   "element_token": "s00000004:100",
+   "enabled": true,
+   "parent_index": 99,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 133,
+   "tree_order": 133
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 101,
+   "element_token": "s00000004:101",
+   "enabled": true,
+   "identifier": "_tileLeft:",
+   "label": "Left of Screen",
+   "parent_index": 100,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 134,
+   "title": "Left of Screen",
+   "tree_order": 134
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 5,
+   "element_index": 102,
+   "element_token": "s00000004:102",
+   "enabled": true,
+   "identifier": "_tileRight:",
+   "label": "Right of Screen",
+   "parent_index": 100,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 135,
+   "title": "Right of Screen",
+   "tree_order": 135
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 103,
+   "element_token": "s00000004:103",
+   "enabled": true,
+   "identifier": "arrangeInFront:",
+   "label": "Bring All to Front",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 137,
+   "title": "Bring All to Front",
+   "tree_order": 137
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 104,
+   "element_token": "s00000004:104",
+   "enabled": true,
+   "identifier": "alternateArrangeInFront:",
+   "label": "Arrange in Front",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 138,
+   "title": "Arrange in Front",
+   "tree_order": 138
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 105,
+   "element_token": "s00000004:105",
+   "enabled": true,
+   "identifier": "makeKeyAndOrderFront:",
+   "label": "Clock",
+   "parent_index": 73,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 139,
+   "title": "Clock",
+   "tree_order": 139
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 1,
+   "element_index": 106,
+   "element_token": "s00000004:106",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 48.0,
+    "x": 306.0,
+    "y": 0.0
+   },
+   "identifier": "com.apple.menu.help",
+   "label": "Help",
+   "parent_index": 16,
+   "role": "AXMenuBarItem",
+   "selected": false,
+   "stable_id": 140,
+   "title": "Help",
+   "tree_order": 140
+  },
+  {
+   "actions": [
+    "AXCancel"
+   ],
+   "depth": 2,
+   "element_index": 107,
+   "element_token": "s00000004:107",
+   "enabled": true,
+   "parent_index": 106,
+   "role": "AXMenu",
+   "selected": false,
+   "stable_id": 141,
+   "tree_order": 141
+  },
+  {
+   "actions": [
+    "AXShowMenu",
+    "AXConfirm"
+   ],
+   "depth": 4,
+   "element_index": 108,
+   "element_token": "s00000004:108",
+   "enabled": true,
+   "frame": {
+    "h": 24.0,
+    "w": 354.0,
+    "x": -1.0,
+    "y": 1177.0
+   },
+   "identifier": "_SC_SEARCH_FIELD",
+   "label": "Search",
+   "parent_index": 107,
+   "role": "AXTextField",
+   "settable": true,
+   "stable_id": 151,
+   "subrole": "AXSearchField",
+   "tree_order": 142,
+   "value": "Search"
+  },
+  {
+   "actions": [
+    "AXCancel",
+    "AXPress",
+    "AXPick"
+   ],
+   "depth": 3,
+   "element_index": 109,
+   "element_token": "s00000004:109",
+   "enabled": true,
+   "identifier": "showHelp:",
+   "label": "Clock Help",
+   "parent_index": 107,
+   "role": "AXMenuItem",
+   "selected": false,
+   "stable_id": 142,
+   "title": "Clock Help",
+   "tree_order": 144
+  }
+ ],
+ "elements_complete": false,
+ "focused_element": "AXGroup",
+ "passive_elements": [
+  {
+   "description": "Add",
+   "label": "Add",
+   "parent_index": 8,
+   "read_only": true,
+   "role": "AXMenuButton",
+   "tree_order": 13
+  },
+  {
+   "identifier": "unhideAllApplications:",
+   "label": "Show All",
+   "parent_index": 18,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Show All",
+   "tree_order": 34
+  },
+  {
+   "identifier": "no_recent_timers",
+   "label": "No Recent Timers",
+   "parent_index": 38,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "No Recent Timers",
+   "tree_order": 41
+  },
+  {
+   "identifier": "duplicate:",
+   "label": "Duplicate",
+   "parent_index": 36,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Duplicate",
+   "tree_order": 44
+  },
+  {
+   "identifier": "move:",
+   "label": "Move",
+   "parent_index": 36,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Move",
+   "tree_order": 45
+  },
+  {
+   "identifier": "rename:",
+   "label": "Rename…",
+   "parent_index": 36,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Rename…",
+   "tree_order": 46
+  },
+  {
+   "identifier": "export:",
+   "label": "Export As…",
+   "parent_index": 36,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Export As…",
+   "tree_order": 47
+  },
+  {
+   "identifier": "undo:",
+   "label": "Undo",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Undo",
+   "tree_order": 50
+  },
+  {
+   "identifier": "redo:",
+   "label": "Redo",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Redo",
+   "tree_order": 51
+  },
+  {
+   "identifier": "cut:",
+   "label": "Cut",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Cut",
+   "tree_order": 52
+  },
+  {
+   "identifier": "copy:",
+   "label": "Copy",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Copy",
+   "tree_order": 53
+  },
+  {
+   "identifier": "paste:",
+   "label": "Paste",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Paste",
+   "tree_order": 54
+  },
+  {
+   "identifier": "pasteAndMatchStyle:",
+   "label": "Paste and Match Style",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Paste and Match Style",
+   "tree_order": 55
+  },
+  {
+   "identifier": "delete:",
+   "label": "Delete",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Delete",
+   "tree_order": 56
+  },
+  {
+   "identifier": "selectAll:",
+   "label": "Select All",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Select All",
+   "tree_order": 57
+  },
+  {
+   "identifier": "find:",
+   "label": "Find…",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Find…",
+   "tree_order": 58
+  },
+  {
+   "identifier": "findAndReplace:",
+   "label": "Find & Replace",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Find & Replace",
+   "tree_order": 59
+  },
+  {
+   "identifier": "findNext:",
+   "label": "Find Next",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Find Next",
+   "tree_order": 60
+  },
+  {
+   "identifier": "findPrevious:",
+   "label": "Find Previous",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Find Previous",
+   "tree_order": 61
+  },
+  {
+   "identifier": "useSelectionForFind:",
+   "label": "Use Selection for Find",
+   "parent_index": 42,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Use Selection for Find",
+   "tree_order": 62
+  },
+  {
+   "identifier": "orderFrontSubstitutionsPanel:",
+   "label": "Smart Substitutions",
+   "parent_index": 51,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Smart Substitutions",
+   "tree_order": 72
+  },
+  {
+   "identifier": "toggleSmartInsertDelete:",
+   "label": "Smart Copy/Paste",
+   "parent_index": 51,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Smart Copy/Paste",
+   "tree_order": 73
+  },
+  {
+   "identifier": "toggleAutomaticLinkDetection:",
+   "label": "Smart Links",
+   "parent_index": 51,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Smart Links",
+   "tree_order": 76
+  },
+  {
+   "identifier": "uppercaseWord:",
+   "label": "Make Upper Case",
+   "parent_index": 56,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Make Upper Case",
+   "tree_order": 80
+  },
+  {
+   "identifier": "lowercaseWord:",
+   "label": "Make Lower Case",
+   "parent_index": 56,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Make Lower Case",
+   "tree_order": 81
+  },
+  {
+   "identifier": "capitalizeWord:",
+   "label": "Capitalize",
+   "parent_index": 56,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Capitalize",
+   "tree_order": 82
+  },
+  {
+   "identifier": "stopSpeaking:",
+   "label": "Stop Speaking",
+   "parent_index": 58,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Stop Speaking",
+   "tree_order": 86
+  },
+  {
+   "identifier": "_handleInsertFromContactsCommand:",
+   "label": "Contact…",
+   "parent_index": 61,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Contact…",
+   "tree_order": 89
+  },
+  {
+   "identifier": "_handleInsertFromPasswordsCommand:",
+   "label": "Passwords…",
+   "parent_index": 61,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Passwords…",
+   "tree_order": 90
+  },
+  {
+   "label": "Halves",
+   "parent_index": 81,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Halves",
+   "tree_order": 111
+  },
+  {
+   "label": "Quarters",
+   "parent_index": 81,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Quarters",
+   "tree_order": 116
+  },
+  {
+   "label": "Arrange",
+   "parent_index": 81,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Arrange",
+   "tree_order": 121
+  },
+  {
+   "identifier": "_zoomUntile:",
+   "label": "Return to Previous Size",
+   "parent_index": 81,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Return to Previous Size",
+   "tree_order": 131
+  },
+  {
+   "identifier": "_removeWindowFromStageManagerSet:",
+   "label": "Remove Window from Set",
+   "parent_index": 73,
+   "read_only": true,
+   "role": "AXMenuItem",
+   "title": "Remove Window from Set",
+   "tree_order": 136
+  },
+  {
+   "description": "search result",
+   "identifier": "_SC_RESULTS_TABLE",
+   "label": "search result",
+   "parent_index": 107,
+   "read_only": true,
+   "role": "AXTable",
+   "tree_order": 143
+  }
+ ],
+ "pid": 29150,
+ "returned_element_count": 110,
+ "snapshot_id": "s00000004",
+ "total_element_count": 110,
+ "tree_markdown": "- [0] AXWindow \"Clock\" [id=SceneWindow actions=[raise]]\n  - [1] AXGenericElement (18.56 seconds) [id=stopwatch-time actions=[press,scrolltovisible,cancel,showmenu]]\n  - [2] AXStaticText (Lap No.) [actions=[press,scrolltovisible,cancel,showmenu]]\n  - [3] AXStaticText (Split) [actions=[press,scrolltovisible,cancel,showmenu]]\n  - [4] AXStaticText (Total) [actions=[press,scrolltovisible,cancel,showmenu]]\n  - [5] AXStaticText (Lap 1, 18.58 seconds, 18.58 seconds, elapsed) [actions=[press,scrolltovisible,cancel,showmenu]]\n  - [6] AXButton (Lap) [id=LapResetButton actions=[press,scrolltovisible,cancel,showmenu]]\n  - [7] AXButton (Stop) [id=StartStopButton actions=[press,scrolltovisible,cancel,showmenu]]\n  - [8] AXToolbar [actions=[showmenu]]\n      - [9] AXRadioButton (World Clock) [actions=[press]]\n      - [10] AXRadioButton (Alarms) [actions=[press]]\n      - [11] AXRadioButton (Stopwatch) [actions=[press]]\n      - [12] AXRadioButton (Timers) [actions=[press]]\n    - AXMenuButton (Add)\n  - [13] AXButton [actions=[press]]\n  - [14] AXButton [help=\"this button also has an action to zoom the window\" actions=[press,zoomwindow,showmenu]]\n  - [15] AXButton [actions=[press]]\n- [16] AXMenuBar [actions=[cancel]]\n  - [17] AXMenuBarItem \"Clock\" [id=com.apple.menu.application actions=[cancel,press,pick]]\n    - [18] AXMenu [actions=[cancel]]\n      - [19] AXMenuItem \"About Clock\" [id=orderFrontStandardAboutPanel: actions=[cancel,press,pick]]\n      - [20] AXMenuItem \"Services\" [id=com.apple.menu.services actions=[cancel,press,pick]]\n        - [21] AXMenu [actions=[cancel]]\n          - [22] AXMenuItem \"Activity Monitor\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [23] AXMenuItem \"Allocations & Leaks\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [24] AXMenuItem \"File Activity\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [25] AXMenuItem \"System Trace\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [26] AXMenuItem \"Time Profile Active Application\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [27] AXMenuItem \"Time Profile App Under Mouse\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [28] AXMenuItem \"Time Profile Entire System\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [29] AXMenuItem \"Toggle Instruments Recording\" [id=_processRequest: actions=[cancel,press,pick]]\n          - [30] AXMenuItem \"Services Settings…\" [id=_configureServicesMenu: actions=[cancel,press,pick]]\n      - [31] AXMenuItem \"Hide Clock\" [id=hide: actions=[cancel,press,pick]]\n      - [32] AXMenuItem \"Hide Others\" [id=hideOtherApplications: actions=[cancel,press,pick]]\n      - AXMenuItem \"Show All\"\n      - [33] AXMenuItem \"Quit Clock\" [id=terminate: actions=[cancel,press,pick]]\n      - [34] AXMenuItem \"Quit and Keep Windows\" [id=NSAlternateQuitMenuItem actions=[cancel,press,pick]]\n  - [35] AXMenuBarItem \"File\" [id=com.apple.menu.file actions=[cancel,press,pick]]\n    - [36] AXMenu [actions=[cancel]]\n      - [37] AXMenuItem \"Start Recent Timer\" [id=com.apple.menu.dynamic.B9EE50C3-1822-4F24-AFB1-3EE0A64DFD25 actions=[cancel,press,pick]]\n        - [38] AXMenu [actions=[cancel]]\n          - AXMenuItem \"No Recent Timers\"\n      - [39] AXMenuItem \"Close\" [id=performClose: actions=[cancel,press,pick]]\n      - [40] AXMenuItem \"Close All\" [id=closeAll: actions=[cancel,press,pick]]\n      - AXMenuItem \"Duplicate\"\n      - AXMenuItem \"Move\"\n      - AXMenuItem \"Rename…\"\n      - AXMenuItem \"Export As…\"\n  - [41] AXMenuBarItem \"Edit\" [id=com.apple.menu.edit actions=[cancel,press,pick]]\n    - [42] AXMenu [actions=[cancel]]\n      - AXMenuItem \"Undo\"\n      - AXMenuItem \"Redo\"\n      - AXMenuItem \"Cut\"\n      - AXMenuItem \"Copy\"\n      - AXMenuItem \"Paste\"\n      - AXMenuItem \"Paste and Match Style\"\n      - AXMenuItem \"Delete\"\n      - AXMenuItem \"Select All\"\n      - AXMenuItem \"Find…\"\n      - AXMenuItem \"Find & Replace\"\n      - AXMenuItem \"Find Next\"\n      - AXMenuItem \"Find Previous\"\n      - AXMenuItem \"Use Selection for Find\"\n      - [43] AXMenuItem \"Spelling and Grammar\" [id=com.apple.menu.spelling actions=[cancel,press,pick]]\n        - [44] AXMenu [actions=[cancel]]\n          - [45] AXMenuItem \"Show Spelling and Grammar\" [id=showGuessPanel: actions=[cancel,press,pick]]\n          - [46] AXMenuItem \"Check Document Now\" [id=checkSpelling: actions=[cancel,press,pick]]\n          - [47] AXMenuItem \"Check Spelling While Typing\" [id=toggleContinuousSpellChecking: actions=[cancel,press,pick]]\n          - [48] AXMenuItem \"Check Grammar With Spelling\" [id=toggleGrammarChecking: actions=[cancel,press,pick]]\n          - [49] AXMenuItem \"Correct Spelling Automatically\" [id=toggleAutomaticSpellingCorrection: actions=[cancel,press,pick]]\n      - [50] AXMenuItem \"Substitutions\" [id=com.apple.menu.substitutions actions=[cancel,press,pick]]\n        - [51] AXMenu [actions=[cancel]]\n          - AXMenuItem \"Smart Substitutions\"\n          - AXMenuItem \"Smart Copy/Paste\"\n          - [52] AXMenuItem \"Smart Quotes\" [id=toggleAutomaticQuoteSubstitution: actions=[cancel,press,pick]]\n          - [53] AXMenuItem \"Smart Dashes\" [id=toggleAutomaticDashSubstitution: actions=[cancel,press,pick]]\n          - AXMenuItem \"Smart Links\"\n          - [54] AXMenuItem \"Text Replacement\" [id=toggleAutomaticTextReplacement: actions=[cancel,press,pick]]\n      - [55] AXMenuItem \"Transformations\" [id=com.apple.menu.transformations actions=[cancel,press,pick]]\n        - [56] AXMenu [actions=[cancel]]\n          - AXMenuItem \"Make Upper Case\"\n          - AXMenuItem \"Make Lower Case\"\n          - AXMenuItem \"Capitalize\"\n      - [57] AXMenuItem \"Speech\" [id=com.apple.command.speech actions=[cancel,press,pick]]\n        - [58] AXMenu [actions=[cancel]]\n          - [59] AXMenuItem \"Start Speaking\" [id=startSpeaking: actions=[cancel,press,pick]]\n          - AXMenuItem \"Stop Speaking\"\n      - [60] AXMenuItem \"AutoFill\" [id=_NSMenuItemAutoFillIdentifier actions=[cancel,press,pick]]\n        - [61] AXMenu [actions=[cancel]]\n          - AXMenuItem \"Contact…\"\n          - AXMenuItem \"Passwords…\"\n      - [62] AXMenuItem \"Start Dictation…\" [id=startDictation: actions=[cancel,press,pick]]\n      - [63] AXMenuItem \"Emoji & Symbols\" [id=orderFrontCharacterPalette: actions=[cancel,press,pick]]\n  - [64] AXMenuBarItem \"View\" [id=com.apple.menu.view actions=[cancel,press,pick]]\n    - [65] AXMenu [actions=[cancel]]\n      - [66] AXMenuItem \"World Clock\" [id=world_clock actions=[cancel,press,pick]]\n      - [67] AXMenuItem \"Alarms\" [id=alarms actions=[cancel,press,pick]]\n      - [68] AXMenuItem \"Stopwatch\" [id=stopwatch actions=[cancel,press,pick]]\n      - [69] AXMenuItem \"Timers\" [id=timers actions=[cancel,press,pick]]\n      - [70] AXMenuItem \"View Digital Stopwatch\" [id=view_digital_stopwatch actions=[cancel,press,pick]]\n      - [71] AXMenuItem \"View Analog Stopwatch\" [id=view_analog_stopwatch actions=[cancel,press,pick]]\n  - [72] AXMenuBarItem \"Window\" [id=com.apple.menu.window actions=[cancel,press,pick]]\n    - [73] AXMenu [actions=[cancel]]\n      - [74] AXMenuItem \"Minimize\" [id=performMiniaturize: actions=[cancel,press,pick]]\n      - [75] AXMenuItem \"Minimize All\" [id=miniaturizeAll: actions=[cancel,press,pick]]\n      - [76] AXMenuItem \"Zoom\" [id=performZoom: actions=[cancel,press,pick]]\n      - [77] AXMenuItem \"Zoom All\" [id=zoomAll: actions=[cancel,press,pick]]\n      - [78] AXMenuItem \"Fill\" [id=_zoomFill: actions=[cancel,press,pick]]\n      - [79] AXMenuItem \"Center\" [id=_zoomCenter: actions=[cancel,press,pick]]\n      - [80] AXMenuItem \"Move & Resize\" [actions=[cancel,press,pick]]\n        - [81] AXMenu [actions=[cancel]]\n          - AXMenuItem \"Halves\"\n          - [82] AXMenuItem \"Left\" [id=_zoomLeft: actions=[cancel,press,pick]]\n          - [83] AXMenuItem \"Right\" [id=_zoomRight: actions=[cancel,press,pick]]\n          - [84] AXMenuItem \"Top\" [id=_zoomTop: actions=[cancel,press,pick]]\n          - [85] AXMenuItem \"Bottom\" [id=_zoomBottom: actions=[cancel,press,pick]]\n          - AXMenuItem \"Quarters\"\n          - [86] AXMenuItem \"Top Left\" [id=_zoomTopLeft: actions=[cancel,press,pick]]\n          - [87] AXMenuItem \"Top Right\" [id=_zoomTopRight: actions=[cancel,press,pick]]\n          - [88] AXMenuItem \"Bottom Left\" [id=_zoomBottomLeft: actions=[cancel,press,pick]]\n          - [89] AXMenuItem \"Bottom Right\" [id=_zoomBottomRight: actions=[cancel,press,pick]]\n          - AXMenuItem \"Arrange\"\n          - [90] AXMenuItem \"Left & Right\" [id=_zoomLeftAndRight: actions=[cancel,press,pick]]\n          - [91] AXMenuItem \"Left & Quarters\" [id=_zoomLeftThreeUp: actions=[cancel,press,pick]]\n          - [92] AXMenuItem \"Right & Left\" [id=_zoomRightAndLeft: actions=[cancel,press,pick]]\n          - [93] AXMenuItem \"Right & Quarters\" [id=_zoomRightThreeUp: actions=[cancel,press,pick]]\n          - [94] AXMenuItem \"Top & Bottom\" [id=_zoomTopAndBottom: actions=[cancel,press,pick]]\n          - [95] AXMenuItem \"Top & Quarters\" [id=_zoomTopThreeUp: actions=[cancel,press,pick]]\n          - [96] AXMenuItem \"Bottom & Top\" [id=_zoomBottomAndTop: actions=[cancel,press,pick]]\n          - [97] AXMenuItem \"Bottom & Quarters\" [id=_zoomBottomThreeUp: actions=[cancel,press,pick]]\n          - [98] AXMenuItem \"Quarters\" [id=_zoomQuarters: actions=[cancel,press,pick]]\n          - AXMenuItem \"Return to Previous Size\"\n      - [99] AXMenuItem \"Full Screen Tile\" [actions=[cancel,press,pick]]\n        - [100] AXMenu [actions=[cancel]]\n          - [101] AXMenuItem \"Left of Screen\" [id=_tileLeft: actions=[cancel,press,pick]]\n          - [102] AXMenuItem \"Right of Screen\" [id=_tileRight: actions=[cancel,press,pick]]\n      - AXMenuItem \"Remove Window from Set\"\n      - [103] AXMenuItem \"Bring All to Front\" [id=arrangeInFront: actions=[cancel,press,pick]]\n      - [104] AXMenuItem \"Arrange in Front\" [id=alternateArrangeInFront: actions=[cancel,press,pick]]\n      - [105] AXMenuItem \"Clock\" [id=makeKeyAndOrderFront: actions=[cancel,press,pick]]\n  - [106] AXMenuBarItem \"Help\" [id=com.apple.menu.help actions=[cancel,press,pick]]\n    - [107] AXMenu [actions=[cancel]]\n        - [108] AXTextField = \"Search\" [id=_SC_SEARCH_FIELD actions=[showmenu,confirm]]\n        - AXTable (search result)\n      - [109] AXMenuItem \"Clock Help\" [id=showHelp: actions=[cancel,press,pick]]\n",
+ "window_id": 462,
+ "window_title": "Clock"
+}

@@ -1,0 +1,112 @@
+{
+ "describe_has": "disable_diff,disableDiff,cumulative_diff",
+ "target": "pid=2260 wid=66080",
+ "warmup": {
+  "rev": 1,
+  "text": "[1] Button \"Press me\"\n[2] Edit \"entry\"\n[3] TitleBar = \"WinTarget2\"\n  [4] MenuItem \"System\"\n  [5] Button \"Minimize\"\n  [6] Button \"Maximize\"\n  [7] Button \"Close\"",
+  "elements": 7,
+  "baseline": "previous",
+  "kind": "full_first",
+  "count": 1,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "turn1": {
+  "rev": 2,
+  "text": "The following is a diff from the previous accessibility tree\nwith ~, +, and - representing changed, added, and removed elements, respectively.\n~ [2] Edit \"entry\" = \"changed by fixture\"",
+  "elements": 7,
+  "baseline": "previous",
+  "kind": "diff",
+  "count": 2,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "turn2": {
+  "rev": 2,
+  "text": "There has been no change in the accessibility tree for powershell.exe",
+  "elements": 7,
+  "baseline": "previous",
+  "kind": "no_change",
+  "count": 3,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "fx": "{\"procid\":2260,\"hit\":\"activated\",\"focused\":true,\"v\":\"\"} | {\"procid\":2260,\"hit\":\"ready\",\"focused\":true,\"v\":\"66080\"} | {\"procid\":2260,\"hit\":\"textChanged\",\"focused\":true,\"v\":\"changed by fixture\"} | {\"procid\":2260,\"hit\":\"selfChanged\",\"focused\":true,\"v\":\"changed by fixture\"}",
+ "turn3_after_fixture_change": {
+  "rev": 2,
+  "text": "There has been no change in the accessibility tree for powershell.exe",
+  "elements": 7,
+  "baseline": "previous",
+  "kind": "no_change",
+  "count": 4,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "entry_stable_kept": true,
+ "turn4_disableDiff": {
+  "rev": 2,
+  "text": "[1] Button \"Press me\"\n[2] Edit \"entry\" = \"changed by fixture\"\n[3] TitleBar = \"WinTarget2\"\n  [4] MenuItem \"System\"\n  [5] Button \"Minimize\"\n  [6] Button \"Maximize\"\n  [7] Button \"Close\"",
+  "elements": 7,
+  "baseline": "previous",
+  "kind": "full",
+  "count": 5,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "turn5_cumulative": {
+  "rev": 2,
+  "text": "The following is a cumulative diff from the initial accessibility tree\nwith ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~ [2] Edit \"entr",
+  "elements": 7,
+  "baseline": "initial",
+  "kind": "diff",
+  "count": 6,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "host_before": {
+  "display_asleep": "False",
+  "display_count": "1",
+  "lid_closed": "",
+  "on_console": "True",
+  "hint": "",
+  "status": "pass",
+  "screen_locked": "False",
+  "message": "Host session is interactive."
+ },
+ "host_display_off": {
+  "display_asleep": "True",
+  "display_count": "1",
+  "lid_closed": "",
+  "on_console": "True",
+  "hint": "",
+  "status": "pass",
+  "screen_locked": "False",
+  "message": "Host session is interactive; the display is asleep, so pixel-route input will wake it."
+ },
+ "host_display_on": {
+  "display_asleep": "False",
+  "display_count": "1",
+  "lid_closed": "",
+  "on_console": "True",
+  "hint": "",
+  "status": "pass",
+  "screen_locked": "False",
+  "message": "Host session is interactive."
+ },
+ "display_gate": "PASS",
+ "host_locked": {
+  "display_asleep": "False",
+  "display_count": "1",
+  "lid_closed": "",
+  "on_console": "True",
+  "hint": "Unlock the screen (or switch the console back to this user) and retry; observation tools keep working meanwhile.",
+  "status": "fail",
+  "screen_locked": "True",
+  "message": "Host session is not interactive (screen_locked); input tools are refused with code host_not_interactive."
+ },
+ "click_locked": "{ \"code\": \"host_not_interactive\", \"host\": { \"active_displays\": 1, \"display_asleep\": false, \"lid_closed\": null, \"on_console\": true, \"screen_locked\": true }, \"reasons\": [ \"screen_locked\" ] } ",
+ "observe_locked": {
+  "rev": 2,
+  "text": "There has been no change in the accessibility tree for powershell.exe",
+  "elements": 7,
+  "baseline": "previous",
+  "kind": "no_change",
+  "count": 7,
+  "stable": "0>1,1>2,2>3,3>4,4>5,5>6,6>7"
+ },
+ "host_gate": "PASS"
+}

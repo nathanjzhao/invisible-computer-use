@@ -1,0 +1,1025 @@
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "exact_participants": {
+          "default": false,
+          "type": "boolean"
+        },
+        "from": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "limit": {
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "participants": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "to": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "unread_only": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "name": "find_chats",
+    "outputSchema": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "chats": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "chat_guid": {
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "last_message_date": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "participants": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "service": {
+                    "type": "string"
+                  },
+                  "unread_count": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "chat_guid",
+                  "display_name",
+                  "service",
+                  "last_message_date",
+                  "participants"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "has_more": {
+              "type": "boolean"
+            },
+            "participants": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "handle": {
+                    "type": "string"
+                  },
+                  "local_ref": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "local_ref",
+                  "handle"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "chats",
+            "participants",
+            "has_more"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "description": "Find recent chats by participant, name, date range or unread state. Participant references apply only to this response."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "chat_guid": {
+          "type": "string"
+        },
+        "cursor": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "from": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "limit": {
+          "default": 50,
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "to": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "unread_only": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "chat_guid"
+      ],
+      "type": "object"
+    },
+    "name": "read_messages",
+    "outputSchema": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "chats": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "chat_guid": {
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "local_ref": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "local_ref",
+                  "chat_guid"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "messages": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "attachments": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "filename": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "mime_type": {
+                          "type": "string"
+                        },
+                        "size_bytes": {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "chat": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "is_unread": {
+                    "type": "boolean"
+                  },
+                  "sender": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "chat",
+                  "sender",
+                  "date"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "next_cursor": {
+              "type": "string"
+            },
+            "senders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "handle": {
+                    "type": "string"
+                  },
+                  "local_ref": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "local_ref",
+                  "handle"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "chats",
+            "senders",
+            "messages"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "description": "Read one chat newest first. Continue with the unchanged cursor and filters. Chat and sender references apply only to this response."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "chat_guids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "cursor": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "exact_participants": {
+          "default": false,
+          "type": "boolean"
+        },
+        "from": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "limit": {
+          "default": 50,
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "participants": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "text": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "to": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "type": "object"
+    },
+    "name": "search_messages",
+    "outputSchema": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "chats": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "chat_guid": {
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "local_ref": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "local_ref",
+                  "chat_guid"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "messages": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "attachments": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "filename": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "mime_type": {
+                          "type": "string"
+                        },
+                        "size_bytes": {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "chat": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "is_unread": {
+                    "type": "boolean"
+                  },
+                  "sender": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "chat",
+                  "sender",
+                  "date"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "next_cursor": {
+              "type": "string"
+            },
+            "permission_filter_message": {
+              "type": "string"
+            },
+            "permission_filtered": {
+              "type": "boolean"
+            },
+            "senders": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "handle": {
+                    "type": "string"
+                  },
+                  "local_ref": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "local_ref",
+                  "handle"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "chats",
+            "senders",
+            "messages"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "description": "Search message text newest first. Continue with the unchanged cursor and filters. Chat and sender references apply only to this response."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true,
+      "readOnlyHint": false
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "text"
+          ]
+        },
+        {
+          "required": [
+            "attachments"
+          ]
+        }
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "chat_guid"
+          ]
+        },
+        {
+          "required": [
+            "recipients"
+          ]
+        }
+      ],
+      "properties": {
+        "attachments": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "type": "array"
+        },
+        "chat_guid": {
+          "type": "string"
+        },
+        "recipients": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 10000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "send_message",
+    "description": "Send reviewed text, files or both to an existing chat or resolved recipients. Sending requires approval from the host."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "breakdown": {
+          "default": "overall",
+          "enum": [
+            "overall",
+            "chat"
+          ],
+          "type": "string"
+        },
+        "chat_guids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "type": "array"
+        },
+        "chat_limit": {
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "chat_type": {
+          "enum": [
+            "direct",
+            "group"
+          ],
+          "type": "string"
+        },
+        "cursor": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "from": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "interval": {
+          "default": "total",
+          "enum": [
+            "total",
+            "day",
+            "week",
+            "month",
+            "year"
+          ],
+          "type": "string"
+        },
+        "rank_by": {
+          "enum": [
+            "total",
+            "sent",
+            "received"
+          ],
+          "type": "string"
+        },
+        "to": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "count_message_activity",
+    "outputSchema": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "breakdown": {
+              "const": "overall",
+              "type": "string"
+            },
+            "buckets": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "to": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "interval": {
+              "enum": [
+                "total",
+                "day",
+                "week",
+                "month",
+                "year"
+              ],
+              "type": "string"
+            },
+            "matching_chat_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "overall_activity": {
+              "additionalProperties": false,
+              "properties": {
+                "counts_by_bucket": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "received": {
+                      "items": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "sent": {
+                      "items": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "items": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "sent",
+                    "received"
+                  ],
+                  "type": "object"
+                },
+                "received": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "sent": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "total": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "total",
+                "sent",
+                "received",
+                "counts_by_bucket"
+              ],
+              "type": "object"
+            },
+            "range": {
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "to": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ],
+              "type": "object"
+            },
+            "time_zone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "breakdown",
+            "range",
+            "interval",
+            "time_zone",
+            "buckets",
+            "matching_chat_count",
+            "overall_activity"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "breakdown": {
+              "const": "chat",
+              "type": "string"
+            },
+            "buckets": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "to": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "chats": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "chat_guid": {
+                    "type": "string"
+                  },
+                  "counts_by_bucket": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "received": {
+                        "items": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "type": "array"
+                      },
+                      "sent": {
+                        "items": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "type": "array"
+                      },
+                      "total": {
+                        "items": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "total",
+                      "sent",
+                      "received"
+                    ],
+                    "type": "object"
+                  },
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "participants": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "received": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "sent": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "service": {
+                    "type": "string"
+                  },
+                  "total": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "type": {
+                    "enum": [
+                      "direct",
+                      "group"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "chat_guid",
+                  "display_name",
+                  "service",
+                  "type",
+                  "participants",
+                  "total",
+                  "sent",
+                  "received",
+                  "counts_by_bucket"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "interval": {
+              "enum": [
+                "total",
+                "day",
+                "week",
+                "month",
+                "year"
+              ],
+              "type": "string"
+            },
+            "matching_chat_count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "next_cursor": {
+              "type": "string"
+            },
+            "participants": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "handle": {
+                    "type": "string"
+                  },
+                  "local_ref": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "local_ref",
+                  "handle"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "range": {
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "to": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ],
+              "type": "object"
+            },
+            "time_zone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "breakdown",
+            "range",
+            "interval",
+            "time_zone",
+            "buckets",
+            "matching_chat_count",
+            "chats",
+            "participants"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "description": "Count activity over a half-open range, with calendar buckets and optional ranked chat pages. Continue with the original filters, including omitted dates."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "name": "read_image",
+    "description": "Read image content for an attachment id previously returned by an approved message read."
+  }
+]

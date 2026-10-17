@@ -1,0 +1,1495 @@
+{
+ "capture": "study/audit/golden-trace-prep-2026-09-25/validation/probe",
+ "about": "The scenarios of golden-trace-prep-2026-09-25.json, rewritten by study/audit/sky-format-2026-09-26/driver_shape.py into the document the patched macOS driver emits for the same AX tree. `known_gap` turns pin our exact text where the driver's data cannot reproduce Sky's. Clock's synthesized turns were replaced by a live driver capture (clock-live-2026-09-26.driver.json, mac-review3-fixes-2026-09-26).",
+ "sessions": [
+  {
+   "name": "minicalc",
+   "pid": "3104",
+   "window": "1",
+   "bundle_id": "dev.icu.golden.minicalc",
+   "turns": [
+    {
+     "step": "minicalc_state_1",
+     "expect": {
+      "results_key": "minicalc_state_1",
+      "json_field": "text"
+     },
+     "ipc_line": 8,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "selected_text": "0",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "depth": 0,
+        "label": "MiniCalc",
+        "actions": [
+         "AXRaise"
+        ],
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "tree_order": 0
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "depth": 1,
+        "identifier": "calc-display",
+        "label": "0",
+        "value": "0",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "parent_index": 0,
+        "settable": true,
+        "tree_order": 1
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-7",
+        "label": "7",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "7",
+        "tree_order": 2
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-8",
+        "label": "8",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "8",
+        "tree_order": 3
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-9",
+        "label": "9",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "9",
+        "tree_order": 4
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-4",
+        "label": "4",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "4",
+        "tree_order": 5
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-5",
+        "label": "5",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "5",
+        "tree_order": 6
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-6",
+        "label": "6",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "6",
+        "tree_order": 7
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-1",
+        "label": "1",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "1",
+        "tree_order": 8
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-2",
+        "label": "2",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "2",
+        "tree_order": 9
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-3",
+        "label": "3",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "3",
+        "tree_order": 10
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-0",
+        "label": "0",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "0",
+        "tree_order": 11
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-×",
+        "label": "×",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "×",
+        "tree_order": 12
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-+",
+        "label": "+",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "+",
+        "tree_order": 13
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-=",
+        "label": "=",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "=",
+        "tree_order": 14
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-C",
+        "label": "C",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "C",
+        "tree_order": 15
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "depth": 1,
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "subrole": "AXZoomButton",
+        "tree_order": 16
+       }
+      ],
+      "passive_elements": [
+       {
+        "role": "AXStaticText",
+        "label": "",
+        "read_only": true,
+        "value": "MiniCalc",
+        "parent_index": 0,
+        "tree_order": 17
+       }
+      ]
+     }
+    },
+    {
+     "step": "minicalc_state_2_diff",
+     "after": "click element 2 (button 7)",
+     "expect": {
+      "results_key": "minicalc_state_2_diff"
+     },
+     "ipc_line": 16,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "selected_text": "7",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "depth": 0,
+        "label": "MiniCalc",
+        "actions": [
+         "AXRaise"
+        ],
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "tree_order": 0
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "depth": 1,
+        "identifier": "calc-display",
+        "label": "7",
+        "value": "7",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "parent_index": 0,
+        "settable": true,
+        "tree_order": 1
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-7",
+        "label": "7",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "7",
+        "tree_order": 2
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-8",
+        "label": "8",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "8",
+        "tree_order": 3
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-9",
+        "label": "9",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "9",
+        "tree_order": 4
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-4",
+        "label": "4",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "4",
+        "tree_order": 5
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-5",
+        "label": "5",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "5",
+        "tree_order": 6
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-6",
+        "label": "6",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "6",
+        "tree_order": 7
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-1",
+        "label": "1",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "1",
+        "tree_order": 8
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-2",
+        "label": "2",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "2",
+        "tree_order": 9
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-3",
+        "label": "3",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "3",
+        "tree_order": 10
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-0",
+        "label": "0",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "0",
+        "tree_order": 11
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-×",
+        "label": "×",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "×",
+        "tree_order": 12
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-+",
+        "label": "+",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "+",
+        "tree_order": 13
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-=",
+        "label": "=",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "=",
+        "tree_order": 14
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-C",
+        "label": "C",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "C",
+        "tree_order": 15
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "depth": 1,
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "subrole": "AXZoomButton",
+        "tree_order": 16
+       }
+      ],
+      "passive_elements": [
+       {
+        "role": "AXStaticText",
+        "label": "",
+        "read_only": true,
+        "value": "MiniCalc",
+        "parent_index": 0,
+        "tree_order": 17
+       }
+      ]
+     }
+    },
+    {
+     "step": "minicalc_state_3_nochange",
+     "expect": {
+      "results_key": "minicalc_state_3_nochange"
+     },
+     "ipc_line": 20,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "selected_text": "7",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "depth": 0,
+        "label": "MiniCalc",
+        "actions": [
+         "AXRaise"
+        ],
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "tree_order": 0
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "depth": 1,
+        "identifier": "calc-display",
+        "label": "7",
+        "value": "7",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "parent_index": 0,
+        "settable": true,
+        "tree_order": 1
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-7",
+        "label": "7",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "7",
+        "tree_order": 2
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-8",
+        "label": "8",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "8",
+        "tree_order": 3
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-9",
+        "label": "9",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "9",
+        "tree_order": 4
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-4",
+        "label": "4",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "4",
+        "tree_order": 5
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-5",
+        "label": "5",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "5",
+        "tree_order": 6
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-6",
+        "label": "6",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "6",
+        "tree_order": 7
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-1",
+        "label": "1",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "1",
+        "tree_order": 8
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-2",
+        "label": "2",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "2",
+        "tree_order": 9
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-3",
+        "label": "3",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "3",
+        "tree_order": 10
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-0",
+        "label": "0",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "0",
+        "tree_order": 11
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-×",
+        "label": "×",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "×",
+        "tree_order": 12
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-+",
+        "label": "+",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "+",
+        "tree_order": 13
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-=",
+        "label": "=",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "=",
+        "tree_order": 14
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-C",
+        "label": "C",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "C",
+        "tree_order": 15
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "depth": 1,
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "subrole": "AXZoomButton",
+        "tree_order": 16
+       }
+      ],
+      "passive_elements": [
+       {
+        "role": "AXStaticText",
+        "label": "",
+        "read_only": true,
+        "value": "MiniCalc",
+        "parent_index": 0,
+        "tree_order": 17
+       }
+      ]
+     }
+    },
+    {
+     "step": "minicalc_state_4_full",
+     "disable_diff": true,
+     "expect": {
+      "results_key": "minicalc_state_4_full"
+     },
+     "ipc_line": 24,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "selected_text": "7",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "depth": 0,
+        "label": "MiniCalc",
+        "actions": [
+         "AXRaise"
+        ],
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "tree_order": 0
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "depth": 1,
+        "identifier": "calc-display",
+        "label": "7",
+        "value": "7",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "parent_index": 0,
+        "settable": true,
+        "tree_order": 1
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-7",
+        "label": "7",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "7",
+        "tree_order": 2
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-8",
+        "label": "8",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "8",
+        "tree_order": 3
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-9",
+        "label": "9",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "9",
+        "tree_order": 4
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-4",
+        "label": "4",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "4",
+        "tree_order": 5
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-5",
+        "label": "5",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "5",
+        "tree_order": 6
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-6",
+        "label": "6",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "6",
+        "tree_order": 7
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-1",
+        "label": "1",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "1",
+        "tree_order": 8
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-2",
+        "label": "2",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "2",
+        "tree_order": 9
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-3",
+        "label": "3",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "3",
+        "tree_order": 10
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-0",
+        "label": "0",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "0",
+        "tree_order": 11
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-×",
+        "label": "×",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "×",
+        "tree_order": 12
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-+",
+        "label": "+",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "+",
+        "tree_order": 13
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-=",
+        "label": "=",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "=",
+        "tree_order": 14
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-C",
+        "label": "C",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "C",
+        "tree_order": 15
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "depth": 1,
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "subrole": "AXZoomButton",
+        "tree_order": 16
+       }
+      ],
+      "passive_elements": [
+       {
+        "role": "AXStaticText",
+        "label": "",
+        "read_only": true,
+        "value": "MiniCalc",
+        "parent_index": 0,
+        "tree_order": 17
+       }
+      ]
+     }
+    },
+    {
+     "step": "minicalc_set_value",
+     "after": "set_value element 1 = 123",
+     "expect": {
+      "results_key": "minicalc_set_value"
+     },
+     "ipc_line": 32,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "depth": 0,
+        "label": "MiniCalc",
+        "actions": [
+         "AXRaise"
+        ],
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "tree_order": 0
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "depth": 1,
+        "identifier": "calc-display",
+        "label": "123",
+        "value": "123",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "parent_index": 0,
+        "focused": true,
+        "settable": true,
+        "tree_order": 1
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-7",
+        "label": "7",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "7",
+        "tree_order": 2
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-8",
+        "label": "8",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "8",
+        "tree_order": 3
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-9",
+        "label": "9",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "9",
+        "tree_order": 4
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-4",
+        "label": "4",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "4",
+        "tree_order": 5
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-5",
+        "label": "5",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "5",
+        "tree_order": 6
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-6",
+        "label": "6",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "6",
+        "tree_order": 7
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-1",
+        "label": "1",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "1",
+        "tree_order": 8
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-2",
+        "label": "2",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "2",
+        "tree_order": 9
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-3",
+        "label": "3",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "3",
+        "tree_order": 10
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-0",
+        "label": "0",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "0",
+        "tree_order": 11
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-×",
+        "label": "×",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "×",
+        "tree_order": 12
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-+",
+        "label": "+",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "+",
+        "tree_order": 13
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-=",
+        "label": "=",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "=",
+        "tree_order": 14
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-C",
+        "label": "C",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "C",
+        "tree_order": 15
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "depth": 1,
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "subrole": "AXZoomButton",
+        "tree_order": 16
+       }
+      ],
+      "passive_elements": [
+       {
+        "role": "AXStaticText",
+        "label": "",
+        "read_only": true,
+        "value": "MiniCalc",
+        "parent_index": 0,
+        "tree_order": 17
+       }
+      ]
+     }
+    },
+    {
+     "step": "minicalc_press_key",
+     "after": "press_key super+a",
+     "expect": {
+      "results_key": "minicalc_press_key"
+     },
+     "ipc_line": 40,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "depth": 0,
+        "label": "MiniCalc",
+        "actions": [
+         "AXRaise"
+        ],
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "tree_order": 0
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "depth": 1,
+        "identifier": "calc-display",
+        "label": "123",
+        "value": "123",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "parent_index": 0,
+        "focused": true,
+        "settable": true,
+        "tree_order": 1
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-7",
+        "label": "7",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "7",
+        "tree_order": 2
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-8",
+        "label": "8",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "8",
+        "tree_order": 3
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-9",
+        "label": "9",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "9",
+        "tree_order": 4
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-4",
+        "label": "4",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "4",
+        "tree_order": 5
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-5",
+        "label": "5",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "5",
+        "tree_order": 6
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-6",
+        "label": "6",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "6",
+        "tree_order": 7
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-1",
+        "label": "1",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "1",
+        "tree_order": 8
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-2",
+        "label": "2",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "2",
+        "tree_order": 9
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-3",
+        "label": "3",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "3",
+        "tree_order": 10
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-0",
+        "label": "0",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "0",
+        "tree_order": 11
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-×",
+        "label": "×",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "×",
+        "tree_order": 12
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-+",
+        "label": "+",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "+",
+        "tree_order": 13
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-=",
+        "label": "=",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "=",
+        "tree_order": 14
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "depth": 1,
+        "identifier": "calc-btn-C",
+        "label": "C",
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "title": "C",
+        "tree_order": 15
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "depth": 1,
+        "actions": [
+         "AXPress"
+        ],
+        "parent_index": 0,
+        "subrole": "AXZoomButton",
+        "tree_order": 16
+       }
+      ],
+      "passive_elements": [
+       {
+        "role": "AXStaticText",
+        "label": "",
+        "read_only": true,
+        "value": "MiniCalc",
+        "parent_index": 0,
+        "tree_order": 17
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,83 @@
+{
+  "bundle": {
+    "linux": {
+      "deb": {
+        "depends": [
+          "at-spi2-core",
+          "libc6 (>= 2.39)",
+          "libpipewire-0.3-0t64",
+          "libxkbcommon0",
+          "libglib2.0-bin",
+          "libpulse0",
+          "libudev1",
+          "libx11-6",
+          "libxtst6",
+          "libstdc++6",
+          "libgcc-s1"
+        ],
+        "recommends": [
+          "copilot-kwin-helper"
+        ],
+        "files": {
+          "/usr/share/copilot/linux-helpers/LICENSE": "linux-helpers/LICENSE",
+          "/usr/share/copilot/linux-helpers/gnome/winrects@cua/extension.js": "linux-helpers/gnome/winrects@cua/extension.js",
+          "/usr/share/copilot/linux-helpers/gnome/winrects@cua/metadata.json": "linux-helpers/gnome/winrects@cua/metadata.json",
+          "/usr/share/copilot/linux-helpers/kwin/CMakeLists.txt": "linux-helpers/kwin/CMakeLists.txt",
+          "/usr/share/copilot/linux-helpers/kwin/README.md": "linux-helpers/kwin/README.md",
+          "/usr/share/copilot/linux-helpers/kwin/kwin_target_helper.cpp": "linux-helpers/kwin/kwin_target_helper.cpp",
+          "/usr/share/copilot/linux-helpers/kwin/kwin_target_helper.json": "linux-helpers/kwin/kwin_target_helper.json",
+          "/usr/share/copilot/linux-helpers/provenance.json": "linux-helpers/provenance.json",
+          "/usr/share/copilot/linux-helpers/gnome/winrects@cua/history-pointer.js": "linux-helpers/gnome/winrects@cua/history-pointer.js"
+        }
+      },
+      "rpm": {
+        "depends": [
+          "at-spi2-core",
+          "libc.so.6(GLIBC_2.39)(64bit)",
+          "libpipewire-0.3.so.0()(64bit)",
+          "libxkbcommon.so.0()(64bit)",
+          "glib2",
+          "libpulse.so.0()(64bit)",
+          "libudev.so.1()(64bit)",
+          "libX11.so.6()(64bit)",
+          "libXtst.so.6()(64bit)",
+          "libstdc++.so.6()(64bit)",
+          "libgcc_s.so.1()(64bit)"
+        ],
+        "recommends": [
+          "copilot-kwin-helper"
+        ],
+        "files": {
+          "/usr/share/copilot/linux-helpers/LICENSE": "linux-helpers/LICENSE",
+          "/usr/share/copilot/linux-helpers/gnome/winrects@cua/extension.js": "linux-helpers/gnome/winrects@cua/extension.js",
+          "/usr/share/copilot/linux-helpers/gnome/winrects@cua/metadata.json": "linux-helpers/gnome/winrects@cua/metadata.json",
+          "/usr/share/copilot/linux-helpers/kwin/CMakeLists.txt": "linux-helpers/kwin/CMakeLists.txt",
+          "/usr/share/copilot/linux-helpers/kwin/README.md": "linux-helpers/kwin/README.md",
+          "/usr/share/copilot/linux-helpers/kwin/kwin_target_helper.cpp": "linux-helpers/kwin/kwin_target_helper.cpp",
+          "/usr/share/copilot/linux-helpers/kwin/kwin_target_helper.json": "linux-helpers/kwin/kwin_target_helper.json",
+          "/usr/share/copilot/linux-helpers/provenance.json": "linux-helpers/provenance.json",
+          "/usr/share/copilot/linux-helpers/gnome/winrects@cua/history-pointer.js": "linux-helpers/gnome/winrects@cua/history-pointer.js"
+        }
+      }
+    },
+    "resources": {
+      "linux-helpers/": "linux-helpers/",
+      "resources/audio-client.mjs": "resources/audio-client.mjs"
+    },
+    "externalBin": [
+      "binaries/cua-driver",
+      "binaries/taiku-observer"
+    ]
+  },
+  "build": {
+    "beforeBuildCommand": "python3 scripts/check-linux-helpers.py && bash scripts/check-icons.sh && npm run build && bash scripts/stage-driver-linux.sh"
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNCOEMwOTUyOTgyRTBGOEQKUldTTkR5NllVZ21NTzdTWWgvOWNPMHVvV2JmbnQ4ZXlUN3BvMGRyc0dUQzcxT2pKazI1SmYvYnYK",
+      "endpoints": [
+        "https://d3sr5pcu8uoa7b.cloudfront.net/latest.json"
+      ]
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "env": "E1 Xvfb/Openbox X11",
+  "fixtures": {
+    "target": [
+      371375,
+      10485763
+    ],
+    "occluder": [
+      371385,
+      14680067
+    ],
+    "bystander": [
+      371380,
+      12582915
+    ]
+  },
+  "actions": [
+    {
+      "action": "click_button",
+      "axes": {
+        "delivery": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "target_not_activated": true
+      },
+      "expected": {
+        "delivery": true,
+        "focus_preserved": true,
+        "no_input_leak": true,
+        "target_not_activated": true
+      },
+      "verdict": {
+        "delivery": "PASS",
+        "focus_preserved": "PASS",
+        "cursor_unmoved": "PASS",
+        "no_input_leak": "PASS",
+        "target_not_activated": "PASS"
+      },
+      "target_events": [
+        "buttonPressed"
+      ],
+      "driver": "{'delivery': {'mode': 'background'}, 'effect': 'unverifiable', 'route': 'accessibility'}",
+      "active": [
+        "14680067",
+        "14680067"
+      ],
+      "pointer": [
+        [
+          "720",
+          "450"
+        ],
+        [
+          "720",
+          "450"
+        ]
+      ]
+    },
+    {
+      "action": "set_value_field",
+      "axes": {
+        "delivery": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "target_not_activated": true
+      },
+      "expected": {
+        "delivery": true,
+        "focus_preserved": true,
+        "no_input_leak": true,
+        "target_not_activated": true
+      },
+      "verdict": {
+        "delivery": "PASS",
+        "focus_preserved": "PASS",
+        "cursor_unmoved": "PASS",
+        "no_input_leak": "PASS",
+        "target_not_activated": "PASS"
+      },
+      "target_events": [
+        "textChanged"
+      ],
+      "driver": "{'delivery': {'mode': 'unknown'}, 'effect': 'unverifiable', 'route': 'accessibility'}",
+      "active": [
+        "14680067",
+        "14680067"
+      ],
+      "pointer": [
+        [
+          "720",
+          "450"
+        ],
+        [
+          "720",
+          "450"
+        ]
+      ]
+    }
+  ],
+  "capture_occluded": {
+    "got_screenshot": true,
+    "nonblack_fraction": 0.999,
+    "faithful": true,
+    "expected_faithful": true,
+    "verdict": "PASS"
+  },
+  "refusal_case": {
+    "returned": {
+      "refusal": {
+        "code": "stale_element_token",
+        "message": "element_token is stale; call get_window_state again to refresh"
+      },
+      "status": "refused"
+    },
+    "is_refusal": true
+  }
+}

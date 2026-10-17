@@ -1,0 +1,17 @@
+[package]
+name = "confirmations"
+version = "0.1.0"
+edition = "2021"
+description = "Codex/Sky parity: Computer Use Confirmations Policy (4 modes), per-app approval elicitation + on-disk session/always allowlists (spec 14)."
+
+[lib]
+name = "confirmations"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[[bin]]
+name = "confirmations"
+path = "src/bin/confirmations.rs"

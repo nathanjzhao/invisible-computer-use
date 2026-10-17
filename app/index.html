@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copilot</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <header id="topbar">
+      <div class="brand">Copilot <span class="sub">computer-use, per window</span></div>
+      <div class="topbar-right">
+        <label class="brain-pick" title="Which model drives">
+          <span>brain</span>
+          <select id="brain-select">
+            <option value="auto">Auto</option>
+            <option value="claude-code">Claude Code (your login)</option>
+            <option value="anthropic">Anthropic (API key)</option>
+            <option value="openai">OpenAI</option>
+            <option value="local">Local (keyless)</option>
+          </select>
+        </label>
+        <button id="model-key-button" class="status mem-chip" type="button" title="Connect a model with an API key">Model key</button>
+        <button id="memory-chip" class="status mem-chip" title="Memory settings and stored memories"><span id="memory-dot" class="dot"></span><span id="memory-text">Memory</span></button>
+        <button id="audio-button" class="status mem-chip" type="button" aria-expanded="false">Audio</button>
+        <button id="history-button" class="status mem-chip" type="button" aria-expanded="false">History</button>
+        <div class="status"><span id="driver-dot" class="dot"></span><span id="driver-text">connecting…</span></div>
+      </div>
+    </header>
+      <!-- Model onboarding: shown on first run when no model is configured (ONBOARD-APIKEY). -->
+      <div id="onboarding-overlay" class="onboard-overlay" hidden>
+        <div class="onboard-card" role="dialog" aria-modal="true" aria-labelledby="onboard-title">
+          <h2 id="onboard-title">Connect a model</h2>
+          <p class="onboard-lead">Give the app a model so it can run tasks. Paste an API key below. If you have Claude Code installed, you can close this and choose it in the brain menu instead.</p>
+          <label class="onboard-field">
+            <span>Provider</span>
+            <select id="onboard-provider">
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI</option>
+            </select>
+          </label>
+          <label class="onboard-field">
+            <span id="onboard-key-label">Anthropic API key</span>
+            <input id="onboard-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" />
+          </label>
+          <p id="onboard-status" class="onboard-status" role="status" hidden></p>
+          <p class="onboard-note">Stored in this app only, not your macOS Keychain. Used to call the model directly.</p>
+          <div class="onboard-actions">
+            <button id="onboard-later" class="ghost" type="button">Maybe later</button>
+            <button id="onboard-save" class="ghost accent" type="button">Save and continue</button>
+          </div>
+        </div>
+      </div>
+      <div id="audio-panel" class="picker-pop mem-pop" hidden>
+        <div class="mem-settings">
+          <strong>Record audio</strong>
+          <p class="muted">Choose what to record. Audio stays in a local folder.</p>
+          <label><input id="audio-microphone" type="checkbox" /> Microphone</label>
+          <label><input id="audio-system" type="checkbox" /> System sound from all applications</label>
+          <label>Maximum seconds <input id="audio-seconds" type="number" min="0.1" max="3600" step="0.001" value="60" /></label>
+          <label><input id="audio-consent" type="checkbox" /> I have permission to record these sources.</label>
+          <div class="mem-actions"><button id="audio-start" class="ghost" type="button" disabled>Start recording</button><button id="audio-stop" class="ghost" type="button" disabled>Stop recording</button><button id="audio-export" class="ghost" type="button" title="Export the last completed recording as local WAV files" disabled>Export WAV</button></div>
+          <p id="audio-status" class="muted" role="status">No recording active.</p>
+        </div>
+      </div>
+      <div id="memory-pop" class="picker-pop mem-pop" hidden>
+        <div class="mem-head">
+          <span id="memory-state" role="status">Memory</span>
+          <button id="memory-pause" class="ghost accent" type="button">Pause</button>
+        </div>
+        <div class="mem-settings">
+          <label><input id="mem-chat" type="checkbox" /> Remember from my tasks</label>
+          <label><input id="mem-sky" type="checkbox" /> Use Computer History memories</label>
+          <label>Keep raw task records and activity metadata for <input id="mem-retention" type="number" min="1" max="3650" step="1" /> days</label>
+          <p class="muted">Generated memories and their supporting quotes stay until you delete them.</p>
+          <div class="mem-actions"><button id="mem-save" class="ghost" type="button">Save</button><span id="mem-note" class="muted"></span></div>
+          <p id="mem-provider-note" class="muted">Memories from a task are written by the model provider that answered it, or by the hosted one when a fallback answered part of it. A task only the local model answered is summarized on the local model. Stored memories are given to later tasks on the same app, whichever provider runs them.</p>
+        </div>
+        <div id="memory-list" class="picker-list mem-list"></div>
+        <section id="memory-source" class="mem-settings" aria-label="Memory source" hidden>
+          <h3 id="memory-source-title" tabindex="-1">Memory source</h3>
+          <p id="memory-source-status" role="status"></p>
+          <pre id="memory-source-text" class="history-summary-text"></pre>
+          <button id="memory-source-close" class="ghost" type="button">Close source</button>
+        </section>
+        <details id="trajectory-tools" class="mem-settings">
+          <summary>Learn from a recording</summary>
+          <button id="trajectory-back" class="ghost" type="button" hidden>Back to History</button>
+          <p class="muted">Review an observer recording folder or a Computer History segment before adding one app's observations to memory. New activity appended after review is not included.</p>
+          <label>Recording folder or history file <input id="trajectory-path" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Path to folder or history segment" /></label>
+          <label><input id="trajectory-values" type="checkbox" /> Include observed text values in the review</label>
+          <p class="muted">Values can contain personal content. Review the redacted text before sharing it with the selected model. Derived memories can reach other models in later tasks when memory is enabled. Changing this option requires a new review.</p>
+          <button id="trajectory-review" class="ghost" type="button">Review recording</button>
+          <div id="trajectory-options" hidden>
+            <label>App <select id="trajectory-app"></select></label>
+            <p id="trajectory-preview-count" class="muted"></p>
+            <ol id="trajectory-preview-steps" aria-label="Reviewed recording events"></ol>
+            <div class="mem-actions"><button id="trajectory-prev" class="ghost" type="button" disabled>Previous events</button><button id="trajectory-next" class="ghost" type="button" disabled>Next events</button></div>
+            <label>Project label <input id="trajectory-project" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" value="default" /></label>
+            <label>Recorded activity <select id="trajectory-actor"><option value="human">Person's demonstration</option><option value="agent">Agent task</option><option value="synthetic_fixture">Test fixture</option></select></label>
+            <label>Task description <input id="trajectory-goal" type="text" maxlength="600" /></label>
+            <label>Summarize with <select id="trajectory-provider"><option value="local">Local model</option><option value="claude-code">Claude Code</option><option value="openai">OpenAI</option><option value="codex">Codex login</option></select></label>
+            <label><input id="trajectory-consent" type="checkbox" /> I have permission to share the selected app's reviewed observations, including any displayed text values, and the task description with the selected model.</label>
+            <button id="trajectory-import" class="ghost" type="button" disabled>Import into memory</button>
+            <button id="workflow-generate" class="ghost" type="button" disabled>Draft reusable workflow</button>
+          </div>
+          <p id="trajectory-message" class="muted" role="status"></p>
+          <section id="workflow-draft" hidden aria-label="Review workflow draft">
+            <p class="muted">Review the steps, inputs and result check before saving. A recording can miss actions. Edit the draft if it omits a required step.</p>
+            <label>Workflow name <input id="workflow-draft-title" type="text" maxlength="100" /></label>
+            <label>When to use it <textarea id="workflow-draft-description" rows="2" maxlength="600"></textarea></label>
+            <div id="workflow-draft-parameters"></div>
+            <ol id="workflow-draft-steps"></ol>
+            <label>How to verify the result <textarea id="workflow-draft-verification" rows="3" maxlength="800"></textarea></label>
+            <label><input id="workflow-save-consent" type="checkbox" /> I reviewed this workflow and want to save it for reuse.</label>
+            <button id="workflow-save" class="ghost" type="button" disabled>Save workflow</button>
+          </section>
+          <button id="workflow-cancel" class="ghost" type="button" hidden>Cancel workflow draft</button>
+          <p id="workflow-message" class="muted" role="status"></p>
+          <section aria-label="Saved workflows">
+            <strong>Saved workflows</strong>
+            <button id="workflow-refresh" class="ghost" type="button">Refresh workflows</button>
+            <div id="workflow-list"></div>
+            <div id="workflow-inputs" hidden>
+              <p id="workflow-selected-title"></p>
+              <div id="workflow-input-fields"></div>
+              <button id="workflow-use" class="ghost" type="button">Use workflow for a task</button>
+            </div>
+          </section>
+        </details>
+        <div class="mem-actions mem-foot"><button id="mem-delete-all" class="ghost" type="button">Delete all memories</button></div>
+      </div>
+      <div id="history-panel" class="picker-pop mem-pop" hidden>
+        <div class="mem-settings">
+          <strong>Computer History</strong>
+          <p class="muted">Keep a local record of allowed app activity. App identity is the default. On macOS, Windows and Linux, you can separately approve focused control labels and text values. Password fields are excluded. Browser capture needs its own opt-in below.</p>
+          <p id="history-status" role="status" class="muted">Loading history status…</p>
+          <div class="mem-actions"><button id="history-toggle" class="ghost" type="button">Enable history</button><button id="history-pause" class="ghost" type="button">Pause</button></div>
+          <label><input id="history-consent" type="checkbox" /> I have permission to record this activity.</label>
+          <button id="history-helper-setup" class="ghost" type="button" hidden disabled>Set up desktop capture</button>
+          <p id="history-helper-notice" class="muted" role="status" hidden></p>
+          <label>Capture <select id="history-scope"><option value="application_metadata">App identity only</option><option value="semantic">Focused control labels</option><option value="values">Focused control labels and text values</option><option value="interaction_events">Native interactions and window text</option></select></label>
+          <p class="muted">Focused control scopes require Accessibility access and keep labels and values in local activity records. App and website context can feed enabled memory summaries. These scopes exclude images, audio and individual keystrokes.</p>
+          <p class="muted">Native interactions additionally record clicks, shortcuts, typed text and accessible text in the current native window. On macOS this scope needs Input Monitoring. On Windows and Linux text is captured as observed field values. Linux support depends on the desktop session. Supported Wayland integrations observe scoped native interactions; unavailable observations remain marked incomplete. Browser and embedded web content are excluded. It uses the same History rules, pause and deletion controls. Images and audio are excluded.</p>
+          <label><input id="history-scope-consent" type="checkbox" /> I approve the selected content scope.</label>
+          <button id="history-scope-save" class="ghost" type="button">Apply capture scope</button>
+          <details>
+            <summary>Browser capture</summary>
+            <p class="muted">Include normal Chrome and Chromium tabs. App-only capture adds the website domain; richer scopes include focused page controls. Private windows, unverified pages and browser toolbars are excluded. Website rules apply before content is saved.</p>
+            <p id="history-browser-status" class="muted"></p>
+            <label><input id="history-browser-enabled" type="checkbox" /> Include supported browser tabs</label>
+            <label><input id="history-browser-consent" type="checkbox" /> I approve browser domains and content at the selected scope.</label>
+            <button id="history-browser-save" class="ghost" type="button">Apply browser capture</button>
+            <p id="history-browser-notice" class="muted" hidden></p>
+            <div id="history-browser-automation">
+            <label>Browser <select id="history-browser-app"><option value="com.google.Chrome">Google Chrome</option><option value="org.chromium.Chromium">Chromium</option></select></label>
+            <button id="history-browser-permission" class="ghost" type="button">Allow browser access</button>
+            <p class="muted">Open the selected browser, then allow access through macOS when prompted.</p>
+            </div>
+          </details>
+          <label>Keep activity for <input id="history-retention" type="number" min="1" max="3650" value="2" /> days</label>
+          <p class="muted">New History stores keep raw activity for two days. Choosing a longer period retains more recorded content. Existing retention choices are preserved.</p>
+          <label>Other apps <select id="history-default-app"><option value="observe">Record</option><option value="do_not_observe">Do not record</option></select></label>
+          <label>Other websites <select id="history-default-url"><option value="observe">Record</option><option value="do_not_observe">Do not record</option></select></label>
+          <p class="muted">Without verified browser context, domain-dependent rules exclude recognized browsers. Other browser families and embedded web views remain excluded from focused-control capture. App and website rules must both allow capture; block rules win.</p>
+          <label>Allowed apps, one identifier per line <textarea id="history-allow-apps" rows="2" spellcheck="false" placeholder="com.apple.TextEdit"></textarea></label>
+          <label>Blocked apps, one identifier per line <textarea id="history-block-apps" rows="2" spellcheck="false"></textarea></label>
+          <label>Allowed websites, one domain per line <textarea id="history-allow-urls" rows="2" spellcheck="false" placeholder="example.com"></textarea></label>
+          <label>Blocked websites, one domain per line <textarea id="history-block-urls" rows="2" spellcheck="false"></textarea></label>
+          <div class="mem-actions"><button id="history-save" class="ghost" type="button">Save rules</button><button id="history-reload" class="ghost" type="button">Reload rules</button></div>
+          <p id="history-message" role="status" class="muted"></p>
+          <p class="muted">Recording and memory generation have separate pause controls. Configure summaries in Memory.</p>
+          <ul id="history-files" aria-label="Recent activity files"></ul>
+          <details id="history-selection">
+            <summary>Delete selected activity</summary>
+            <div id="history-delete-filter">
+            <label>Time range <select id="history-delete-range"><option value="10">Last 10 minutes</option><option value="60">Last hour</option><option value="1440">Last day</option><option value="all">All recorded times</option></select></label>
+            <label>App identifier, optional <input id="history-delete-app" type="text" placeholder="All apps" spellcheck="false" /></label>
+            <button id="history-delete-preview" class="ghost" type="button">Review deletion</button>
+            </div>
+            <p id="history-delete-selection-status" class="muted" role="status"></p>
+            <div id="history-delete-review" hidden>
+              <p id="history-delete-selection-description"></p>
+              <p class="muted">This removes the selected observations and memories or workflows derived from them. A summary containing any selected observation is removed in full. Capture pauses and automatic sharing needs approval again. This cannot be undone.</p>
+              <label><input id="history-delete-selection-confirm" type="checkbox" /> Delete this reviewed selection and its derived memories.</label>
+              <button id="history-delete-selection-apply" class="ghost" type="button" disabled>Delete reviewed selection</button>
+              <button id="history-delete-selection-cancel" class="ghost" type="button">Cancel deletion</button>
+            </div>
+          </details>
+          <label><input id="history-delete-confirm" type="checkbox" /> Delete the recorded activity files in this history store.</label>
+          <button id="history-delete" class="ghost" type="button" disabled>Delete recorded activity</button>
+          <p class="muted">Deleting activity also removes its imported memories, automatic summaries and saved workflows, and pauses capture until you resume it.</p>
+          <details id="history-summary-settings">
+            <summary>Automatic content summaries</summary>
+            <p class="muted">Native content needs the native interaction capture scope. Approve future sharing once to create summaries without manual import. Summaries and bounded source excerpts remain untrusted observations. Memory-enabled tasks can use them to recall details in the same app with whichever model you choose.</p>
+            <label><input id="history-summary-enabled" type="checkbox" /> Include native content in automatic summaries</label>
+            <label>History summary provider <select id="history-summary-provider"><option value="codex">Codex login</option><option value="openai">OpenAI</option><option value="claude-code">Claude Code</option><option value="anthropic">Anthropic API</option></select></label>
+            <label><input id="history-summary-consent" type="checkbox" /> I approve automatic sharing with this provider and later task reuse of these source observations.</label>
+            <button id="history-summary-save" class="ghost" type="button" disabled>Apply summary sharing</button>
+            <p class="muted">Recording pause excludes new activity. Approved retained activity may still be summarized. Pause Memory to stop generation. Deleting History removes its automatic summaries. Deleting memories turns off native content sharing; approve future capture again or review older recordings manually.</p>
+            <p class="muted">Generated summaries remain until you delete them. Raw activity follows the retention period above, so older summaries may no longer have their original source records.</p>
+            <p id="history-summary-status" class="muted" role="status">Loading summary settings…</p>
+          </details>
+          <section aria-label="Automatic content summaries"><div id="history-summary-list"></div></section>
+        </div>
+      </div>
+
+
+    <main id="grid">
+      <!-- LEFT: command bar -->
+      <section id="chat-pane" class="pane">
+        <div class="pane-title">Command</div>
+        <div id="chat-log" class="chat-log"></div>
+        <form id="chat-form" class="chat-form">
+          <div id="task-resume-notice" hidden><span>Saved task loaded. Review the goal and target.</span> <button id="task-start-fresh" class="ghost" type="button">Start fresh</button></div>
+          <div class="cmd-wrap">
+            <div id="mention-pop" class="mention-pop" hidden></div>
+            <input id="chat-input" placeholder="e.g. in @Calculator compute 6×7; type @ to pick a window" autocomplete="off" spellcheck="false" />
+          </div>
+          <button type="submit">Send</button>
+        </form>
+        <div class="run-opts">
+          <label>Decision budget <select id="task-budget"><option value="18">18</option><option value="36" selected>36</option><option value="72">72</option></select></label>
+          <button id="task-progress-button" class="ghost" type="button">Saved tasks</button>
+          <label title="Give this task the stored memories for its app"><input id="run-use-memory" type="checkbox" checked /> Use memories</label>
+          <label title="Share this window's screenshots with the selected model for visual controls. Requires an image-capable model."><input id="run-use-screenshots" type="checkbox" /> Use screenshots</label>
+          <label title="This task may bring its selected window to front or switch Spaces for keyboard input and drags."><input id="run-allow-foreground" type="checkbox" /> Allow foreground</label>
+          <label title="Let memory learn from this task"><input id="run-remember" type="checkbox" checked /> Remember this task</label>
+        </div>
+        <div id="task-progress-panel" class="mem-settings" hidden><p>Choose a saved task, then select its application and send the reviewed goal. Progress contains redacted history, never actions or approvals to replay.</p><div id="task-progress-list"></div></div>
+      </section>
+
+      <!-- CENTER: live feed of controlled windows -->
+      <section id="feed-pane" class="pane">
+        <div class="pane-title">
+          Live feed
+          <button id="add-window" class="ghost accent" title="Watch a window">+ window</button>
+        </div>
+        <div id="picker-pop" class="picker-pop" hidden>
+          <input id="picker-search" class="picker-search" placeholder="Search open windows…" autocomplete="off" spellcheck="false" />
+          <div id="picker-list" class="picker-list"></div>
+        </div>
+        <div id="feed" class="feed"></div>
+      </section>
+
+      <!-- RIGHT: observability -->
+      <section id="log-pane" class="pane">
+        <div class="pane-title">Actions</div>
+        <div id="action-log" class="action-log"></div>
+      </section>
+    </main>
+  </body>
+</html>

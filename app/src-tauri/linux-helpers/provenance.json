@@ -1,0 +1,25 @@
+{
+  "vendor_commit": "00678fa8ec8f0f371716993ae4a207df812ef667",
+  "license": "MIT",
+  "gnome_protocol": 8,
+  "kwin_protocol": 1,
+  "files": {
+    "LICENSE": "c0779290c1d4783169aa3dbfb55feb505e563ef8a004bbf55298ceffcfbda8d9",
+    "kwin/CMakeLists.txt": "8f2fd682a054313d73b49b16ce93b8c7377b3a2a0682cc7c2da6b6ac82e827ee",
+    "kwin/kwin_target_helper.json": "91c5b9a8e21feac7f90340ef19cd970ddb950d59b0d9aa6b766e4e1af7ee10b1",
+    "kwin/README.md": "c2eeaae5a6d69629fcabb8ff3000c57b4a881aed394df702dfa95647b7f3c568",
+    "kwin/kwin_target_helper.cpp": "f4e99a979bed61dff5871fe06fd4b9fbc3fbfbf19f9a7fcd236e539a3b91d008",
+    "gnome/winrects@cua/extension.js": "309b39e439f2992ce809a577c260f82a2155f14d920c37fa9f98ddc0d4bbacdc",
+    "gnome/winrects@cua/metadata.json": "cf8f57b78720d657fa61150a7bea093deedfbb0dd7023bfb269d11f81f26ec12",
+    "gnome/winrects@cua/history-pointer.js": "6a0734ce241b57f4be7f9cb29dfcc4662fe4526d76b39ea21381287bb8ea2581"
+  },
+  "gnome_capture_protocol": 9,
+  "kwin_capture_protocol": 2,
+  "gnome_history_pointer_protocol": 2,
+  "local_extensions": [
+    "Caller-bound transient GNOME pointer and non-text key metadata for the existing History collector",
+    "Caller-bound native KWin input metadata for the existing History collector"
+  ],
+  "kwin_history_input_protocol": 1,
+  "kwin_history_setup_protocol": 1
+}

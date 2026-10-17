@@ -1,0 +1,27 @@
+{
+  "version": "1.0.32",
+  "applies_after": "taiku-observer-audio-ready.patch",
+  "files": [
+    {
+      "path": "taiku-observer/Cargo.toml",
+      "base_sha256": "150190d067da029a079ea0cfbdea432d2af124211e22deb0a0e3ff2fa28aec89",
+      "patched_sha256": "210fe9e3d291f5ce187f318d7788ccc13f7a2da3a2bf5bbb67f7a39e641b449b"
+    },
+    {
+      "path": "taiku-observer/Cargo.lock",
+      "base_sha256": "f3382b12cffc23d4da260a1e49eb7f5b5b62bf5eae181e51d3fe2f64080779c6",
+      "patched_sha256": "eb0a5a2f7f52252bd78b8d9787590c363d9f0a47e008c59ce8aee48f2dcc65a9"
+    },
+    {
+      "path": "taiku-observer/src/audio_backend.rs",
+      "base_sha256": "132e6216732c9d5863517c64b6d89dbf2e98b2533acfa05682196518627e169a",
+      "patched_sha256": "56d928f8544dd2f5b4bac66aac8a8d42932da6c8e4da9d54c6547a8f7c0dd8f7"
+    },
+    {
+      "path": "taiku-observer/src/audio_capture_linux.rs",
+      "base_sha256": null,
+      "patched_sha256": "3afd4fd0ecaa5c3da0219f526717a88b750b05f47a3fb3c9b8a778eea39b6b24"
+    }
+  ],
+  "validation": "Linux source isolation and removal controls plus shared readiness, duration and sample limits; merged signed acceptance required"
+}

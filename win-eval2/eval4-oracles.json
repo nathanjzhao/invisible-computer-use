@@ -1,0 +1,8 @@
+{
+  "note": "eval4 per-action oracle (GetForegroundWindow before/after). Target pid 5608, hwnd 197158. Foreground throughout = window 196872 (pid 4788), i.e. NOT the target.",
+  "minimize": {"target_hwnd":197158,"is_iconic":true,"is_visible":true,"target_is_foreground":false,"foreground":{"hwnd":196872,"pid":4788}},
+  "window": {"target":{"pid":5608,"window_id":197158,"z_index":12,"minimized":true,"is_on_screen":false},"nelem":7,"btn_idx":0,"fld_idx":1},
+  "click": {"resp":{"code":"window_minimized","effect":"refused","status":"refused","refusal":{"code":"window_minimized","message":"Element [0] resolves to (-31850,-31964), the Win32 iconic sentinel rather than a location on any display; window minimized, clicking would be posted off-screen. Call bring_to_front then re-snapshot."}},"fg_before":{"hwnd":196872,"pid":4788},"fg_after":{"hwnd":196872,"pid":4788},"target_was_fg":false,"iconic_after":true},
+  "set_value": {"resp":{"route":"accessibility","delivery":{"mode":"unknown"},"effect":"unverifiable"},"fg_before":{"hwnd":196872,"pid":4788},"fg_after":{"hwnd":196872,"pid":4788},"target_was_fg":false,"iconic_after":true,"delivered":"fx4.log textChanged 'unfocused hello' minimized:true"},
+  "type_text": {"resp":{"delivery":{"mode":"background"},"effect":"unverifiable","escalation":{"reason":"delivery_failed","target":"foreground"}},"fg_after":{"hwnd":196872,"pid":4788},"iconic_after":true,"delivered":false}
+}

@@ -1,0 +1,13 @@
+{
+  "source": "Metadata request to the bundled driver from the native Debian package built at 931ce9d, September 22, 2026. No input actions.",
+  "driver_sha256": "3dd07a4ee997ae49a04b3e82a2c1f5ddda75f4ac6237561c3da4dff1374fb078",
+  "metadata": {
+    "capability_version": "1",
+    "contract_version": "0.7.0",
+    "driver_version": "0.24.0",
+    "embedded": true,
+    "mcp_protocol_version": "2025-06-18",
+    "pid": 755464,
+    "tools_list_schema_version": "1"
+  }
+}

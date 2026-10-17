@@ -1,0 +1,12 @@
+snap= nelem=0
+
+----------ERROR-------
+ConvertFrom-Json : Invalid JSON primitive: Cua.
+At C:\ProgramData\Amazon\SSM\InstanceData\i-019a13249e869def8\document\orchestration\d68111ef-d478-48dd-8365-8c1ecc9c68
+99\awsrunPowerShellScript\0.awsrunPowerShellScript\_script.ps1:1 char:167
++ ... nclude_text=$true}|ConvertTo-Json -Compress) 2>&1 | ConvertFrom-Json;
++                                                         ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [ConvertFrom-Json], ArgumentException
+    + FullyQualifiedErrorId : System.ArgumentException,Microsoft.PowerShell.Commands.ConvertFromJsonCommand
+ 
+

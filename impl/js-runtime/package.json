@@ -1,0 +1,9 @@
+{
+  "name":"@icu/js-runtime",
+  "version":"0.1.0",
+  "private":true,
+  "type":"module",
+  "engines":{"node":">=22"},
+  "scripts":{"test":"node --test"},
+  "dependencies":{"quickjs-emscripten":"0.32.0"}
+}

@@ -1,0 +1,21 @@
+{
+  "version": "1.0.32",
+  "applies_after": "taiku-observer-audio-limit.patch",
+  "files": [
+    {
+      "path": "taiku-observer/src/recorder.rs",
+      "base_sha256": "965611753c258d344628f3f3ab4c4a1d043ae95deee256d0827fa84d2038d6d8",
+      "patched_sha256": "2e69d6eddcc5319cb254214a96db9a0b55fd84efffb49d76121ac3b4f517ba65"
+    },
+    {
+      "path": "taiku-observer/src/audio_backend.rs",
+      "base_sha256": "67ced797d682f8de2f4b92b8bc93e89735679b9af4e8c8382da6677d4a1f5cce",
+      "patched_sha256": "132e6216732c9d5863517c64b6d89dbf2e98b2533acfa05682196518627e169a"
+    },
+    {
+      "path": "taiku-observer/src/audio_only.rs",
+      "base_sha256": "1e69611104d0f4d69b8aa66b5fcd15f0e5be169bccc2165e4b3847a1b2786be9",
+      "patched_sha256": "e4c5ecbe2e49838bea700ae3773b52b7a094d946a17428347495d2cbe1bec99c"
+    }
+  ]
+}

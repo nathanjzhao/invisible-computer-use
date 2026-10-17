@@ -1,0 +1,124 @@
+--- a/taiku-observer/src/main.rs
++++ b/taiku-observer/src/main.rs
+@@ -28,6 +28,7 @@
+ mod upload_client;
+ mod etw_clock;
+ mod audio_backend;
++mod audio_only;
+ mod input_backend;
+ mod multitouch_backend;
+ mod net_etw_backend;
+@@ -131,6 +132,12 @@
+ 
+ #[derive(Subcommand)]
+ enum Cmd {
++    /// Record only the explicitly selected audio sources, with no other sensors.
++    Audio {
++        #[arg(long)] out: PathBuf,
++        #[arg(long, value_enum)] source: audio_backend::Sources,
++        #[arg(long, default_value_t = 60, value_parser = clap::value_parser!(u64).range(1..=3600))] secs: u64,
++    },
+     /// Record screen frames + process events onto one master timeline.
+     Record {
+         /// Output base directory (a recording-<session>/ dir is created under it).
+@@ -455,6 +462,12 @@
+     qos::set_process_eco();
+     let cli = Cli::parse();
+     match cli.cmd {
++        Cmd::Audio {out, source, secs} => {
++            if let Err(error) = audio_only::run(&out, source, secs) {
++                eprintln!("audio recording failed: {error}");
++                std::process::exit(1);
++            }
++        },
+         Cmd::Record {
+             out,
+             frames,
+--- a/taiku-observer/src/audio_backend.rs
++++ b/taiku-observer/src/audio_backend.rs
+@@ -37,10 +37,22 @@
+ /// LOOPBACK capture thread, each writing its own `.opus` into `dir` and registering
+ /// itself with `rec` on finalize. Blocks until `stop` is set, then joins both.
+ pub fn run(rec: Arc<Recorder>, dir: std::path::PathBuf, stop: Arc<AtomicBool>) {
++    run_sources(rec, dir, stop, Sources::Both);
++}
++
++#[derive(Clone, Copy, Debug, clap::ValueEnum)]
++pub enum Sources { Microphone, System, Both }
++impl Sources {
++    pub fn microphone(self) -> bool { matches!(self, Self::Microphone | Self::Both) }
++    pub fn system(self) -> bool { matches!(self, Self::System | Self::Both) }
++}
++
++/// Source-specific capture. Never initializes an unselected audio device.
++pub fn run_sources(rec: Arc<Recorder>, dir: std::path::PathBuf, stop: Arc<AtomicBool>, sources: Sources) {
+     let mut handles = Vec::new();
+ 
+     // MIC (cpal default input) — shared across every OS.
+-    {
++    if sources.microphone() {
+         let rec = rec.clone();
+         let dir = dir.clone();
+         let stop = stop.clone();
+@@ -55,7 +67,7 @@
+     }
+ 
+     // SYSTEM OUTPUT loopback — per-OS.
+-    {
++    if sources.system() {
+         let rec = rec.clone();
+         let dir = dir.clone();
+         let stop = stop.clone();
+--- /dev/null
++++ b/taiku-observer/src/audio_only.rs
+@@ -0,0 +1,50 @@
++//! One bounded, explicit audio recording. No process, input, screen or UI sensors.
++use crate::{audio_backend::{self, Sources}, clock::MasterClock, recorder::Recorder, schema::Event};
++use std::{io::{self, BufRead}, path::Path, sync::{Arc, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
++
++pub fn run(out: &Path, sources: Sources, seconds: u64) -> io::Result<()> {
++    if !(1..=3600).contains(&seconds) { return Err(io::Error::new(io::ErrorKind::InvalidInput, "duration must be 1..3600 seconds")); }
++    let rec = Recorder::create(out, &format!("audio-{}", uuid::Uuid::new_v4()), MasterClock::new())?;
++    rec.write_event(&Event::new(rec.clock.now_mono_ns(), "observer.audio_scope", serde_json::json!({
++        "microphone":sources.microphone(), "system":sources.system(), "max_seconds":seconds,
++        "other_sensors":false
++    })));
++    let stop=Arc::new(AtomicBool::new(false));
++    let stopped=stop.clone();
++    ctrlc::set_handler(move || { stopped.store(true,Ordering::SeqCst); }).map_err(io::Error::other)?;
++    let stopped=stop.clone();
++    std::thread::spawn(move || {
++        for line in io::stdin().lock().lines() {
++            if matches!(line.as_deref(), Ok("stop") | Err(_)) { break; }
++        }
++        // Losing the owning process's stdin ends recording too.
++        stopped.store(true,Ordering::SeqCst);
++    });
++    let capture=rec.clone(); let stopped=stop.clone();
++    let worker=std::thread::spawn(move || audio_backend::run_sources(capture.clone(),capture.dir.clone(),stopped,sources));
++    println!("{}",serde_json::json!({"recording_directory":rec.dir,"microphone":sources.microphone(),"system":sources.system()}));
++    let deadline=Instant::now()+Duration::from_secs(seconds);
++    while Instant::now()<deadline && !stop.load(Ordering::SeqCst) && !worker.is_finished() {
++        std::thread::sleep(Duration::from_millis(25));
++    }
++    stop.store(true,Ordering::SeqCst);
++    let deadline=Instant::now()+Duration::from_secs(5);
++    while !worker.is_finished() && Instant::now()<deadline { std::thread::sleep(Duration::from_millis(25)); }
++    if !worker.is_finished() { return Err(io::Error::other("audio device did not stop; recording is incomplete")); }
++    worker.join().map_err(|_|io::Error::other("audio worker failed"))?;
++    rec.finalize()?;
++    println!("{}",serde_json::json!({"finalized":true,"recording_directory":rec.dir}));
++    Ok(())
++}
++
++#[cfg(test)] mod tests {
++    use super::*;
++    #[test] fn source_selection_never_implies_the_other_source() {
++        assert!(Sources::Microphone.microphone()); assert!(!Sources::Microphone.system());
++        assert!(Sources::System.system()); assert!(!Sources::System.microphone());
++        assert!(Sources::Both.microphone() && Sources::Both.system());
++    }
++    #[test] fn invalid_duration_refuses_before_recorder_or_device_creation() {
++        for duration in [0,3601,u64::MAX] { assert!(run(Path::new("/no-recording-here"),Sources::Both,duration).is_err()); }
++    }
++}

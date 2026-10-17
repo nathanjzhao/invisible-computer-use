@@ -1,0 +1,9 @@
+{
+  "source": "taiku-observer-audio-helper",
+  "files": {
+    "Cargo.toml": "2f3422790ada78a74fbb216e7583e0bbd4876de173506579b9a2aa34d3dc1333",
+    "Cargo.lock": "fd3731e0e76cd1e99ed3a0805aa0d5648bc42cb8ec8890d48bd56d63618da468",
+    "build.rs": "1907460c96924d57217007e0461e07a1c81b3a62b33254d1f3d80839b3af2229",
+    "src/main.rs": "9c9c32f2b7db2b3856464d218c4787db06e659a2492f1c67115f20b7c6653f4d"
+  }
+}

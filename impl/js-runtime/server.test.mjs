@@ -1,0 +1,15 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import cp from 'node:child_process';import readline from 'node:readline';import {fileURLToPath} from 'node:url';
+test('MCP keeps native approval outside guest code and retains state across cells',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'icu-runtime-'));const fake=path.join(dir,'native');
+ fs.writeFileSync(fake,`#!${process.execPath}\nconst rl=require('node:readline').createInterface({input:process.stdin});let waiting;const send=v=>process.stdout.write(JSON.stringify(v)+'\\n');rl.on('line',line=>{const m=JSON.parse(line);if(!m.method&&m.id==='approve'){send({id:waiting,result:{structuredContent:{accepted:m.result.action==='accept'},content:[]}});return;}if(m.id===undefined)return;if(m.method==='initialize')send({id:m.id,result:{protocolVersion:'2024-11-05'}});else if(m.method==='tools/list')send({id:m.id,result:{tools:[{name:'click'},{name:'approve_app'}]}});else if(m.method==='tools/call'){waiting=m.id;send({jsonrpc:'2.0',id:'approve',method:'elicitation/create',params:{message:'Allow fixture click?',requestedSchema:{type:'object'}}});}});`,{mode:0o700});
+ const child=cp.spawn(process.execPath,[fileURLToPath(new URL('./server.mjs',import.meta.url)),'--icu',fake],{stdio:['pipe','pipe','pipe']});const pending=new Map();let seq=0,approved=0;const errors=[];child.stderr.on('data',x=>errors.push(String(x)));
+ const reader=readline.createInterface({input:child.stdout});reader.on('line',line=>{const m=JSON.parse(line);if(m.method==='elicitation/create'){approved++;child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:m.id,result:{action:'accept',content:{}}})+'\n');return;}const p=pending.get(m.id);if(p){clearTimeout(p.timer);pending.delete(m.id);p.resolve(m);}});
+ const call=(method,params={})=>new Promise((resolve,reject)=>{const id=++seq;const timer=setTimeout(()=>{pending.delete(id);reject(Error('runtime response timeout '+errors.join('')))},5000);pending.set(id,{resolve,reject,timer});child.stdin.write(JSON.stringify({jsonrpc:'2.0',id,method,params})+'\n');});
+ try{
+  await call('initialize',{capabilities:{elicitation:{}}});
+  let reply=await call('tools/call',{name:'js',arguments:{code:'state.answer=await icu.call("click",{}); emit(state.answer);'}});
+  assert.equal(reply.result.isError,false,JSON.stringify(reply));assert.equal(approved,1);assert.equal(JSON.parse(reply.result.content[0].text).accepted,true);
+  reply=await call('tools/call',{name:'js',arguments:{code:'emit(state.answer.accepted)'}});assert.equal(reply.result.content[0].text,'true');
+  reply=await call('tools/call',{name:'js',arguments:{code:'await icu.call("approve_app",{app:"anything"})'}});assert.equal(reply.result.isError,true);assert.equal(approved,1);
+ }finally{child.stdin.end();await new Promise(r=>{child.once('exit',r);setTimeout(()=>{child.kill();r()},1500).unref();});for(const p of pending.values())clearTimeout(p.timer);fs.rmSync(dir,{recursive:true,force:true});}
+});

@@ -1,0 +1,16 @@
+# The vendor paths impl/native/cua-driver.patch carries, one git pathspec per line. Read by
+# merge-patch.sh and apply-and-build.sh, and checked by conformance/test_patch_merges.py, so the
+# tools cannot disagree about what the patch covers.
+#
+# Source: the crates and the lockfile.
+libs/cua-driver/rust/crates
+libs/cua-driver/rust/Cargo.lock
+# Generated from that source: the checked-in tool contract and the SDK bindings built from it.
+# Regenerate them with `impl/native/apply-and-build.sh --regen`, never by hand; `--check-generated`
+# fails when they are stale against the source.
+libs/cua-driver/contract/manifest.json
+libs/cua-driver/python/src/cua_driver/_native.py
+libs/cua-driver/python/src/cua_driver/_native_contract.py
+libs/cua-driver/python/.cua-driver-uniffi-generated-files
+libs/cua-driver/typescript/src/native
+libs/cua-driver/typescript/.cua-driver-uniffi-generated-files

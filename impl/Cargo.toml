@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+members = ["axdiff", "app-instructions", "window2", "confirmations", "skysight", "icu", "ui-readiness", "action-outcomes"]
+
+# One build for the whole layer: `cargo build --manifest-path impl/Cargo.toml --release`
+# (artifacts under impl/target/). The vendored driver depends on `axdiff` by path
+# from its own workspace; that is unaffected.
+[profile.release]
+strip = true

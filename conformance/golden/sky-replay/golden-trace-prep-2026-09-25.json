@@ -1,0 +1,1914 @@
+{
+ "capture": "study/audit/golden-trace-prep-2026-09-25/validation/probe",
+ "about": "AX input written from each captured Sky row (roles, subroles and the raw AX actions the stock driver reports on the same controls: conformance/fixtures/clock_gws.json, study/audit/review-2026-09-25/macos-evidence/mac/runs/ffbd39a-identity/turn-w0.json), replayed through our layer and compared byte for byte with what Sky returned. `expect` points into the capture; `ipc_line` is the 1-based line of sky-ipc.jsonl carrying the service's own skyshot.",
+ "sessions": [
+  {
+   "name": "minicalc",
+   "pid": "3104",
+   "window": "1",
+   "bundle_id": "dev.icu.golden.minicalc",
+   "turns": [
+    {
+     "step": "minicalc_state_1",
+     "expect": {
+      "results_key": "minicalc_state_1",
+      "json_field": "text"
+     },
+     "ipc_line": 8,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "parent_index": 0,
+        "title": null,
+        "settable": true,
+        "value": "0",
+        "identifier": "calc-display",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ]
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "7",
+        "identifier": "calc-btn-7",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "8",
+        "identifier": "calc-btn-8",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "9",
+        "identifier": "calc-btn-9",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "4",
+        "identifier": "calc-btn-4",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "5",
+        "identifier": "calc-btn-5",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "6",
+        "identifier": "calc-btn-6",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "1",
+        "identifier": "calc-btn-1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "2",
+        "identifier": "calc-btn-2",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "3",
+        "identifier": "calc-btn-3",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "0",
+        "identifier": "calc-btn-0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "×",
+        "identifier": "calc-btn-×",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "+",
+        "identifier": "calc-btn-+",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "=",
+        "identifier": "calc-btn-=",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "C",
+        "identifier": "calc-btn-C",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXZoomButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 0,
+        "title": null,
+        "value": "MiniCalc"
+       }
+      ],
+      "selected_text": "0"
+     }
+    },
+    {
+     "step": "minicalc_state_2_diff",
+     "after": "click element 2 (button 7)",
+     "expect": {
+      "results_key": "minicalc_state_2_diff"
+     },
+     "ipc_line": 16,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "parent_index": 0,
+        "title": null,
+        "settable": true,
+        "value": "7",
+        "identifier": "calc-display",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ]
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "7",
+        "identifier": "calc-btn-7",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "8",
+        "identifier": "calc-btn-8",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "9",
+        "identifier": "calc-btn-9",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "4",
+        "identifier": "calc-btn-4",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "5",
+        "identifier": "calc-btn-5",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "6",
+        "identifier": "calc-btn-6",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "1",
+        "identifier": "calc-btn-1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "2",
+        "identifier": "calc-btn-2",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "3",
+        "identifier": "calc-btn-3",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "0",
+        "identifier": "calc-btn-0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "×",
+        "identifier": "calc-btn-×",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "+",
+        "identifier": "calc-btn-+",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "=",
+        "identifier": "calc-btn-=",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "C",
+        "identifier": "calc-btn-C",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXZoomButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 0,
+        "title": null,
+        "value": "MiniCalc"
+       }
+      ],
+      "selected_text": "7"
+     }
+    },
+    {
+     "step": "minicalc_state_3_nochange",
+     "expect": {
+      "results_key": "minicalc_state_3_nochange"
+     },
+     "ipc_line": 20,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "parent_index": 0,
+        "title": null,
+        "settable": true,
+        "value": "7",
+        "identifier": "calc-display",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ]
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "7",
+        "identifier": "calc-btn-7",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "8",
+        "identifier": "calc-btn-8",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "9",
+        "identifier": "calc-btn-9",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "4",
+        "identifier": "calc-btn-4",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "5",
+        "identifier": "calc-btn-5",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "6",
+        "identifier": "calc-btn-6",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "1",
+        "identifier": "calc-btn-1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "2",
+        "identifier": "calc-btn-2",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "3",
+        "identifier": "calc-btn-3",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "0",
+        "identifier": "calc-btn-0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "×",
+        "identifier": "calc-btn-×",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "+",
+        "identifier": "calc-btn-+",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "=",
+        "identifier": "calc-btn-=",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "C",
+        "identifier": "calc-btn-C",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXZoomButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 0,
+        "title": null,
+        "value": "MiniCalc"
+       }
+      ],
+      "selected_text": "7"
+     }
+    },
+    {
+     "step": "minicalc_state_4_full",
+     "disable_diff": true,
+     "expect": {
+      "results_key": "minicalc_state_4_full"
+     },
+     "ipc_line": 24,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "parent_index": 0,
+        "title": null,
+        "settable": true,
+        "value": "7",
+        "identifier": "calc-display",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ]
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "7",
+        "identifier": "calc-btn-7",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "8",
+        "identifier": "calc-btn-8",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "9",
+        "identifier": "calc-btn-9",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "4",
+        "identifier": "calc-btn-4",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "5",
+        "identifier": "calc-btn-5",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "6",
+        "identifier": "calc-btn-6",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "1",
+        "identifier": "calc-btn-1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "2",
+        "identifier": "calc-btn-2",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "3",
+        "identifier": "calc-btn-3",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "0",
+        "identifier": "calc-btn-0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "×",
+        "identifier": "calc-btn-×",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "+",
+        "identifier": "calc-btn-+",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "=",
+        "identifier": "calc-btn-=",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "C",
+        "identifier": "calc-btn-C",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXZoomButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 0,
+        "title": null,
+        "value": "MiniCalc"
+       }
+      ],
+      "selected_text": "7"
+     }
+    },
+    {
+     "step": "minicalc_set_value",
+     "after": "set_value element 1 = 123",
+     "expect": {
+      "results_key": "minicalc_set_value"
+     },
+     "ipc_line": 32,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "parent_index": 0,
+        "title": null,
+        "settable": true,
+        "value": "123",
+        "identifier": "calc-display",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "focused": true
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "7",
+        "identifier": "calc-btn-7",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "8",
+        "identifier": "calc-btn-8",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "9",
+        "identifier": "calc-btn-9",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "4",
+        "identifier": "calc-btn-4",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "5",
+        "identifier": "calc-btn-5",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "6",
+        "identifier": "calc-btn-6",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "1",
+        "identifier": "calc-btn-1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "2",
+        "identifier": "calc-btn-2",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "3",
+        "identifier": "calc-btn-3",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "0",
+        "identifier": "calc-btn-0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "×",
+        "identifier": "calc-btn-×",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "+",
+        "identifier": "calc-btn-+",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "=",
+        "identifier": "calc-btn-=",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "C",
+        "identifier": "calc-btn-C",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXZoomButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 0,
+        "title": null,
+        "value": "MiniCalc"
+       }
+      ]
+     }
+    },
+    {
+     "step": "minicalc_press_key",
+     "after": "press_key super+a",
+     "expect": {
+      "results_key": "minicalc_press_key"
+     },
+     "ipc_line": 40,
+     "doc": {
+      "pid": 3104,
+      "window_id": 1,
+      "app_name": "MiniCalc",
+      "window_title": "MiniCalc",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "MiniCalc",
+        "subrole": "AXStandardWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXTextField",
+        "parent_index": 0,
+        "title": null,
+        "settable": true,
+        "value": "123",
+        "identifier": "calc-display",
+        "actions": [
+         "AXShowMenu",
+         "AXConfirm"
+        ],
+        "focused": true
+       },
+       {
+        "element_index": 2,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "7",
+        "identifier": "calc-btn-7",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "8",
+        "identifier": "calc-btn-8",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "9",
+        "identifier": "calc-btn-9",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "4",
+        "identifier": "calc-btn-4",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "5",
+        "identifier": "calc-btn-5",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "6",
+        "identifier": "calc-btn-6",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "1",
+        "identifier": "calc-btn-1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "2",
+        "identifier": "calc-btn-2",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "3",
+        "identifier": "calc-btn-3",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "0",
+        "identifier": "calc-btn-0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "×",
+        "identifier": "calc-btn-×",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "+",
+        "identifier": "calc-btn-+",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "=",
+        "identifier": "calc-btn-=",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": "C",
+        "identifier": "calc-btn-C",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXZoomButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 0,
+        "title": null,
+        "value": "MiniCalc"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "clock",
+   "pid": "3193",
+   "window": "1",
+   "bundle_id": "com.apple.clock",
+   "turns": [
+    {
+     "step": "clock_first_touch",
+     "expect": {
+      "results_key": "clock_first_touch"
+     },
+     "ipc_line": 44,
+     "doc": {
+      "pid": 3193,
+      "window_id": 1,
+      "app_name": "Clock",
+      "window_title": "Clock",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "Clock",
+        "subrole": "AXStandardWindow",
+        "identifier": "SceneWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXGroup",
+        "parent_index": 0,
+        "title": null
+       },
+       {
+        "element_index": 2,
+        "role": "AXGroup",
+        "parent_index": 1,
+        "title": null,
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXGroup",
+        "parent_index": 2,
+        "title": null,
+        "actions": [
+         "AXCancel",
+         "AXScrollDownByPage",
+         "AXScrollUpByPage"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXStaticText",
+        "parent_index": 3,
+        "title": null,
+        "description": "Cupertino",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXStaticText",
+        "parent_index": 3,
+        "title": null,
+        "description": "New York",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXStaticText",
+        "parent_index": 3,
+        "title": null,
+        "description": "3:02 PM",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXStaticText",
+        "parent_index": 3,
+        "title": null,
+        "description": "6:02 PM",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXGroup",
+        "parent_index": 3,
+        "title": null,
+        "identifier": "Cupertino",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXUnknown",
+        "parent_index": 8,
+        "title": null,
+        "description": "Daytime",
+        "value": "3:02 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXStaticText",
+        "parent_index": 8,
+        "title": null,
+        "description": "Cupertino, 3:02 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 11,
+        "role": "AXStaticText",
+        "parent_index": 8,
+        "title": null,
+        "description": "Today, -7 HRS",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 12,
+        "role": "AXStaticText",
+        "parent_index": 8,
+        "title": null,
+        "description": "Sunrise: 6:58 AM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 13,
+        "role": "AXStaticText",
+        "parent_index": 8,
+        "title": null,
+        "description": "Sunset: 7:00 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 14,
+        "role": "AXGroup",
+        "parent_index": 3,
+        "title": null,
+        "identifier": "New York",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 15,
+        "role": "AXUnknown",
+        "parent_index": 14,
+        "title": null,
+        "description": "Nighttime",
+        "value": "6:02 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 16,
+        "role": "AXStaticText",
+        "parent_index": 14,
+        "title": null,
+        "description": "New York, 6:02 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 17,
+        "role": "AXStaticText",
+        "parent_index": 14,
+        "title": null,
+        "description": "Today, -4 HRS",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 18,
+        "role": "AXStaticText",
+        "parent_index": 14,
+        "title": null,
+        "description": "Sunrise: 6:46 AM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 19,
+        "role": "AXStaticText",
+        "parent_index": 14,
+        "title": null,
+        "description": "Sunset: 6:48 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 20,
+        "role": "AXToolbar",
+        "parent_index": 0,
+        "title": null,
+        "actions": [
+         "AXShowMenu"
+        ]
+       },
+       {
+        "element_index": 21,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "World Clock",
+        "value": "1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 22,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "Alarms",
+        "value": "0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 23,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "Stopwatch",
+        "value": "0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 24,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "Timers",
+        "value": "0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 25,
+        "role": "AXMenuButton",
+        "parent_index": 20,
+        "title": null,
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 26,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXCloseButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 27,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXFullScreenButton",
+        "help": "this button also has an action to zoom the window",
+        "actions": [
+         "AXPress",
+         "AXZoomWindow",
+         "AXShowMenu"
+        ]
+       },
+       {
+        "element_index": 28,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXMinimizeButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 29,
+        "role": "AXMenuBar",
+        "title": null,
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 30,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Clock",
+        "identifier": "com.apple.menu.application",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 31,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "File",
+        "identifier": "com.apple.menu.file",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 32,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Edit",
+        "identifier": "com.apple.menu.edit",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 33,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "View",
+        "identifier": "com.apple.menu.view",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 34,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Window",
+        "identifier": "com.apple.menu.window",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 35,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Help",
+        "identifier": "com.apple.menu.help",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 36,
+        "role": "AXMenu",
+        "parent_index": 30,
+        "title": null,
+        "actions": [
+         "AXCancel"
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "step": "clock_second_read",
+     "after": "nothing (Clock fills its accessibility content lazily)",
+     "expect": {
+      "results_key": "clock_second_read"
+     },
+     "ipc_line": 48,
+     "doc": {
+      "pid": 3193,
+      "window_id": 1,
+      "app_name": "Clock",
+      "window_title": "Clock",
+      "elements": [
+       {
+        "element_index": 0,
+        "role": "AXWindow",
+        "title": "Clock",
+        "subrole": "AXStandardWindow",
+        "identifier": "SceneWindow",
+        "actions": [
+         "AXRaise"
+        ]
+       },
+       {
+        "element_index": 1,
+        "role": "AXGroup",
+        "parent_index": 0,
+        "title": null
+       },
+       {
+        "element_index": 2,
+        "role": "AXGroup",
+        "parent_index": 1,
+        "title": null,
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 3,
+        "role": "AXGroup",
+        "parent_index": 2,
+        "title": null,
+        "actions": [
+         "AXCancel",
+         "AXScrollDownByPage",
+         "AXScrollUpByPage"
+        ]
+       },
+       {
+        "element_index": 4,
+        "role": "AXHeading",
+        "parent_index": 3,
+        "title": null,
+        "description": "World map",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 5,
+        "role": "AXUnknown",
+        "parent_index": 4,
+        "title": null,
+        "description": "Cupertino, 3:02 PM",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 6,
+        "role": "AXUnknown",
+        "parent_index": 4,
+        "title": null,
+        "description": "New York, 6:02 PM",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 7,
+        "role": "AXGroup",
+        "parent_index": 3,
+        "title": null,
+        "description": "Cupertino, 3:02 PM",
+        "identifier": "Cupertino",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 8,
+        "role": "AXStaticText",
+        "parent_index": 7,
+        "title": null,
+        "description": "Cupertino, 3:02 PM, Daytime, Today, -7 HRS, Sunrise: 6:58 AM, Sunset: 7:00 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 9,
+        "role": "AXGroup",
+        "parent_index": 3,
+        "title": null,
+        "description": "New York, 6:02 PM",
+        "identifier": "New York",
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 10,
+        "role": "AXStaticText",
+        "parent_index": 9,
+        "title": null,
+        "description": "New York, 6:02 PM, Nighttime, Today, -4 HRS, Sunrise: 6:46 AM, Sunset: 6:48 PM",
+        "actions": [
+         "AXCancel",
+         "Name:Remove clock\nTarget:0x0\nSelector:(null)"
+        ]
+       },
+       {
+        "element_index": 20,
+        "role": "AXToolbar",
+        "parent_index": 0,
+        "title": null,
+        "actions": [
+         "AXShowMenu"
+        ]
+       },
+       {
+        "element_index": 21,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "World Clock",
+        "value": "1",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 22,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "Alarms",
+        "value": "0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 23,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "Stopwatch",
+        "value": "0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 24,
+        "role": "AXRadioButton",
+        "parent_index": 20,
+        "title": null,
+        "description": "Timers",
+        "value": "0",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 25,
+        "role": "AXMenuButton",
+        "parent_index": 20,
+        "title": null,
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 26,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXCloseButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 27,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXFullScreenButton",
+        "help": "this button also has an action to zoom the window",
+        "actions": [
+         "AXPress",
+         "AXZoomWindow",
+         "AXShowMenu"
+        ]
+       },
+       {
+        "element_index": 28,
+        "role": "AXButton",
+        "parent_index": 0,
+        "title": null,
+        "subrole": "AXMinimizeButton",
+        "actions": [
+         "AXPress"
+        ]
+       },
+       {
+        "element_index": 29,
+        "role": "AXMenuBar",
+        "title": null,
+        "actions": [
+         "AXCancel"
+        ]
+       },
+       {
+        "element_index": 30,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Clock",
+        "identifier": "com.apple.menu.application",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 31,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "File",
+        "identifier": "com.apple.menu.file",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 32,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Edit",
+        "identifier": "com.apple.menu.edit",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 33,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "View",
+        "identifier": "com.apple.menu.view",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 34,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Window",
+        "identifier": "com.apple.menu.window",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 35,
+        "role": "AXMenuBarItem",
+        "parent_index": 29,
+        "title": "Help",
+        "identifier": "com.apple.menu.help",
+        "actions": [
+         "AXCancel",
+         "AXPress",
+         "AXPick"
+        ]
+       },
+       {
+        "element_index": 36,
+        "role": "AXMenu",
+        "parent_index": 30,
+        "title": null,
+        "actions": [
+         "AXCancel"
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

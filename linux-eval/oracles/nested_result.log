@@ -1,0 +1,12 @@
+nested display=wayland-0 inject=/tmp/xdgrt/cua-inject.sock
+nested target pid 582731 wid 38189858816 elements 3
+click         deliver=False focus_free=False route=accessibility          events=[]
+set_value     deliver=False focus_free=False route=None                   events=[]
+double_click  deliver=False focus_free=False route=None                   events=[]
+right_click   deliver=False focus_free=False route=None                   events=[]
+scroll        deliver=False focus_free=False route=background_unavailable events=[]
+drag          deliver=False focus_free=False route=None                   events=[]
+type_text     deliver=False focus_free=False route=None                   events=[]
+press_key     deliver=False focus_free=False route=None                   events=[]
+hotkey        deliver=False focus_free=False route=None                   events=[]
+DONE_NESTED2

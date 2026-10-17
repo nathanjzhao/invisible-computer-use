@@ -1,0 +1,320 @@
+git status
+git log --oneline -20
+git log -p src/main.rs
+git log --author=alice --since=2.weeks
+git log --author "Jane Doe" --stat
+git shortlog -sn --author=bob
+git diff HEAD~1 -- src/
+git commit -m "fix password reset flow"
+git commit -m "rotate api key for staging"
+git commit -am "session timeout handling"
+git checkout -b fix/session-timeout
+git push origin feature/token-refresh
+git push -u origin main
+git pull --rebase origin main
+git fetch --all --prune
+git rebase -i HEAD~3
+git stash pop
+git tag -a v1.2.0 -m "release"
+git remote add origin git@github.com:org/repo.git
+git remote -v
+git clone https://github.com/org/repo.git
+git clone ssh://git@github.com/org/repo.git
+git config --global user.email me@example.com
+git config --global credential.helper osxkeychain
+git config --get credential.helper
+git -c credential.helper= fetch origin
+git credential-osxkeychain erase
+git blame -L 10,40 src/auth.rs
+git grep -n "api_key" -- src/
+git bisect start HEAD v1.0
+git worktree add ../wt feature/cookie-banner
+gh pr list --author @me
+gh pr create --title "Add token refresh" --body "Refreshes the session token"
+gh pr view 42 --web
+gh auth status
+gh auth login --web
+gh auth token
+gh auth refresh -s read:org
+gh secret list
+gh secret set API_KEY < api_key.txt
+gh run list --limit 5
+gh repo clone org/repo
+gh api repos/org/repo/pulls
+ls -la
+ls -la ~/.ssh
+ls ~/.aws/credentials
+cat ~/.ssh/known_hosts
+cat /etc/passwd
+cat .env.example
+cd /var/log
+pwd
+mkdir -p build/out
+cp -p a.txt b.txt
+cp -r src/ backup/
+mv old.rs new.rs
+rm -rf target/
+chmod 600 ~/.ssh/id_ed25519
+chmod +x run.sh
+chown -R www-data: /var/www
+ln -s ../shared/config.toml config.toml
+find . -name "*.key" -mtime -7
+find . -type f -name "*secret*"
+tar -xpf archive.tar
+tar czf backup-keys.tgz keys/
+zip -r site.zip public/
+unzip site.zip -d site
+du -sh * | sort -h
+df -h
+ps -p 1234 -o pid,cmd
+ps aux | grep nginx
+lsof -p 4321
+lsof -i :8080
+kill -9 4321
+top -o cpu
+htop
+nice -n 10 make -j8
+time cargo build --release
+watch -n 5 kubectl get pods
+grep -rn api_key src
+grep -i token logs.txt
+grep -n "token=" app.log
+grep -p pattern file.txt
+rg "password" src/
+rg -t rust "fn session"
+sed -n 1,20p README.md
+sed -i 's/localhost/127.0.0.1/' config.ini
+awk -F: '{print $1}' /etc/passwd
+cut -d: -f1 /etc/passwd
+sort -t, -k2 data.csv
+sort -u --key 2 names.txt
+uniq -c counts.txt
+wc -w essay.txt
+head -n 50 app.log
+tail -f /var/log/syslog
+less +F server.log
+jq .token config.json
+jq -r '.access_token' resp.json
+jq '.items[] | .name' list.json
+yq '.auth.enabled' values.yaml
+xargs -n 1 echo < list.txt
+diff -u a.txt b.txt
+patch -p1 < fix.patch
+vim .env
+nano ~/.bashrc
+code .
+open -a Safari https://example.com
+echo $PATH
+echo $API_KEY
+echo "hello world"
+printf '%s\n' "done"
+export PATH=$HOME/.cargo/bin:$PATH
+export EDITOR=vim
+export LANG=en_US.UTF-8
+LANG=C sort names.txt
+CC=clang make
+RUST_LOG=debug cargo run
+NODE_ENV=production npm start
+source .venv/bin/activate
+python3 -m venv .venv
+python3 -c "import secrets; print(secrets.token_hex(16))"
+python manage.py createsuperuser
+python manage.py migrate
+pip install -r requirements.txt
+pip install --index-url https://pypi.org/simple requests
+pip install --upgrade pip
+pip config get global.index-url
+poetry install
+poetry run pytest -k token_refresh
+pytest -k "session and not slow" -x
+pytest tests/test_auth.py::test_login
+npm install
+npm run build
+npm run token:refresh
+npm test -- --watch
+npm config get registry
+npm whoami
+npm token list
+npm login
+npm publish --access public
+npx prettier --write .
+yarn add lodash
+pnpm install --frozen-lockfile
+node -e "console.log(process.env.HOME)"
+cargo build --release
+cargo test --workspace -- --nocapture
+cargo login
+cargo publish --dry-run
+cargo clippy -- -D warnings
+rustup update stable
+go test ./...
+go build -o bin/server ./cmd/server
+go mod tidy
+make test
+make install PREFIX=/usr/local
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+docker ps -a
+docker images
+docker build -t app:latest .
+docker build --secret id=npm,src=$HOME/.npmrc -t app .
+docker run -p 8080:80 nginx
+docker run -w /app -v $PWD:/app node:20 npm test
+docker run --rm -it -e POSTGRES_DB=app -p 5432:5432 postgres:16
+docker run --rm -v ~/.ssh:/root/.ssh:ro alpine ls /root/.ssh
+docker exec -it db psql -U postgres
+docker logs -f api
+docker compose up -d
+docker compose --env-file .env.prod up -d
+docker login ghcr.io -u me --password-stdin
+docker login
+docker system prune -af
+kubectl get pods -o wide
+kubectl get secrets
+kubectl get secret db -o yaml
+kubectl describe secret db-creds
+kubectl logs -f deploy/api
+kubectl exec -it api-7d9 -- bash
+kubectl port-forward svc/api 8080:80
+kubectl config use-context prod
+kubectl config get-contexts
+kubectl apply -f k8s/
+kubectl rollout restart deploy/api
+kubectl create token my-sa
+kubectl create secret generic tls-files --from-file=./key.pem --from-file=./cert.pem
+kubectl delete pod api-7d9
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install db bitnami/postgresql -f values.yaml
+helm upgrade api ./chart --set image.tag=1.2.3
+helm upgrade api ./chart --set auth.enabled=true
+helm list -A
+terraform init
+terraform plan -var-file=prod.tfvars
+terraform apply -auto-approve
+terraform state list
+aws configure list
+aws s3 ls s3://my-bucket
+aws s3 cp s3://bucket/key.txt .
+aws s3api get-object --bucket b --key path/to/file.txt out.txt
+aws sts get-caller-identity
+aws sts assume-role --role-arn arn:aws:iam::123456789012:role/dev --role-session-name dev
+aws secretsmanager get-secret-value --secret-id prod/db
+aws ssm get-parameter --name /prod/db/password --with-decryption
+aws kms decrypt --key-id alias/app --ciphertext-blob fileb://c.bin
+aws iam create-access-key --user-name ci
+aws logs tail /aws/lambda/api --follow
+gcloud auth login
+gcloud auth application-default login
+gcloud config set project my-project
+gcloud compute ssh vm-1 --zone us-central1-a
+az login --use-device-code
+az account show
+az keyvault secret show --name db --vault-name kv
+az aks get-credentials -g rg -n cluster
+ssh host
+ssh -p 22 host
+ssh -p 2222 deploy@host
+ssh -i ~/.ssh/key.pem ubuntu@10.0.0.5
+ssh -o PasswordAuthentication=no host
+ssh -o "ProxyCommand=ssh -W %h:%p bastion" host
+ssh -L 5432:localhost:5432 bastion
+ssh-keygen -t ed25519 -C "me@example.com" -f ~/.ssh/id_ed25519
+ssh-keygen -lf ~/.ssh/id_ed25519.pub
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+ssh-add ~/.ssh/id_ed25519
+ssh-copy-id -i ~/.ssh/id_ed25519.pub host
+eval "$(ssh-agent -s)"
+scp -P 2222 file.txt host:/tmp/
+rsync -avz -e "ssh -p 2222" src/ host:/srv/app/
+sshpass -f pw.txt ssh -p 22 host
+sftp -P 2222 user@host
+gpg --recv-keys ABCD1234EF
+gpg --list-secret-keys
+gpg --export-secret-keys ABCD1234EF > key.asc
+gpg --decrypt secrets.yml.gpg
+gpg --passphrase-fd 0 --batch -d file.gpg
+openssl genrsa -out key.pem 2048
+openssl req -new -key key.pem -out csr.pem
+openssl x509 -in cert.pem -noout -text
+openssl rsa -in key.pem -pubout -out pub.pem
+openssl pkcs12 -export -in cert.pem -inkey key.pem -out cert.p12
+openssl s_client -connect example.com:443
+openssl rand -hex 32
+openssl dgst -sha256 -sign key.pem -out sig.bin file
+openssl enc -aes-256-cbc -in f -out f.enc -pass file:./pw.txt
+openssl enc -aes-256-cbc -in f -out f.enc -pass env:PW
+keytool -list -keystore ks.jks
+certbot certonly --webroot -w /var/www -d example.com
+mysql -u root -p
+mysql -h db -u app -p app_db
+mysqldump -u root -p db > db.sql
+psql -h db -U app -d app
+psql -p 5433 -U postgres
+psql postgresql://app@localhost/app
+pg_dump -Fc app > app.dump
+redis-cli -h cache -p 6379 ping
+redis-cli -n 2 KEYS 'session:*'
+redis-cli GET session:abc
+mongosh mongodb://localhost:27017
+sqlite3 app.db ".tables"
+curl https://example.com
+curl -I https://example.com
+curl -sSL https://sh.rustup.rs | sh
+curl -H "Accept: application/json" https://api.example.com/items
+curl -X POST -d 'username=alice&remember=1' https://example.com/login
+curl -d "grant_type=client_credentials" https://auth.example.com/token
+curl -u admin https://example.com/admin
+curl -w "%{http_code}" -o /dev/null -s https://example.com
+curl -b cookies.txt -c cookies.txt https://example.com
+wget https://example.com/file.tar.gz
+wget --user=me --ask-password https://example.com/file
+http GET :8000/items
+http POST :8000/login username=alice
+ansible-playbook site.yml --ask-vault-pass
+ansible-playbook site.yml --vault-password-file ~/.vault_pass
+ansible-vault encrypt secrets.yml
+ansible all -m ping
+vault status
+vault kv get secret/data/app
+vault token lookup
+vault login -method=oidc
+pass show email/gmail
+pass generate web/github 24
+op read op://vault/item/password
+bw unlock
+bw get password github
+security find-generic-password -s svc -w
+security find-generic-password -w -s svc
+security list-keychains
+htpasswd -n admin
+htpasswd -D .htpasswd admin
+mkpasswd -m sha-512
+pwgen 16 1
+kinit alice@EXAMPLE.COM
+klist
+passwd
+sudo -u postgres psql
+sudo systemctl restart sshd
+su - deploy
+journalctl -u nginx --since today
+systemctl status nginx
+tmux new-session -s work
+tmux attach-session -t work
+screen -S session1
+ffmpeg -i in.mp4 -c:v libx264 -crf 23 out.mp4
+ffmpeg -y -i in.mp4 -c:v libx264 -b:v 2M -pass 1 -f null /dev/null
+convert in.png -resize 50% out.png
+brew install jq
+brew upgrade
+apt-get update && apt-get install -y curl
+apt-key list
+dnf install -y git
+nmcli dev wifi list
+nmcli connection show
+Get-ChildItem Env:
+Get-Credential
+runas /user:admin cmd
+Get-Process | Sort-Object CPU -Descending
+Set-Location C:\Users\me\src
+Invoke-WebRequest -Uri https://example.com -OutFile page.html
+set -x EDITOR vim
+set -gx PATH $HOME/bin $PATH

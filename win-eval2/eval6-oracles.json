@@ -1,0 +1,8 @@
+{
+  "note": "eval6: VISIBLE, NON-FOREGROUND target (form hwnd 66122, pid 4348). Foreground throughout = window 327936 (a different window). Fixture logs focused-state on every event.",
+  "state": {"target_hwnd":66122,"is_iconic":false,"is_visible":true,"target_is_foreground":false,"foreground":{"hwnd":327936,"pid":4348}},
+  "window": {"target":{"pid":4348,"window_id":66122,"minimized":false,"is_on_screen":true},"nelem":7,"btn_idx":0,"fld_idx":1},
+  "click": {"resp":{"route":"accessibility","delivery":{"mode":"background"},"effect":"unverifiable"},"fg_before":{"hwnd":327936},"fg_after":{"hwnd":327936},"target_was_fg":false,"target_fg_after":false,"iconic_after":false,"oracle":"fx6.log buttonPressed focused:false"},
+  "set_value": {"resp":{"route":"accessibility","delivery":{"mode":"unknown"},"effect":"unverifiable"},"fg_before":{"hwnd":327936},"fg_after":{"hwnd":327936},"target_was_fg":false,"target_fg_after":false,"oracle":"fx6.log textChanged 'visible unfocused' focused:false"},
+  "type_text": {"resp":{"route":"synthetic_events","delivery":{"mode":"background"},"effect":"unverifiable","escalation":{"reason":"delivery_failed","target":"foreground"}},"fg_before":{"hwnd":327936},"fg_after":{"hwnd":327936},"target_fg_after":false,"oracle":"no ' typed' in fx6.log — not delivered"}
+}

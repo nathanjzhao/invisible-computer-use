@@ -1,0 +1,541 @@
+--- a/taiku-observer/src/main.rs
++++ b/taiku-observer/src/main.rs
+@@ -98,6 +98,7 @@
+ // limits the privacy guarantees rest on must be one definition, readable and testable on
+ // every platform, not a per-OS copy that can quietly drift.
+ mod ui_common;
++mod ui_pointer;
+ #[cfg(target_os = "linux")]
+ mod ui_atspi_linux;
+ #[cfg(windows)]
+--- a/taiku-observer/src/ui_ax_macos.rs
++++ b/taiku-observer/src/ui_ax_macos.rs
+@@ -19,8 +19,9 @@
+ //!
+ //! ## The permission story, which is the point
+ //!
+-//! This sensor requires the **Accessibility** grant and NOTHING ELSE. Specifically it
+-//! never requires (and cannot silently acquire) Screen Recording:
++//! Semantic reads require **Accessibility**. The pointer-only event tap can also
++//! require Input Monitoring on some macOS versions; when unavailable, the sensor
++//! explicitly reports the gap and retries installation. Neither path requests Screen Recording:
+ //!
+ //!   * The frontmost application is resolved from `CGWindowListCopyWindowInfo`, reading
+ //!     ONLY `kCGWindowOwnerPID` and `kCGWindowLayer`. Those two keys are served without
+@@ -161,10 +162,10 @@
+ ///
+ /// The focus TREE is sampled at `cfg.poll` (the privacy parameter — see the module header on
+ /// why polling beats AXObserver). But a click is instantaneous: a 400 ms sampler would miss
+-/// most clicks entirely. So the loop actually ticks at this faster interval, polls only the
+-/// CHEAP button STATE each tick (no event tap, no CFRunLoop, no keylogging surface), and
+-/// pays for the expensive hit-test only on the button-down rising edge. 40 ms reliably lands
+-/// inside a normal click's down-phase (measured: a 300 ms held click sampled 4 times).
++/// most clicks entirely. This interval is retained only for the explicitly reported
++/// fallback when the left-button-only event tap is unavailable. It polls button state
++/// and hit-tests on the rising edge. Short down/up pulses can be missed between polls;
++/// the event stream identifies this fallback so consumers do not assume complete capture.
+ const POINTER_POLL: Duration = Duration::from_millis(40);
+ 
+ /// Policy (sampling interval, value cap, excluded apps) is shared with every other
+@@ -289,7 +290,7 @@
+ /// matters: menu bars, the Dock, notification banners, and screen-saver windows all sit on
+ /// non-zero layers and would otherwise be reported as "the app the user is in" every time
+ /// a notification appeared.
+-fn frontmost_pid() -> Option<i32> {
++pub(crate) fn frontmost_pid() -> Option<i32> {
+     // Raw sys-level FFI rather than the `core-graphics` / `core-foundation` safe
+     // wrappers: this crate's dependency graph contains MORE THAN ONE version of
+     // `core_foundation`, so the typed `CFDictionary::find` from one version does not
+@@ -362,7 +363,7 @@
+     let s = String::from_utf8_lossy(&out.stdout);
+     let (_, rhs) = s.split_once('=')?;
+     let v = rhs.trim().trim_matches('"').to_string();
+-    if v.is_empty() {
++    if v.is_empty() || !v.bytes().all(|c|c.is_ascii_alphanumeric()||b"._-".contains(&c)) {
+         None
+     } else {
+         Some(v)
+@@ -613,7 +614,8 @@
+ }
+ 
+ pub fn run(rec: Arc<Recorder>, stop: Arc<AtomicBool>, cfg: AxConfig) {
+-    if !unsafe { AXIsProcessTrusted() } {
++    let initially_untrusted=!unsafe { AXIsProcessTrusted() };
++    if initially_untrusted {
+         // Degrade, never crash: an ungranted permission disables THIS stream and leaves
+         // every other sensor running. The event records why, so a recording missing ui.*
+         // is self-explaining rather than looking like a broken backend.
+@@ -626,18 +628,21 @@
+                 "reason": "not trusted for Accessibility (Privacy & Security -> Accessibility)",
+             }),
+         ));
+-        return;
++        while !unsafe{AXIsProcessTrusted()} {
++            if !sleep_interruptible(&stop,Duration::from_millis(500)){return;}
++        }
++        rec.write_event(&Event::new(rec.clock.now_mono_ns(),"observer.ui_accessibility_recovered",serde_json::json!({"lost_count_unknown":true})));
+     }
+ 
+     rec.write_event(&Event::new(
+         rec.clock.now_mono_ns(),
+         "observer.ui_start",
+         serde_json::json!({
+-            "mechanism": "macOS AX (AXUIElement, polled focus + click hit-test)",
++            "mechanism": "macOS AX (sampled focus + pointer event hit-test)",
+             "enabled": true,
+             "values": cfg.values,
+             "poll_ms": cfg.poll.as_millis() as u64,
+-            "pointer_poll_ms": POINTER_POLL.as_millis() as u64,
++            "click_source": "listen-only pointer event tap with bounded retries",
+             "max_value_chars": cfg.max_value_chars,
+             "excluded_apps": cfg.excluded_apps.len(),
+             "note": "focus tree sampled on change at poll_ms; clicks emit ui.click with the \
+@@ -656,30 +661,32 @@
+     let mut last_value: Option<String> = None;
+     let mut last_value_len: usize = usize::MAX;
+     let mut was_locked = false;
++    let mut was_untrusted=false;
+     // None forces the first focus poll immediately, then it fires every cfg.poll.
+     let mut last_focus_at: Option<std::time::Instant> = None;
+ 
+-    // CLICK PATH runs on its OWN thread. A click is a rising edge on the mouse button, sampled
+-    // every POINTER_POLL; the FOCUS read below is a synchronous AX round-trip that can block for
+-    // hundreds of ms (worse with content capture on, which reads the value string too). Polling
+-    // the button in the SAME loop let a slow focus read straddle a whole click -- button down AND
+-    // up before the next sample -- silently dropping it. That is a real, content-dependent miss:
+-    // the e2e harness failed values-on (slow focus reads) while values-off passed. A dedicated
+-    // thread guarantees the ~40ms button cadence no matter how slow a focus read is.
++    // Focus remains sampled. Pointer events use a listen-only tap and bounded AX worker.
+     let click_thread = {
+         let rec = rec.clone();
+         let stop = stop.clone();
+         let cfg = cfg.clone();
+-        // NOT demoted. QOS_CLASS_UTILITY (what the focus thread uses) subjects the thread to
++        // Keep the click source responsive. QOS_CLASS_UTILITY subjects the thread to
+         // macOS timer coalescing, which stretches the 40ms poll and re-introduced the drop even
+         // on its own thread (mode 1 was still 3/4). This thread is almost entirely asleep, so
+         // leaving it at the default QoS costs no meaningful power but keeps the poll prompt.
+         std::thread::spawn(move || {
+-            click_poll_loop(rec, stop, cfg);
++            click_event_loop(rec, stop, cfg);
+         })
+     };
+ 
+     while !stop.load(Ordering::Relaxed) {
++        let untrusted=!unsafe{AXIsProcessTrusted()};
++        if untrusted!=was_untrusted {
++            was_untrusted=untrusted;cur_pid=-1;cur_app=None;last_focus_id.clear();last_value=None;last_value_len=usize::MAX;
++            rec.write_event(&Event::new(rec.clock.now_mono_ns(),if untrusted{"ui.pointer_gap"}else{"observer.ui_accessibility_recovered"},serde_json::json!({"reason":"accessibility_permission_changed","lost_count_unknown":true})));
++        }
++        if untrusted{if !sleep_interruptible(&stop,Duration::from_millis(500)){break;}continue;}
++
+         // SCREEN LOCK GATE. The AX APIs keep serving the LAST focused element while the
+         // screen is locked, and CGWindowList keeps reporting the last frontmost app, so
+         // without this check a machine sitting locked overnight records a continuous
+@@ -690,7 +697,7 @@
+         // Found the hard way: an e2e run produced exactly one ui.focus for four driven
+         // focus changes because the session had locked mid-test, and the sensor was
+         // faithfully reporting the stale pre-lock state the whole time.
+-        let locked = crate::idle::screen_locked().unwrap_or(false);
++        let locked = crate::idle::screen_locked().unwrap_or(true);
+         if locked != was_locked {
+             was_locked = locked;
+             rec.write_event(&Event::new(
+@@ -805,49 +812,100 @@
+     let _ = click_thread.join();
+ }
+ 
+-/// The CLICK cursor path, on its own thread (see the spawn in `run`). Samples the mouse button
+-/// every `POINTER_POLL` and, on the rising edge, hit-tests the element under the cursor and emits
+-/// one `ui.click`. Guarantees the button cadence independent of the focus read's cost, so a click
+-/// during a slow focus read is never dropped. Owns its own systemwide element and resolves the
+-/// clicked app fresh from the hit element's pid, so it shares no mutable state with the focus loop.
+-fn click_poll_loop(rec: Arc<Recorder>, stop: Arc<AtomicBool>, cfg: AxConfig) {
+-    // One system-wide element, reused for every hit-test (stable for the process lifetime).
+-    let syswide = unsafe { Owned(with_timeout(AXUIElementCreateSystemWide())) };
+-
+-    crate::ui_common::run_click_poll(
+-        &stop,
+-        POINTER_POLL,
+-        // Button source: left button down, EXCEPT while the screen is locked -- never hit-test a
+-        // locked desktop (the AX tree serves stale state). Reporting "up" while locked also resets
+-        // the rising-edge state, so a press straddling unlock is treated as a fresh click.
+-        || {
+-            if crate::idle::screen_locked().unwrap_or(false) {
+-                return false;
+-            }
+-            unsafe { CGEventSourceButtonState(COMBINED_SESSION_STATE, MOUSE_BUTTON_LEFT) }
+-        },
+-        // On the rising edge: hit-test the element under the cursor and emit one ui.click.
+-        || unsafe {
+-            if let Some(p) = cursor_location() {
+-                if let Some(el) = hit_test(syswide.get(), p) {
+-                    let epid = element_pid(el.get());
+-                    // Resolve the owning app fresh from the hit element's pid so the exclusion
+-                    // list gates the RIGHT app. Clicks are infrequent, so the extra AX reads per
+-                    // click are cheap and keep this thread free of the focus loop's cache.
+-                    let bundle = bundle_id_for_pid(epid).unwrap_or_default();
+-                    let app_el = Owned(with_timeout(AXUIElementCreateApplication(epid)));
+-                    let app_name = attr_string(app_el.get(), "AXTitle").unwrap_or_default();
+-                    let allowed = !cfg.app_excluded(&bundle);
+-                    let r = read_element(el.get(), &cfg, allowed);
+-                    rec.write_event(&Event::new(
+-                        rec.clock.now_mono_ns(),
+-                        "ui.click",
+-                        click_payload(epid, &app_name, &bundle, p, &r),
+-                    ));
++// The callback only queues pointer observations. AX and disk writes stay on a worker.
++fn click_event_loop(rec: Arc<Recorder>, stop: Arc<AtomicBool>, cfg: AxConfig) {
++    use core_foundation::{runloop::CFRunLoop,base::TCFType};
++    unsafe extern "C" {fn CGEventTapIsEnabled(tap:*const std::ffi::c_void)->bool;}
++    use core_graphics::event::{CGEventTap,CGEventTapLocation,CGEventTapPlacement,CGEventTapOptions,CGEventType as T,CallbackResult,EventField};
++    use std::sync::mpsc::{sync_channel,TrySendError,RecvTimeoutError};
++    use std::sync::atomic::AtomicU64;
++    use std::cell::{RefCell,Cell};
++    use crate::ui_pointer::{Input,Tracker,Sample};
++    let (sender,receiver)=sync_channel::<Sample>(64);
++    let dropped=Arc::new(AtomicU64::new(0));
++    let capture_stop=Arc::new(AtomicBool::new(false));
++    let worker={
++        let rec=rec.clone();let stop=stop.clone();let cfg=cfg.clone();let dropped=dropped.clone();let capture_stop=capture_stop.clone();
++        std::thread::spawn(move || {
++            let syswide=unsafe {Owned(with_timeout(AXUIElementCreateSystemWide()))};
++            while !stop.load(Ordering::Relaxed) && !capture_stop.load(Ordering::Relaxed) {
++                let lost=dropped.swap(0,Ordering::Relaxed);
++                if lost>0 {pointer_gap(&rec,"queue_full",lost);}
++                match receiver.recv_timeout(Duration::from_millis(50)) {
++                    Ok(sample)=>{
++                        if sample.stale(){pointer_gap(&rec,"stale_hit_test",1);continue;}
++                        if !unsafe{AXIsProcessTrusted()}{pointer_gap(&rec,"accessibility_permission_unavailable",1);continue;}
++                        if crate::idle::screen_locked().unwrap_or(true){pointer_gap(&rec,"desktop_unavailable",1);continue;}
++                        unsafe {emit_pointer(&rec,&cfg,syswide.get(),sample);}
++                    },Err(RecvTimeoutError::Timeout)=>continue,Err(RecvTimeoutError::Disconnected)=>break,
+                 }
+             }
+-        },
+-    );
++            let remaining=receiver.try_iter().count() as u64+dropped.swap(0,Ordering::Relaxed);
++            if remaining>0 {pointer_gap(&rec,"stopped_before_resolution",remaining);}
++        })
++    };
++    let mut unavailable=false;
++    while !stop.load(Ordering::Relaxed) {
++        let tracker=RefCell::new(Tracker::default());let disabled=Cell::new(false);
++        // SAFETY: tap, callback captures and run-loop source all live on this thread.
++        // The source is removed and the tap dropped before any captured state is dropped.
++        let result=unsafe{CGEventTap::new_unchecked(
++            CGEventTapLocation::HID,CGEventTapPlacement::HeadInsertEventTap,CGEventTapOptions::ListenOnly,
++            vec![T::LeftMouseDown,T::LeftMouseUp,T::RightMouseDown,T::RightMouseUp,T::OtherMouseDown,T::OtherMouseUp,T::ScrollWheel],
++            |_,kind,event| {
++                if matches!(kind,T::TapDisabledByTimeout|T::TapDisabledByUserInput){disabled.set(true);tracker.borrow_mut().reset();return CallbackResult::Keep;}
++                let input=match kind {T::LeftMouseDown=>Input::Down(0),T::LeftMouseUp=>Input::Up(0),T::RightMouseDown=>Input::Down(1),T::RightMouseUp=>Input::Up(1),T::OtherMouseDown=>Input::Down(event.get_integer_value_field(EventField::MOUSE_EVENT_BUTTON_NUMBER) as u8),T::OtherMouseUp=>Input::Up(event.get_integer_value_field(EventField::MOUSE_EVENT_BUTTON_NUMBER) as u8),T::ScrollWheel=>Input::Wheel(event.get_integer_value_field(EventField::SCROLL_WHEEL_EVENT_DELTA_AXIS_2) as f64,event.get_integer_value_field(EventField::SCROLL_WHEEL_EVENT_DELTA_AXIS_1) as f64),_=>return CallbackResult::Keep};
++                let p=event.location();
++                if let Some(sample)=tracker.borrow_mut().accept(input,p.x,p.y,rec.clock.now_mono_ns()) {
++                    if let Err(TrySendError::Full(_))=sender.try_send(sample){dropped.fetch_add(1,Ordering::Relaxed);}
++                }
++                CallbackResult::Keep
++            })};
++        if let Ok(tap)=result {
++            if let Ok(source)=tap.mach_port().create_runloop_source(0) {
++                let loop_=CFRunLoop::get_current();let mode=unsafe{core_foundation_sys::runloop::kCFRunLoopCommonModes};
++                loop_.add_source(&source,mode);tap.enable();
++                rec.write_event(&Event::new(rec.clock.now_mono_ns(),"observer.ui_pointer_source",serde_json::json!({"source":"listen_only_pointer_tap","recovered":unavailable,"queue_capacity":64,"max_hit_test_delay_ms":250,"keys_subscribed":false,"moves_recorded":false})));
++                #[cfg(feature="dev-commands")]
++                let disable_at=std::env::var("ICU_TEST_TAP_DISABLE_AFTER_MS").ok().and_then(|s|s.parse::<u64>().ok()).map(|ms|std::time::Instant::now()+Duration::from_millis(ms));
++                #[cfg(feature="dev-commands")]
++                let mut disabled_for_test=false;
++                while !stop.load(Ordering::Relaxed) {
++                    #[cfg(feature="dev-commands")]
++                    if !disabled_for_test&&disable_at.is_some_and(|at|std::time::Instant::now()>=at){
++                        unsafe extern "C"{fn CGEventTapEnable(tap:*const std::ffi::c_void,enable:bool);}
++                        unsafe{CGEventTapEnable(tap.mach_port().as_CFTypeRef(),false);}
++                        disabled_for_test=true;
++                        rec.write_event(&Event::new(rec.clock.now_mono_ns(),"observer.test_fault",serde_json::json!({"fault":"native_tap_disabled"})));
++                    }
++                    CFRunLoop::run_in_mode(unsafe{core_foundation_sys::runloop::kCFRunLoopDefaultMode},Duration::from_millis(100),false);
++                    if disabled.replace(false)||!unsafe{CGEventTapIsEnabled(tap.mach_port().as_CFTypeRef())}{tracker.borrow_mut().reset();pointer_gap(&rec,"tap_disabled",1);tap.enable();rec.write_event(&Event::new(rec.clock.now_mono_ns(),"observer.ui_pointer_recovered",serde_json::json!({"method":"tap_reenabled","lost_count_unknown":true})));}
++                }
++                loop_.remove_source(&source,mode);
++            } else {pointer_gap(&rec,"runloop_source_unavailable",1);}
++        } else {
++            if !unavailable {pointer_gap(&rec,"pointer_tap_unavailable",1);}
++            unavailable=true;
++            if !sleep_interruptible(&stop,Duration::from_secs(2)){break;}
++        }
++    }
++    capture_stop.store(true,Ordering::Relaxed);drop(sender);let _=worker.join();
++}
++fn pointer_gap(rec:&Recorder,reason:&str,count:u64){rec.write_event(&Event::new(rec.clock.now_mono_ns(),"ui.pointer_gap",serde_json::json!({"reason":reason,"count":count})));}
++unsafe fn emit_pointer(rec:&Recorder,cfg:&AxConfig,syswide:AXUIElementRef,s:crate::ui_pointer::Sample) {
++    let p=CGPoint{x:s.x,y:s.y};
++    if let Some(el)=hit_test(syswide,p) {
++        let pid=element_pid(el.get());let bundle=bundle_id_for_pid(pid).unwrap_or_default();
++        let app_el=Owned(with_timeout(AXUIElementCreateApplication(pid)));
++        let name=attr_string(app_el.get(),"AXTitle").unwrap_or_default();let allowed=!cfg.app_excluded(&bundle);
++        let r=read_element(el.get(),cfg,allowed);
++        // Provider reads can stall after the initial queue-age check. Never label a
++        // late result as though it was resolved at the original event instant.
++        if s.stale(){pointer_gap(rec,"stale_hit_test",1);return;}
++        let mut payload=click_payload(pid,&name,&bundle,p,&r);s.fields(&mut payload);
++        payload["source"]=serde_json::json!("event_tap");payload["resolved_mono_ns"]=serde_json::json!(rec.clock.now_mono_ns());payload["content_excluded"]=serde_json::json!(!allowed);
++        rec.write_event(&Event::new(s.at,s.kind,payload));
++    } else {pointer_gap(rec,"hit_test_unavailable",1);}
+ }
+ 
+ fn focus_payload(s: &FocusSnapshot) -> serde_json::Value {
+--- a/taiku-observer/src/ui_uia_windows.rs
++++ b/taiku-observer/src/ui_uia_windows.rs
+@@ -49,8 +49,6 @@
+     CUIAutomation, IUIAutomation, IUIAutomationElement, IUIAutomationValuePattern,
+     UIA_ValuePatternId,
+ };
+-use windows::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_LBUTTON};
+-use windows::Win32::UI::WindowsAndMessaging::GetCursorPos;
+ 
+ use crate::recorder::Recorder;
+ use crate::schema::Event;
+@@ -392,7 +390,7 @@
+         while !stop.load(Ordering::Relaxed) {
+             // Same lock gate as the other platforms: a locked workstation has no focused
+             // UI, but UIA keeps answering with the last one.
+-            let locked = crate::idle::screen_locked().unwrap_or(false);
++            let locked = crate::idle::screen_locked().unwrap_or(true);
+             if locked != was_locked {
+                 was_locked = locked;
+                 rec.write_event(&Event::new(
+@@ -480,74 +478,85 @@
+     }
+ }
+ 
+-/// The CLICK cursor path, on its own thread with its own COM apartment + IUIAutomation. Samples
+-/// the async button state every POINTER_POLL and, on the rising edge, hit-tests the element under
+-/// the cursor (ElementFromPoint) and emits one ui.click. Independent of the focus read's cost, so
+-/// a click during a slow UIA round-trip is never dropped. Uses the shared `run_click_poll` core.
+-fn click_poll_thread(rec: Arc<Recorder>, stop: Arc<AtomicBool>, cfg: UiaConfig) {
+-    // COM is per-thread; this thread needs its own MTA apartment and automation instance. (Unsafe
+-    // is applied per call rather than one big block, because the closures below do not inherit an
+-    // enclosing `unsafe` and would need their own regardless.)
+-    if unsafe { CoInitializeEx(None, COINIT_MULTITHREADED) }.is_err() {
+-        return;
+-    }
+-    let automation: IUIAutomation =
+-        match unsafe { CoCreateInstance(&CUIAutomation, None, CLSCTX_INPROC_SERVER) } {
+-            Ok(a) => a,
+-            Err(_) => {
+-                unsafe { CoUninitialize() };
+-                return;
++// Semantic pointer capture uses a passive mouse hook. UIA work and file IO never
++// run inside the hook, where a slow provider would cause silent OS removal.
++mod pointer_hook {
++    use super::*;
++    use crate::ui_pointer::{Input,Sample,Tracker};
++    use std::cell::RefCell;
++    use std::sync::{mpsc::{sync_channel,SyncSender,TrySendError,RecvTimeoutError},atomic::AtomicU64};
++    use std::time::Instant;
++    use windows::Win32::Foundation::{LPARAM,LRESULT,WPARAM};
++    use windows::Win32::UI::WindowsAndMessaging::{CallNextHookEx,SetWindowsHookExW,UnhookWindowsHookEx,PeekMessageW,TranslateMessage,DispatchMessageW,MSG,MSLLHOOKSTRUCT,WH_MOUSE_LL,PM_REMOVE};
++    struct Context {rec:Arc<Recorder>,sender:SyncSender<Sample>,dropped:Arc<AtomicU64>,tracker:Tracker}
++    thread_local! {static CTX:RefCell<Option<Context>>=const{RefCell::new(None)};}
++    fn gap(rec:&Recorder,reason:&str,count:u64){rec.write_event(&Event::new(rec.clock.now_mono_ns(),"ui.pointer_gap",serde_json::json!({"reason":reason,"count":count})));}
++    unsafe extern "system" fn callback(code:i32,w:WPARAM,l:LPARAM)->LRESULT {
++        if code>=0 {
++            let e=&*(l.0 as *const MSLLHOOKSTRUCT);
++            let input=match w.0 as u32 {
++                0x201=>Some(Input::Down(0)),0x202=>Some(Input::Up(0)),0x204=>Some(Input::Down(1)),0x205=>Some(Input::Up(1)),0x207=>Some(Input::Down(2)),0x208=>Some(Input::Up(2)),
++                0x20a=>Some(Input::Wheel(0.,((e.mouseData>>16) as i16) as f64)),
++                0x20e=>Some(Input::Wheel(((e.mouseData>>16) as i16) as f64,0.)),_=>None,
++            };
++            if let Some(input)=input {CTX.with(|c|{if let Some(c)=c.borrow_mut().as_mut(){
++                if let Some(s)=c.tracker.accept(input,e.pt.x as f64,e.pt.y as f64,c.rec.clock.now_mono_ns()){
++                    if let Err(TrySendError::Full(_))=c.sender.try_send(s){c.dropped.fetch_add(1,Ordering::Relaxed);}
++                }
++            }});}
++        }
++        CallNextHookEx(None,code,w,l)
++    }
++    pub fn run(rec:Arc<Recorder>,stop:Arc<AtomicBool>,cfg:UiaConfig){
++        let (sender,receiver)=sync_channel::<Sample>(64);let dropped=Arc::new(AtomicU64::new(0));
++        let worker={let rec=rec.clone();let stop=stop.clone();let dropped=dropped.clone();
++            std::thread::spawn(move ||{
++                if unsafe{CoInitializeEx(None,COINIT_MULTITHREADED)}.is_err(){gap(&rec,"com_unavailable",1);return;}
++                let result=unsafe{CoCreateInstance::<_,IUIAutomation>(&CUIAutomation,None,CLSCTX_INPROC_SERVER)};
++                if let Ok(automation)=result {
++                    if let Ok(a2)=automation.cast::<windows::Win32::UI::Accessibility::IUIAutomation2>(){unsafe{let _=a2.SetTransactionTimeout(UIA_TIMEOUT_MS as u32);let _=a2.SetConnectionTimeout(UIA_TIMEOUT_MS as u32);}}
++                    while !stop.load(Ordering::Relaxed){
++                        let lost=dropped.swap(0,Ordering::Relaxed);if lost>0{gap(&rec,"queue_full",lost);}
++                        match receiver.recv_timeout(Duration::from_millis(50)){
++                            Ok(s)=>{
++                                if s.stale(){gap(&rec,"stale_hit_test",1);continue;}
++                                if crate::idle::screen_locked().unwrap_or(true){gap(&rec,"desktop_unavailable",1);continue;}
++                                if let Ok(el)=unsafe{automation.ElementFromPoint(POINT{x:s.x as i32,y:s.y as i32})}{
++                                    let snap=unsafe{snapshot_from_element(&automation,&el,&cfg)};
++                                    if s.stale(){gap(&rec,"stale_hit_test",1);continue;}
++                                    let mut p=click_payload(&snap,s.x as i32,s.y as i32);s.fields(&mut p);p["source"]=serde_json::json!("mouse_hook");p["resolved_mono_ns"]=serde_json::json!(rec.clock.now_mono_ns());
++                                    rec.write_event(&Event::new(s.at,s.kind,p));
++                                }else{gap(&rec,"hit_test_unavailable",1);}
++                            },Err(RecvTimeoutError::Timeout)=>{},Err(RecvTimeoutError::Disconnected)=>break,
++                        }
++                    }
++                    drop(automation);
++                }else{gap(&rec,"uia_unavailable",1);}
++                let remaining=receiver.try_iter().count() as u64+dropped.swap(0,Ordering::Relaxed);if remaining>0{gap(&rec,"stopped_before_resolution",remaining);}
++                unsafe{CoUninitialize();}
++            })
++        };
++        CTX.with(|c|*c.borrow_mut()=Some(Context{rec:rec.clone(),sender,dropped,tracker:Tracker::default()}));
++        let mut installed=false;
++        while !stop.load(Ordering::Relaxed){
++            if worker.is_finished(){gap(&rec,"resolution_worker_stopped",1);break;}
++            match unsafe{SetWindowsHookExW(WH_MOUSE_LL,Some(callback),None,0)}{
++                Ok(hook)=>{
++                    rec.write_event(&Event::new(rec.clock.now_mono_ns(),"observer.ui_pointer_source",serde_json::json!({"source":"passive_mouse_hook","rearmed":installed,"queue_capacity":64,"max_hit_test_delay_ms":250,"keys_subscribed":false,"moves_recorded":false,"rearm_interval_ms":10000,"silent_removal_detection":false})));
++                    installed=true;let deadline=Instant::now()+Duration::from_secs(10);let mut msg=MSG::default();
++                    while !stop.load(Ordering::Relaxed)&&Instant::now()<deadline {
++                        while unsafe{PeekMessageW(&mut msg,None,0,0,PM_REMOVE)}.as_bool(){unsafe{let _=TranslateMessage(&msg);DispatchMessageW(&msg);}}
++                        std::thread::sleep(Duration::from_millis(5));
++                    }
++                    unsafe{let _=UnhookWindowsHookEx(hook);}
++                    CTX.with(|c|{if let Some(c)=c.borrow_mut().as_mut(){c.tracker.reset();}});
++                },Err(_)=>{gap(&rec,"pointer_hook_unavailable",1);std::thread::sleep(Duration::from_millis(500));}
+             }
+-        };
+-    if let Ok(a2) = automation.cast::<windows::Win32::UI::Accessibility::IUIAutomation2>() {
+-        unsafe {
+-            let _ = a2.SetTransactionTimeout(UIA_TIMEOUT_MS as u32);
+-            let _ = a2.SetConnectionTimeout(UIA_TIMEOUT_MS as u32);
+-        }
+-    }
+-
+-    crate::ui_common::run_click_poll(
+-        &stop,
+-        POINTER_POLL,
+-        // Button source: left button down, EXCEPT while the screen is locked (UIA keeps answering
+-        // with the last element; never hit-test a locked workstation). Reporting "up" while locked
+-        // also resets the edge so a press straddling unlock is fresh.
+-        || {
+-            if crate::idle::screen_locked().unwrap_or(false) {
+-                return false;
+-            }
+-            unsafe { (GetAsyncKeyState(VK_LBUTTON.0 as i32) as u16 & 0x8000) != 0 }
+-        },
+-        // On the rising edge: hit-test the element under the cursor and emit one ui.click.
+-        || {
+-            let mut pt = POINT::default();
+-            if unsafe { GetCursorPos(&mut pt) }.is_ok() {
+-                if let Ok(el) = unsafe { automation.ElementFromPoint(pt) } {
+-                    let snap = unsafe { snapshot_from_element(&automation, &el, &cfg) };
+-                    rec.write_event(&Event::new(
+-                        rec.clock.now_mono_ns(),
+-                        "ui.click",
+-                        click_payload(&snap, pt.x, pt.y),
+-                    ));
+-                }
+-            }
+-        },
+-    );
+-    // Release the COM pointer BEFORE tearing COM down on this thread.
+-    //
+-    // `automation` is an IUIAutomation, i.e. a refcounted COM pointer whose Drop calls
+-    // Release. Rust drops it at the end of this function - which is AFTER
+-    // `CoUninitialize()` unless we say otherwise - and calling Release into an apartment
+-    // that no longer exists is an access violation that takes the whole PROCESS down, not
+-    // just this thread.
+-    //
+-    // It surfaced as a bare `STATUS_ACCESS_VIOLATION` in the Windows test job rather than
+-    // as anything legible: the crash happens when the sensor thread STOPS, so the bounded
+-    // segment in `record_segment_succeeds_on_fresh_session_with_sensors_off` killed the
+-    // test binary mid-run and the harness reported no failing test at all.
+-    drop(automation);
+-    unsafe { CoUninitialize() };
+-}
++        }
++        CTX.with(|c|*c.borrow_mut()=None);let _=worker.join();
++    }
++}
++fn click_poll_thread(rec:Arc<Recorder>,stop:Arc<AtomicBool>,cfg:UiaConfig){pointer_hook::run(rec,stop,cfg);}
+ 
+ #[cfg(test)]
+ mod tests {
+--- /dev/null
++++ b/taiku-observer/src/ui_pointer.rs
+@@ -0,0 +1,47 @@
++//! Passive pointer observations. No key subscription, input injection or stored move stream.
++use std::time::{Duration,Instant};
++use serde_json::{json,Value};
++#[derive(Clone,Copy,Debug)]
++pub enum Input { Down(u8), Up(u8), Wheel(f64,f64) }
++#[derive(Clone,Copy,Debug)]
++pub struct Sample { pub at:i64,pub queued:Instant,pub x:f64,pub y:f64,pub kind:&'static str,pub button:u8,pub from:Option<(f64,f64)>,pub delta:(f64,f64) }
++impl Sample {
++    pub fn stale(&self)->bool {self.queued.elapsed()>Duration::from_millis(250)}
++    pub fn fields(&self,p:&mut Value){
++        if self.kind=="ui.scroll" {p.as_object_mut().unwrap().remove("button");}
++        if self.kind!="ui.scroll" {p["button"]=json!(match self.button {0=>"left",1=>"right",2=>"middle",_=>"other"});}
++        if let Some((x,y))=self.from {p["from_x"]=json!(x);p["from_y"]=json!(y);}
++        if self.kind=="ui.scroll" {p["dx"]=json!(self.delta.0);p["dy"]=json!(self.delta.1);p["units"]=json!("native");}
++        p["observed_only"]=json!(true);
++    }
++}
++#[derive(Default)]
++pub struct Tracker {downs:[Option<(f64,f64,i64)>;3]}
++impl Tracker {
++    pub fn reset(&mut self){self.downs=[None;3];}
++    pub fn accept(&mut self,input:Input,x:f64,y:f64,at:i64)->Option<Sample>{
++        if !x.is_finite()||!y.is_finite(){return None;}
++        let mut s=Sample{at,queued:Instant::now(),x,y,kind:"ui.click",button:0,from:None,delta:(0.,0.)};
++        match input {
++            Input::Down(b)=>{if b>2{return None;}self.downs[b as usize]=Some((x,y,at));s.button=b;},
++            Input::Up(b)=>{if b>2{return None;}let (a,z,t)=self.downs[b as usize].take()?;
++                if at<t||at-t>60_000_000_000||((x-a).powi(2)+(y-z).powi(2))<16.{return None;}
++                s.kind="ui.drag";s.button=b;s.from=Some((a,z));},
++            Input::Wheel(dx,dy)=>{if !dx.is_finite()||!dy.is_finite()||(dx==0.&&dy==0.){return None;}s.kind="ui.scroll";s.delta=(dx,dy);},
++        }
++        Some(s)
++    }
++}
++#[cfg(test)] mod tests {
++    use super::*;
++    #[test] fn buttons_drags_and_wheels_are_distinct(){
++        let mut t=Tracker::default();
++        for b in 0..3 {let s=t.accept(Input::Down(b),1.,2.,10).unwrap();assert_eq!(s.button,b);assert_eq!(s.kind,"ui.click");assert!(t.accept(Input::Up(b),1.,2.,20).is_none());}
++        t.accept(Input::Down(0),1.,2.,30);let s=t.accept(Input::Up(0),10.,20.,40).unwrap();assert_eq!(s.kind,"ui.drag");assert_eq!(s.from,Some((1.,2.)));
++        assert!(t.accept(Input::Up(0),50.,20.,50).is_none());
++        let s=t.accept(Input::Wheel(-2.,3.),1.,2.,60).unwrap();assert_eq!(s.kind,"ui.scroll");assert_eq!(s.delta,(-2.,3.));
++    }
++    #[test] fn capture_gaps_invalidate_pending_gestures(){let mut t=Tracker::default();t.accept(Input::Down(0),0.,0.,1);t.reset();assert!(t.accept(Input::Up(0),100.,100.,2).is_none());}
++    #[test] fn late_resolution_is_never_current_evidence(){let s=Sample{at:1,queued:Instant::now()-Duration::from_millis(251),x:0.,y:0.,kind:"ui.click",button:0,from:None,delta:(0.,0.)};assert!(s.stale());}
++    #[test] fn stale_and_invalid_gestures_are_dropped(){let mut t=Tracker::default();assert!(t.accept(Input::Down(0),f64::NAN,0.,1).is_none());t.accept(Input::Down(0),0.,0.,1);assert!(t.accept(Input::Up(0),100.,100.,61_000_000_001).is_none());}
++}
+--- a/taiku-observer/src/window_focus_backend.rs
++++ b/taiku-observer/src/window_focus_backend.rs
+@@ -113,22 +113,14 @@
+ 
+ #[cfg(target_os = "macos")]
+ fn read_focus() -> Option<FocusState> {
+-    use std::process::Command;
+-    let app = Command::new("osascript")
+-        .args([
+-            "-e",
+-            "tell application \"System Events\" to get name of first application process whose frontmost is true",
+-        ])
+-        .output()
+-        .ok()
+-        .filter(|o| o.status.success())
+-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
+-        .filter(|s| !s.is_empty())?;
+-    Some(FocusState {
+-        app: app.clone(),
+-        title: app,
+-        pid: None,
+-    })
++    // A System Events AppleScript can block indefinitely behind Automation
++    // consent. Read native window ownership instead, without a subprocess or
++    // an Automation prompt, matching the semantic sensor's existing policy.
++    if crate::idle::screen_locked().unwrap_or(true){return None;}
++    let pid=crate::ui_ax_macos::frontmost_pid()?;
++    let path=libproc::libproc::proc_pid::pidpath(pid).ok()?;
++    let app=std::path::Path::new(&path).file_stem()?.to_string_lossy().into_owned();
++    Some(FocusState{app:app.clone(),title:app,pid:Some(pid as u32)})
+ }
+ 
+ // Xlib's DEFAULT error handler calls exit() on ANY protocol error, so a single

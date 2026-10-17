@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
+  <defs>
+    <linearGradient id="graphite" x1="160" y1="0" x2="800" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#30343c"/>
+      <stop offset=".46" stop-color="#191d24"/>
+      <stop offset="1" stop-color="#090c11"/>
+    </linearGradient>
+    <radialGradient id="ambient" cx="0" cy="0" r="1" gradientTransform="translate(500 490) rotate(90) scale(480 440)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2e8fff" stop-opacity=".19"/>
+      <stop offset="1" stop-color="#2e8fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="shell" cx="0" cy="0" r="1" gradientTransform="translate(370 320) rotate(58) scale(530 580)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#78bbff"/>
+      <stop offset=".36" stop-color="#2e8fff"/>
+      <stop offset=".72" stop-color="#2e8fff"/>
+      <stop offset="1" stop-color="#1463ce"/>
+    </radialGradient>
+    <linearGradient id="limb" x1="265" y1="355" x2="651" y2="805" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2e8fff"/>
+      <stop offset="1" stop-color="#165ac0"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="370" y1="337" x2="588" y2="623" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1254a8"/>
+      <stop offset="1" stop-color="#60b1ff"/>
+    </linearGradient>
+    <linearGradient id="eye" x1="476" y1="374" x2="570" y2="595" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffef4"/>
+      <stop offset=".65" stop-color="#ecf6ff"/>
+      <stop offset="1" stop-color="#b9d9f6"/>
+    </linearGradient>
+    <linearGradient id="pupil" x1="530" y1="411" x2="583" y2="532" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0a1629"/>
+      <stop offset="1" stop-color="#153865"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="382" y1="260" x2="642" y2="733" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c0e3ff" stop-opacity=".6"/>
+      <stop offset=".5" stop-color="#8fcaff" stop-opacity=".09"/>
+      <stop offset="1" stop-color="#8fcaff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="ground" cx="0" cy="0" r="1" gradientTransform="translate(517 821) scale(284 58)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#03070d" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#03070d" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="92" y="134" width="849" height="783" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="19"/>
+      <feOffset dy="25"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <path id="body" d="M278 473C274 350 369 271 507 265C663 258 754 359 754 493L754 541C754 674 660 755 522 758C377 761 278 683 278 558V473Z"/>
+  </defs>
+
+  <path fill="url(#graphite)" d="M0 0H1024V1024H0Z"/>
+  <path fill="url(#ambient)" d="M0 0H1024V1024H0Z"/>
+  <path fill="url(#ground)" d="M180 745H860V900H180Z"/>
+
+  <!-- Pip: a curious, single-eyed scout with a cocked feeler and little fins. -->
+  <g filter="url(#shadow)">
+    <path d="M361 321C356 276 334 246 319 225C306 207 317 181 340 183C390 187 429 233 430 289L361 321Z" fill="url(#shell)"/>
+    <path d="M310 454C269 446 242 423 219 393C206 376 184 384 185 406C187 483 217 544 291 552L310 454Z" fill="url(#limb)"/>
+    <path d="M725 440C769 423 795 396 814 373C829 355 848 368 841 391C822 461 800 502 742 531L725 440Z" fill="url(#shell)"/>
+    <path d="M378 690C357 713 335 746 329 774C325 793 339 805 357 800L450 773L464 719L378 690Z" fill="url(#limb)"/>
+    <path d="M580 720L589 773L676 795C697 800 710 784 701 766L657 699L580 720Z" fill="url(#limb)"/>
+    <use href="#body" fill="url(#shell)"/>
+    <use href="#body" stroke="url(#edge)" stroke-width="4"/>
+
+    <!-- The large warm eye is the whole expression; the gaze looks ahead. -->
+    <ellipse cx="521" cy="489" rx="160" ry="149" fill="url(#rim)"/>
+    <ellipse cx="521" cy="481" rx="143" ry="132" fill="url(#eye)"/>
+    <ellipse cx="551" cy="473" rx="69" ry="78" fill="url(#pupil)"/>
+    <ellipse cx="531" cy="440" rx="19" ry="23" transform="rotate(22 531 440)" fill="#f5fbff"/>
+    <path d="M482 665C507 688 548 684 570 658" stroke="#113965" stroke-width="19" stroke-linecap="round"/>
+    <path d="M324 516C321 550 325 575 335 596" stroke="#a7d6ff" stroke-opacity=".27" stroke-width="12" stroke-linecap="round"/>
+  </g>
+</svg>

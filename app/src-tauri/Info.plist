@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Record microphone audio when you select Microphone and start a recording.</string>
+  <key>NSScreenCaptureUsageDescription</key>
+  <string>Capture selected windows, or system sound when you start an audio recording.</string>
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Read the active Chrome tab and private-window state when you enable browser history capture.</string>
+</dict></plist>

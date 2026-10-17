@@ -1,0 +1,38 @@
+### codex-computer-use.exe (Windows Codex CU native engine) — PE teardown, Tue Sep  8 15:01:02 PDT 2026
+### source: ChatGPT-x64.msix (persistent.oaistatic.com/codex-app-prod), @oai/sky 0.6.26
+
+## imported DLLs:
+    DLL Name: advapi32.dll
+    DLL Name: api-ms-win-appmodel-runtime-l1-1-1.dll
+    DLL Name: api-ms-win-core-synch-l1-2-0.dll
+    DLL Name: api-ms-win-core-winrt-l1-1-0.dll
+    DLL Name: api-ms-win-shcore-scaling-l1-1-1.dll
+    DLL Name: bcryptprimitives.dll
+    DLL Name: coremessaging.dll
+    DLL Name: crypt32.dll
+    DLL Name: d2d1.dll
+    DLL Name: d3d11.dll
+    DLL Name: dwmapi.dll
+    DLL Name: dwrite.dll
+    DLL Name: kernel32.dll
+    DLL Name: KERNEL32.dll
+    DLL Name: msvcrt.dll
+    DLL Name: ntdll.dll
+    DLL Name: ole32.dll
+    DLL Name: oleaut32.dll
+    DLL Name: propsys.dll
+    DLL Name: shell32.dll
+    DLL Name: uiautomationcore.dll
+    DLL Name: user32.dll
+    DLL Name: version.dll
+    DLL Name: winhttp.dll
+    DLL Name: wintrust.dll
+
+## decisive user32 imports:
+         259  GetForegroundWindow
+         364  GetWindowThreadProcessId
+         521  SendInput
+         544  SetCursorPos
+         553  SetForegroundWindow
+         594  SetWindowPos
+         658  keybd_event

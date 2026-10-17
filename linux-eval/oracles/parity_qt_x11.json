@@ -1,0 +1,156 @@
+{
+  "env": "Qt/X11 (Xvfb+Openbox+picom), PyQt fixture, QT_ACCESSIBILITY=1",
+  "rows": [
+    {
+      "action": "click",
+      "background": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": true
+    },
+    {
+      "action": "set_value",
+      "background": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "unknown"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": true
+    },
+    {
+      "action": "double_click",
+      "background": {
+        "delivered": true,
+        "focus_preserved": false,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": false,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": false
+    },
+    {
+      "action": "right_click",
+      "background": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": true
+    },
+    {
+      "action": "scroll",
+      "background": {
+        "delivered": false,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": false,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "foreground"
+      },
+      "final_delivers": true,
+      "invisible_bg": false
+    },
+    {
+      "action": "drag",
+      "background": {
+        "delivered": false,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "unknown"
+      },
+      "foreground": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": false,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "foreground"
+      },
+      "final_delivers": true,
+      "invisible_bg": false
+    },
+    {
+      "action": "type_text",
+      "background": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": true
+    },
+    {
+      "action": "press_key",
+      "background": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": true
+    },
+    {
+      "action": "hotkey",
+      "background": {
+        "delivered": true,
+        "focus_preserved": true,
+        "cursor_unmoved": true,
+        "no_input_leak": true,
+        "not_activated": true,
+        "code": null,
+        "route": "background"
+      },
+      "foreground": null,
+      "final_delivers": true,
+      "invisible_bg": true
+    }
+  ]
+}

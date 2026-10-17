@@ -1,0 +1,17 @@
+arranging: Clock at (100,150,600,500) as target, Calculator at (400,150) as a static occluder brought to front
+clock frame: {'delivery': {'mode': 'not_applicable'}, 'effect': 'suspected_noop', 'evidence': [{'kind': 'value_readback'}], 'route': 'accessibility'}
+occluder frame: {'_raw': 'set_window_frame: window_id 26366 does not expose a settable AXSize\n'}
+z-order: clock (257, True, {'height': 640.0, 'width': 600.0, 'x': 100.0, 'y': 150.0}) am (272, True, {'height': 408.0, 'width': 230.0, 'x': 414.0, 'y': 559.0})
+scale 2.0
+windows above Clock: [(26366, 414, 559, 230, 408), (26008, 724, 375, 280, 400), (25635, 400, 150, 740, 500)]
+exposed point (140, 190) covered point (460, 710)
+click exposed (140, 190) unverifiable global_input None None
+  restack S1: above Clock now [26366, 26008, 25635]; P1 covered by []; P2 covered by [26366]
+cursor now {'x': 140.0, 'y': 190.0}
+click covered (460, 710) unverifiable global_input None None
+  restack S2: above Clock now [26366, 26008, 25635]; P1 covered by []; P2 covered by [26366]
+z after restore: clock 258 occluder 273
+cursor now {'x': 460.0, 'y': 710.0}
+exposed box P1: 1804/9216 pixels differ between S1 (cursor there) and S2 (cursor gone)
+covered box P2: 0/9216 pixels differ between S1 (no cursor there) and S2 (cursor clipped under the occluder)
+OCCLUSION_RESULT PASS

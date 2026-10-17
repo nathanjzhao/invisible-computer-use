@@ -1,0 +1,14 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {Session} from './session.mjs';
+const create=(dispatch=async()=>({ok:true}),tools=[])=>Session.create({dispatch,tools});
+test('state and async native results persist without exposing Node',async()=>{const calls=[];const s=await create(async(name,args)=>{calls.push({name,args});return {windows:[7]};},['list_windows']);try{
+ assert.equal((await s.execute('state.windows=(await icu.call("list_windows")).windows; emit(state.windows);')).ok,true);
+ const r=await s.execute('state.windows.push(9); emit(state.windows); emit([typeof process,typeof require,typeof fetch]);');assert.equal(r.ok,true);assert.deepEqual(r.outputs.map(x=>JSON.parse(x.text)),[[7,9],['undefined','undefined','undefined']]);assert.equal(calls.length,1);
+}finally{s.destroy();}});
+test('operator approvals and imports cannot be reached',async()=>{let dispatched=0;const s=await create(async()=>{dispatched++},['approve_app','list_windows']);try{assert.equal((await s.execute('await icu.call("approve_app",{app:"X"});')).ok,false);assert.equal(dispatched,0);assert.equal((await s.execute('await import("node:fs");')).ok,false);}finally{s.destroy();}});
+test('infinite code is interrupted and failed state is discarded',async()=>{const s=await create();try{const r=await s.execute('state.partial=1; while(true){}',{timeoutMs:15});assert.equal(r.ok,false);assert.equal(r.state_reset,true);const next=await s.execute('emit(state.partial===undefined)');assert.equal(next.outputs[0].text,'true');}finally{s.destroy();}});
+test('stop cancels an awaiting call and rejects any later dispatch',async()=>{let count=0;const s=await create(async(_name,_args,{signal})=>{count++;await new Promise(r=>signal.addEventListener('abort',r,{once:true}));return {late:true};},['click']);try{const result=s.execute('await icu.call("click",{}); await icu.call("click",{});');setTimeout(()=>s.stop(),15);const r=await result;assert.equal(r.ok,false);assert.equal(count,1);}finally{s.destroy();}});
+test('parallel native actions and oversized input are rejected',async()=>{let count=0;const s=await create(async()=>{count++;await new Promise(r=>setTimeout(r,20));return {};},['click']);try{await assert.rejects(s.execute('x'.repeat(65537)),/64 KiB/);const r=await s.execute('await Promise.all([icu.call("click"),icu.call("click")])');assert.equal(r.ok,false);assert.ok(count<=1);if(s.inFlight)await assert.rejects(s.execute('emit(1)'),/still settling/);}finally{s.destroy();}});
+test('raw guest bridge cannot emit arbitrary MCP content or mislabeled images',async()=>{const s=await create();try{
+ for(const code of ['__emit(JSON.stringify({type:"resource",resource:{uri:"file:///private"}}))','emitImage("YWJjZA==")','__emit(JSON.stringify({type:"text",text:7}))'])assert.equal((await s.execute(code)).ok,false);
+ assert.equal((await s.execute('emit("valid")')).ok,true);
+}finally{s.destroy();}});

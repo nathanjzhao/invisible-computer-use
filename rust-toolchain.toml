@@ -1,0 +1,4 @@
+[toolchain]
+# The owned crates under impl/ build with the same toolchain as the vendored driver, so
+# verify.sh does not depend on whatever `stable` currently resolves to on the machine.
+channel = "1.97.1"

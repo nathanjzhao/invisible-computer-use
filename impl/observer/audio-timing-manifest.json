@@ -1,0 +1,26 @@
+{
+  "version": "1.0.32",
+  "applies_after": "taiku-observer-audio.patch",
+  "files": [
+    {
+      "path": "taiku-observer/src/main.rs",
+      "base_sha256": "70bd3b4ee3db86f24ce8d9360b5d9db6072e8e7d7a04847f89c602a7ecf9f92d",
+      "patched_sha256": "74f175a6065c3fd244ea3058b2e035f437a282cc2b955c7bd787ba6e907cf199"
+    },
+    {
+      "path": "taiku-observer/src/audio_only.rs",
+      "base_sha256": "7f1ec1b8d1ab743733b16397299ae92855b742b740f7067de648b3f2392b246b",
+      "patched_sha256": "995df18d8f591afa22106b13388318040cbe5176a67bdd74fa6bc2cf78a5cb15"
+    },
+    {
+      "path": "taiku-observer/src/audio_backend.rs",
+      "base_sha256": "ce639d7cbfb44ac252365d6d7fed894d1cc163e442874a0cc5688d7432304dce",
+      "patched_sha256": "e43c12e559076e608918a10bbf1797d237d0ceb679cd6e1e144580aebd71127a"
+    },
+    {
+      "path": "taiku-observer/src/recorder.rs",
+      "base_sha256": "d1d6f69403988e053cfeda8941dc7ec70c035ea3ba80e413820a443237918fa3",
+      "patched_sha256": "073f66d64ce297127f4ceb4a5059925aae16ccc36e433a03dd930a745b8dccfa"
+    }
+  ]
+}

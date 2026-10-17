@@ -1,0 +1,11 @@
+{
+  "checkbox": {"actions":[{"kind":"click","label":"Enable option"}],"expected":{"enabled":true}},
+  "checkbox_reset": {"actions":[{"kind":"click","label":"Enable option"},{"kind":"click","label":"Enable option"}],"expected":{"enabled":false,"toggle_count":2}},
+  "radio": {"actions":[{"kind":"click","label":"Detailed mode"}],"expected":{"mode":"detailed"}},
+  "popup_selection": {"actions":[{"kind":"click","label":"Format"},{"kind":"click","label":"Markdown"}],"expected":{"format":"Markdown"}},
+  "unicode_text": {"actions":[{"kind":"set_value","label":"Draft","value":"Résumé 東京🙂"}],"expected":{"draft":"Résumé 東京🙂"}},
+  "multiline_text": {"actions":[{"kind":"set_value","label":"Draft","value":"first line\n第二行\nlast"}],"expected":{"draft":"first line\n第二行\nlast"}},
+  "clear_text": {"actions":[{"kind":"set_value","label":"Draft","value":""}],"expected":{"draft":""}},
+  "scroll_reveal": {"actions":[{"kind":"scroll","label":"Records","direction":"down","amount":2},{"kind":"click","label":"Last record"}],"expected":{"scrolled":true,"last_record_clicked":true}},
+  "workflow": {"actions":[{"kind":"click","label":"Enable option"},{"kind":"click","label":"Detailed mode"},{"kind":"set_value","label":"Draft","value":"ready to review"},{"kind":"click","label":"Apply draft"}],"expected":{"enabled":true,"mode":"detailed","draft":"ready to review","applied":"ready to review"}}
+}

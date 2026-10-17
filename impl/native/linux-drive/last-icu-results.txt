@@ -1,0 +1,8 @@
+A. real app via icu list_windows: [('org.gnome.Calculator', 8388612)]
+   observed gnome-calculator: rev 1 tree top: [1] window "Calculator"
+B. fixture turn1: rev 1 | tree: [1] push button "Press me"|[2] text
+   button id: 1 entry id: 2
+   click button -> {'effect': 'unverifiable', 'route': 'accessibility', 'code': None, 'tool': None}
+   set_value entry -> {"_elapsed_ms": 8, "delivery": {"mode": "unknown"}, "effect": "unverifiable", "route": "accessibility"}
+   turn3 after set_value: rev 2 | value present: True | changed: True
+ICU_LINUX_DRIVE PASS

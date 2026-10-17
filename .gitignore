@@ -1,0 +1,30 @@
+# vendored upstream checkout (533M)
+vendor-cua/
+# rust build output
+**/target/
+# large binaries under reference/ (keep MANIFEST.md + small text/docs)
+reference/openai-sky/bin/SkyComputerUseService
+reference/openai-windows/codex-computer-use.exe
+reference/openai-windows/codex-computer-use-swift.exe
+win/helpers/codex-computer-use-swift.exe
+# python / editor noise
+__pycache__/
+.pytest_cache/
+.DS_Store
+
+# credentials of torn-down EC2 eval instances (kept locally, never tracked)
+win-eval/adminpw.txt
+win-eval2/adminpw.txt
+win-eval/bootstrap.ps1
+win-eval/bootstrap.b64
+win-eval2/bootstrap2.ps1
+win-eval2/bootstrap2.b64
+reference/win-eval/bootstrap.ps1
+win-eval/ssm-bootstrap-params.json
+win-eval2/ssm-bootstrap2.json
+
+# A/B render contains real Codex LensSequence art (not ours to commit); the notes stay tracked.
+study/cursor-graphics/*.png
+
+# Bundled cua-driver sidecar (built + signed locally by scripts/stage-driver.sh)
+app/src-tauri/binaries/

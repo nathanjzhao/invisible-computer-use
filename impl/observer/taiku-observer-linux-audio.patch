@@ -1,0 +1,363 @@
+--- a/taiku-observer/Cargo.toml
++++ b/taiku-observer/Cargo.toml
+@@ -268,6 +268,7 @@
+ # works on Wayland + X11 + headless). Needs the `input` group / CAP_DAC_OVERRIDE.
+ # evdev is pure-Rust (no C lib), so it builds fine on musl and stays here.
+ evdev = "0.12"
++libpulse-binding = "2.30"
+ 
+ # Linux GNU (glibc) ONLY — deliberately NOT musl. WAYLAND screen capture: the X11
+ # backends produce BLACK frames on a Wayland session (the default on modern
+--- a/taiku-observer/Cargo.lock
++++ b/taiku-observer/Cargo.lock
+@@ -1835,6 +1835,33 @@
+  "bindgen 0.72.1",
+  "errno",
+  "libc",
++]
++
++[[package]]
++name = "libpulse-binding"
++version = "2.30.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "909eb3049e16e373680fe65afe6e2a722ace06b671250cc4849557bc57d6a397"
++dependencies = [
++ "bitflags 2.13.0",
++ "libc",
++ "libpulse-sys",
++ "num-derive",
++ "num-traits",
++ "winapi",
++]
++
++[[package]]
++name = "libpulse-sys"
++version = "1.23.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d74371848b22e989f829cc1621d2ebd74960711557d8b45cfe740f60d0a05e61"
++dependencies = [
++ "libc",
++ "num-derive",
++ "num-traits",
++ "pkg-config",
++ "winapi",
+ ]
+ 
+ [[package]]
+@@ -3307,6 +3334,7 @@
+  "jpeg-encoder",
+  "libc",
+  "libproc",
++ "libpulse-binding",
+  "mach2 0.6.0",
+  "mp4",
+  "nusb",
+--- a/taiku-observer/src/audio_backend.rs
++++ b/taiku-observer/src/audio_backend.rs
+@@ -26,7 +26,11 @@
+ // Per-OS system-output loopback capture. Each owns its file end-to-end so they can
+ // be filled in independently. Linux/Windows use cpal (a monitor / WASAPI-loopback
+ // device); macOS needs ScreenCaptureKit audio (not a cpal device).
++#[cfg(not(target_os = "linux"))]
+ #[path = "audio_loopback_linux.rs"]
++mod loopback_linux;
++#[cfg(target_os = "linux")]
++#[path = "audio_capture_linux.rs"]
+ mod loopback_linux;
+ #[path = "audio_loopback_windows.rs"]
+ mod loopback_windows;
+@@ -57,7 +61,9 @@
+         let dir = dir.clone();
+         let stop = stop.clone();
+         handles.push(std::thread::spawn(move || {
+-            #[cfg(any(target_os = "macos", target_os = "linux", target_os = "windows"))]
++            #[cfg(target_os = "linux")]
++            loopback_linux::run_microphone(&rec, &dir, &stop);
++            #[cfg(any(target_os = "macos", target_os = "windows"))]
+             cpal_capture::run_default_input(&rec, &dir, "mic", "audio-mic.opus", &stop);
+             #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
+             {
+--- /dev/null
++++ b/taiku-observer/src/audio_capture_linux.rs
+@@ -0,0 +1,281 @@
++//! Linux audio through the Pulse protocol (PulseAudio or pipewire-pulse).
++//! Resolve concrete devices, refuse monitors as microphones, and forbid moves.
++//! All server interaction is nonblocking so Stop/owning-stdin EOF can always flush.
++use super::{emit_source_start, emit_source_unavailable, finish_source, OpusOggWriter};
++use crate::{recorder::Recorder, schema::Event};
++use libpulse_binding as pulse;
++use pulse::{callbacks::ListResult, context::{Context, State as ContextState},
++    mainloop::standard::{Mainloop, IterateResult}, operation::State as OperationState,
++    sample::{Format, Spec}, stream::{Stream, State as StreamState, FlagSet, PeekResult}};
++use std::{cell::{Cell, RefCell}, rc::Rc, path::Path, sync::{Arc, atomic::{AtomicBool, Ordering}},
++    time::{Duration, Instant}};
++
++type Result<T> = std::result::Result<T, String>;
++const RATE: u32 = 48_000;
++const SETUP_TIMEOUT: Duration = Duration::from_secs(3);
++const STALL_TIMEOUT: Duration = Duration::from_secs(2);
++
++struct Connection { context: Context, mainloop: Mainloop }
++impl Drop for Connection { fn drop(&mut self) { self.context.disconnect(); } }
++struct RecordingStream(Stream);
++impl Drop for RecordingStream { fn drop(&mut self) { let _ = self.0.disconnect(); } }
++
++fn tick(mainloop: &mut Mainloop) -> Result<()> {
++    match mainloop.iterate(false) {
++        IterateResult::Success(_) => Ok(()),
++        _ => Err("audio server mainloop stopped".into()),
++    }
++}
++fn wait_until(mainloop: &mut Mainloop, stop: &AtomicBool, deadline: Instant,
++    mut ready: impl FnMut() -> Result<bool>) -> Result<()> {
++    loop {
++        if stop.load(Ordering::SeqCst) { return Err("capture cancelled".into()); }
++        if Instant::now() >= deadline { return Err("audio server setup timed out".into()); }
++        tick(mainloop)?;
++        if ready()? { return Ok(()); }
++        std::thread::sleep(Duration::from_millis(5));
++    }
++}
++fn device_name(name: Option<String>) -> Result<String> {
++    name.filter(|n| !n.is_empty() && !n.contains('\0'))
++        .ok_or_else(|| "selected audio device is unavailable".into())
++}
++fn validate_source(microphone: bool, monitor_of_sink: Option<u32>, index: u32,
++    expected_monitor: Option<u32>) -> Result<()> {
++    if microphone {
++        if monitor_of_sink.is_some() { return Err("default microphone is a sink monitor; refusing system audio".into()); }
++    } else if monitor_of_sink.is_none() || expected_monitor != Some(index) {
++        return Err("default sink has no matching monitor; refusing default input fallback".into());
++    }
++    Ok(())
++}
++fn same_device(stream: &Stream, index: u32, name: &str) -> bool {
++    stream.get_device_index() == Some(index) && stream.get_device_name().as_deref() == Some(name)
++}
++fn data_timed_out(started: bool, now: Instant, setup_deadline: Instant, last_data: Instant) -> bool {
++    if started { now.duration_since(last_data) >= STALL_TIMEOUT } else { now >= setup_deadline }
++}
++fn source_removed(facility: Option<pulse::context::subscribe::Facility>,
++    operation: Option<pulse::context::subscribe::Operation>, index: u32, selected: u32) -> bool {
++    facility == Some(pulse::context::subscribe::Facility::Source)
++        && operation == Some(pulse::context::subscribe::Operation::Removed) && index == selected
++}
++fn stream_flags() -> FlagSet { FlagSet::DONT_MOVE | FlagSet::ADJUST_LATENCY }
++
++// Retain incomplete frames across chunks rather than dropping bytes or swapping channels.
++#[derive(Default)]
++struct Pcm { pending: Vec<u8> }
++impl Pcm {
++    fn push(&mut self, bytes: &[u8], channels: u8) -> Vec<i16> {
++        self.pending.extend_from_slice(bytes);
++        let frame = usize::from(channels) * 2;
++        let complete = self.pending.len() / frame * frame;
++        let samples = self.pending[..complete].chunks_exact(2)
++            .map(|b| i16::from_le_bytes([b[0], b[1]])).collect();
++        self.pending.drain(..complete);
++        samples
++    }
++}
++
++fn audio_writer(path: &Path, channels: u8, limit: Option<u64>) -> Result<OpusOggWriter> {
++    let mut writer = OpusOggWriter::create(path, RATE, channels.into()).map_err(|e| e.to_string())?;
++    if let Some(limit) = limit { writer.set_max_duration_ms(limit).map_err(|e| e.to_string())?; }
++    Ok(writer)
++}
++
++pub fn run(rec: &Arc<Recorder>, dir: &Path, stop: &Arc<AtomicBool>) {
++    capture(rec, dir, stop, false);
++}
++pub fn run_microphone(rec: &Arc<Recorder>, dir: &Path, stop: &Arc<AtomicBool>) {
++    capture(rec, dir, stop, true);
++}
++fn capture(rec: &Arc<Recorder>, dir: &Path, stop: &Arc<AtomicBool>, microphone: bool) {
++    let (name, file) = if microphone { ("mic", "audio-mic.opus") } else { ("system", "audio-system.opus") };
++    if let Err(error) = capture_inner(rec, dir, stop, microphone, name, file) {
++        emit_source_unavailable(rec, name, &error);
++    }
++}
++fn capture_inner(rec: &Arc<Recorder>, dir: &Path, stop: &AtomicBool,
++    microphone: bool, name: &str, file: &str) -> Result<()> {
++    let mainloop = Mainloop::new().ok_or("cannot create audio mainloop")?;
++    let context = Context::new(&mainloop, "ICU explicit audio capture").ok_or("cannot create audio context")?;
++    let mut connection = Connection { context, mainloop };
++    let Connection { context, mainloop } = &mut connection;
++    let deadline = Instant::now() + SETUP_TIMEOUT;
++    context.connect(None, pulse::context::FlagSet::NOAUTOSPAWN, None).map_err(|e| format!("{e}"))?;
++    wait_until(mainloop, stop, deadline, || match context.get_state() {
++        ContextState::Ready => Ok(true),
++        ContextState::Failed | ContextState::Terminated => Err(format!("audio server unavailable: {}", context.errno())),
++        _ => Ok(false),
++    })?;
++    let selected = Rc::new(RefCell::new(None));
++    let result = selected.clone();
++    let op = context.introspect().get_server_info(move |info| {
++        *result.borrow_mut() = if microphone { info.default_source_name.as_ref() } else { info.default_sink_name.as_ref() }
++            .map(|s| s.to_string());
++    });
++    wait_until(mainloop, stop, deadline, || Ok(op.get_state() != OperationState::Running))?;
++    let mut device = device_name(selected.borrow_mut().take())?;
++    let monitor = Rc::new(RefCell::new(None));
++    if !microphone {
++        let result = monitor.clone();
++        let op = context.introspect().get_sink_info_by_name(&device, move |item| {
++            if let ListResult::Item(info) = item {
++                *result.borrow_mut() = info.monitor_source_name.as_ref().map(|s| (s.to_string(), info.monitor_source));
++            }
++        });
++        wait_until(mainloop, stop, deadline, || Ok(op.get_state() != OperationState::Running))?;
++        device = device_name(monitor.borrow().as_ref().map(|x| x.0.clone()))?;
++    }
++    let selected = Rc::new(RefCell::new(None));
++    let result = selected.clone();
++    let op = context.introspect().get_source_info_by_name(&device, move |item| {
++        if let ListResult::Item(info) = item {
++            *result.borrow_mut() = Some((info.index, info.monitor_of_sink, info.sample_spec.channels));
++        }
++    });
++    wait_until(mainloop, stop, deadline, || Ok(op.get_state() != OperationState::Running))?;
++    let (index, monitor_of_sink, channels) = selected.borrow_mut().take().ok_or("selected source disappeared")?;
++    validate_source(microphone, monitor_of_sink, index, monitor.borrow().as_ref().map(|x| x.1))?;
++    // PipeWire can leave a removed source's stream Ready while delivering no
++    // more samples. Subscribe before connecting; state polling alone misses it.
++    let removed = Rc::new(Cell::new(false));
++    let notification = removed.clone();
++    context.set_subscribe_callback(Some(Box::new(move |facility, operation, changed| {
++        if source_removed(facility, operation, changed, index) { notification.set(true); }
++    })));
++    let subscribed = Rc::new(Cell::new(false));
++    let acknowledged = subscribed.clone();
++    let op = context.subscribe(pulse::context::subscribe::InterestMaskSet::SOURCE,
++        move |success| acknowledged.set(success));
++    wait_until(mainloop, stop, deadline, || Ok(op.get_state() != OperationState::Running))?;
++    if !subscribed.get() { return Err("cannot monitor selected device removal".into()); }
++    let channels = channels.clamp(1, 2);
++    let spec = Spec { format: Format::S16le, channels, rate: RATE };
++    let mut stream = RecordingStream(Stream::new(context, name, &spec, None).ok_or("cannot create capture stream")?);
++    let attr = pulse::def::BufferAttr { maxlength: u32::MAX, tlength: u32::MAX, prebuf: u32::MAX,
++        minreq: u32::MAX, fragsize: RATE / 50 * u32::from(channels) * 2 };
++    stream.0.connect_record(Some(&device), Some(&attr), stream_flags()).map_err(|e| format!("{e}"))?;
++    wait_until(mainloop, stop, deadline, || match stream.0.get_state() {
++        StreamState::Ready => Ok(true),
++        StreamState::Failed | StreamState::Terminated => Err(format!("selected source unavailable: {}", context.errno())),
++        _ => Ok(false),
++    })?;
++    if !same_device(&stream.0, index, &device) { return Err("audio server substituted a different source".into()); }
++    let path = dir.join(file);
++    let mut writer = audio_writer(&path, channels, rec.audio_limit_ms())?;
++    let mut first = None;
++    let mut last_data = Instant::now();
++    let mut pcm = Pcm::default();
++    let outcome = (|| -> Result<()> {
++        while !stop.load(Ordering::SeqCst) {
++            tick(mainloop)?;
++            if removed.get() { return Err("selected audio device disconnected".into()); }
++            if context.get_state() != ContextState::Ready || stream.0.get_state() != StreamState::Ready {
++                return Err(format!("selected audio device disconnected: {}", context.errno()));
++            }
++            if !same_device(&stream.0, index, &device) { return Err("audio device moved; capture stopped before reading replacement".into()); }
++            match stream.0.peek().map_err(|e| format!("{e}"))? {
++                PeekResult::Empty => {
++                    if data_timed_out(first.is_some(), Instant::now(), deadline, last_data) { return Err("selected audio device stopped delivering samples".into()); }
++                    std::thread::sleep(Duration::from_millis(5));
++                    continue;
++                },
++                PeekResult::Hole(_) => return Err("audio stream lost samples".into()),
++                PeekResult::Data(bytes) => {
++                    let samples = pcm.push(bytes, channels);
++                    if !samples.is_empty() {
++                        writer.write_pcm_i16(&samples).map_err(|e| format!("{e}"))?;
++                        if first.is_none() {
++                            let now = rec.clock.now_mono_ns(); first = Some(now);
++                            emit_source_start(rec, now, name, file, serde_json::json!({
++                                "mechanism":"Pulse protocol (PulseAudio/pipewire-pulse)", "device":device,
++                                "device_index":index, "device_rate":RATE, "device_channels":channels,
++                                "channels":channels, "format":"I16", "dont_move":true
++                            }));
++                        }
++                    }
++                    last_data = Instant::now();
++                },
++            }
++            stream.0.discard().map_err(|e| format!("{e}"))?;
++        }
++        Ok(())
++    })();
++    drop(stream); // release the sensor before finalizing any file
++    let Some(first_ns) = first else {
++        drop(writer); let _ = std::fs::remove_file(path);
++        return Err(outcome.err().unwrap_or_else(|| "selected source produced no audio before Stop".into()));
++    };
++    let finalized = writer.finalize().map_err(|e| format!("{e}"));
++    drop(writer);
++    if let Err(error) = &outcome {
++        rec.write_event(&Event::new(rec.clock.now_mono_ns(), "audio.source_error",
++            serde_json::json!({"name":name, "device":device, "error":error})));
++    }
++    match finalized {
++        Ok(duration) => finish_source(rec, name, file, first_ns, channels, duration),
++        Err(error) => {
++            let _ = std::fs::remove_file(path);
++            rec.write_event(&Event::new(rec.clock.now_mono_ns(), "audio.source_error",
++                serde_json::json!({"name":name, "error":format!("finalization failed: {error}")})));
++        }
++    }
++    Ok(())
++}
++
++#[cfg(test)] mod tests {
++    use super::*;
++    #[test] fn linux_writer_applies_the_requested_sample_limit() {
++        let path = std::env::temp_dir().join(format!("icu-linux-audio-limit-{}.opus", std::process::id()));
++        let mut writer = audio_writer(&path, 2, Some(100)).unwrap();
++        writer.write_pcm_i16(&vec![1000; 19_200]).unwrap();
++        let duration = writer.finalize().unwrap();
++        drop(writer);
++        std::fs::remove_file(path).unwrap();
++        assert!((duration - 0.1).abs() < 0.0001, "Linux source exceeded its sample limit: {duration}");
++    }
++    #[test] fn microphone_refuses_a_monitor_even_if_its_name_looks_like_a_microphone() {
++        assert!(validate_source(true, Some(8), 12, None).is_err());
++        assert!(validate_source(true, None, 12, None).is_ok());
++    }
++    #[test] fn system_requires_the_exact_default_sink_monitor() {
++        assert!(validate_source(false, None, 12, Some(12)).is_err());
++        assert!(validate_source(false, Some(8), 12, None).is_err());
++        assert!(validate_source(false, Some(8), 12, Some(13)).is_err());
++        assert!(validate_source(false, Some(8), 12, Some(12)).is_ok());
++    }
++    #[test] fn unresolved_device_never_becomes_default_input() {
++        for name in [None, Some(String::new()), Some("bad\0device".into())] { assert!(device_name(name).is_err()); }
++        assert_eq!(device_name(Some("sink.monitor".into())).unwrap(), "sink.monitor");
++    }
++    #[test] fn first_samples_get_the_bounded_setup_window() {
++        let start = Instant::now(); let deadline = start + SETUP_TIMEOUT;
++        let later = start + Duration::from_millis(2500);
++        assert!(!data_timed_out(false, later, deadline, start));
++        assert!(data_timed_out(false, deadline, deadline, start));
++        assert!(data_timed_out(true, later, deadline, start));
++        assert!(!data_timed_out(true, later, deadline, later));
++    }
++    #[test] fn removal_notifications_match_only_the_selected_source() {
++        use pulse::context::subscribe::{Facility, Operation};
++        assert!(source_removed(Some(Facility::Source), Some(Operation::Removed), 12, 12));
++        assert!(!source_removed(Some(Facility::Source), Some(Operation::Removed), 13, 12));
++        assert!(!source_removed(Some(Facility::Sink), Some(Operation::Removed), 12, 12));
++        assert!(!source_removed(Some(Facility::Source), Some(Operation::Changed), 12, 12));
++    }
++    #[test] fn disconnection_cannot_migrate_to_another_source() { assert!(stream_flags().contains(FlagSet::DONT_MOVE)); }
++    #[test] fn split_pcm_frames_preserve_every_byte_and_channel() {
++        let bytes: Vec<u8> = [1_i16, -2, 300, -400, 500, -600].iter().flat_map(|x| x.to_le_bytes()).collect();
++        for chunk in 1..=bytes.len() {
++            let mut pcm = Pcm::default(); let mut samples = Vec::new();
++            for part in bytes.chunks(chunk) { samples.extend(pcm.push(part, 2)); }
++            assert_eq!(samples, [1, -2, 300, -400, 500, -600]); assert!(pcm.pending.is_empty());
++        }
++    }
++    #[test] fn stop_and_deadline_interrupt_server_setup() {
++        let mut mainloop = Mainloop::new().unwrap();
++        assert!(wait_until(&mut mainloop, &AtomicBool::new(true), Instant::now()+SETUP_TIMEOUT, || panic!("must not access server after Stop")).is_err());
++        assert!(wait_until(&mut mainloop, &AtomicBool::new(false), Instant::now(), || panic!("must not access server after deadline")).is_err());
++    }
++}

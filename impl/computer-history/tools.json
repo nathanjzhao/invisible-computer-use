@@ -1,0 +1,157 @@
+[
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "computer_history_pause",
+    "description": "Pause activity capture without disabling Computer History."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "computer_history_resume",
+    "description": "Resume an enabled Computer History recorder after a pause."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "computer_history_status",
+    "description": "Read capture status and recent local activity paths."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "computer_history_get_settings",
+    "description": "Read current observation rules before updating them."
+  },
+  {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "observation": {
+          "additionalProperties": false,
+          "properties": {
+            "allowlist": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "bundleID": {
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": [
+                      "app",
+                      "url"
+                    ],
+                    "type": "string"
+                  },
+                  "urlDomain": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "scope"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "blocklist": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "bundleID": {
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": [
+                      "app",
+                      "url"
+                    ],
+                    "type": "string"
+                  },
+                  "urlDomain": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "scope"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "defaultApplicationBehavior": {
+              "enum": [
+                "observe",
+                "do_not_observe"
+              ],
+              "type": "string"
+            },
+            "defaultURLBehavior": {
+              "enum": [
+                "observe",
+                "do_not_observe"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "defaultApplicationBehavior",
+            "defaultURLBehavior",
+            "allowlist",
+            "blocklist"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "observation"
+      ],
+      "type": "object"
+    },
+    "name": "computer_history_update_settings",
+    "description": "Replace the observation rules. Read settings first and preserve fields the user did not request changing."
+  }
+]

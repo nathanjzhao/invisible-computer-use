@@ -1,0 +1,11 @@
+[package]
+name = "ui-readiness"
+version = "0.1.0"
+edition = "2021"
+description = "Bounded polling readiness for window observations"
+
+[dependencies]
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+serde_json = "1"
+sha2 = "0.10"

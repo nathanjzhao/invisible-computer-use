@@ -1,0 +1,22 @@
+[package]
+name = "axdiff"
+version = "0.1.0"
+edition = "2021"
+description = "Codex/Sky UIElementRenderDifference-parity AX-tree diff engine + stateful layer over cua-driver."
+
+[lib]
+name = "axdiff"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+app_instructions = { path = "../app-instructions" }
+
+[[bin]]
+name = "axdiff-cua"
+path = "src/bin/axdiff_cua.rs"
+
+[[bin]]
+name = "axdiff-layer"
+path = "src/bin/axdiff_layer.rs"

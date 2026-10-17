@@ -1,0 +1,16 @@
+axTreeDiffing
+axTreeDiffingRemovedElementIDRanges
+chromeExtensionInstall
+computerUseAlwaysSimulateClick
+computerUseCursor
+computerUsePersonalInstructionsOverridesBuiltIn
+computerUsePIP
+computerUsePIPOverrideMinimizeButton
+detachComputerUseCursor
+evaluations
+loopStepLimit
+memory
+memoryForIntegrations
+messagesIntegration
+overrideFogTexture
+skyshotClassifier

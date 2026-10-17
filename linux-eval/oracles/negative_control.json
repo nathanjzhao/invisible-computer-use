@@ -1,0 +1,7 @@
+{
+  "negative_control": "click at empty (1200,800), window at 400,400",
+  "driver_resp_route": null,
+  "driver_resp_code": "desktop_coordinate_scope_required",
+  "delivery_events_on_fixture": 0,
+  "PASS_zero_delivery": true
+}

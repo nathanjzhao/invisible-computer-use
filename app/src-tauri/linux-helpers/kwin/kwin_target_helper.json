@@ -1,0 +1,11 @@
+{
+  "KPlugin": {
+    "Name": "Cua KWin Target Helper",
+    "Description": "Provides trusted KWin window identity, window-owned capture and scoped History input metadata; no input injection.",
+    "License": "MIT",
+    "EnabledByDefault": false
+  },
+  "org.kde.kwin.effect": {
+    "enabledByDefaultMethod": false
+  }
+}

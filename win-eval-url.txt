@@ -1,0 +1,1 @@
+https://github.com/trycua/cua/releases/download/nightly-cua-driver-rs-v0.24.1-nightly.20260909.34311195045/cua-driver-rs-0.24.1-nightly.20260909.34311195045-windows-x86_64-binary.zip

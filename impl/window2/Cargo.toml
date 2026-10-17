@@ -1,0 +1,21 @@
+[package]
+name = "window2"
+version = "0.1.0"
+edition = "2021"
+description = "Codex/Sky window2 observation surface facade over cua-driver (specs 01/19, golden tool-surface-window2.md)."
+
+[lib]
+name = "window2"
+path = "src/lib.rs"
+
+[dependencies]
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+axdiff = { path = "../axdiff" }
+app_instructions = { path = "../app-instructions" }
+
+[[bin]]
+name = "window2"
+path = "src/bin/window2.rs"

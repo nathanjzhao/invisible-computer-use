@@ -1,0 +1,4 @@
+host before: ('fail', {'display_count': 0, 'host': {'active_displays': 0, 'display_asleep': None, 'lid_closed': False, 'on_console': True, 'screen_locked': True}}, 'Unlock the screen (or switch the console back to this user) and retry; observation tools keep working meanwhile.')
+click locked: {"code": "host_not_interactive", "host": {"active_displays": 0, "display_asleep": null, "lid_closed": false, "on_console": true, "screen_locked": true}, "reasons": ["screen_locked"]}
+observe locked: elements= 0 diff= None code= None
+HOST_GATE_RESULT PASS (screen is locked now; unlock it at the machine)

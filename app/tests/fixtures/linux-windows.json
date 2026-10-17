@@ -1,0 +1,62 @@
+{
+  "source": "Captured from the bundled Linux driver during the isolated native GUI task probe.",
+  "app_pid": 784507,
+  "response": {
+    "windows": [
+      {
+        "app_name": "Minicalc_gtk.py",
+        "bounds": {
+          "height": 320,
+          "width": 380,
+          "x": 1001,
+          "y": 120
+        },
+        "height": 320,
+        "is_on_screen": true,
+        "pid": 784481,
+        "title": "ICU Calculator",
+        "width": 380,
+        "window_id": 6291459,
+        "x": 1001,
+        "y": 120,
+        "z_index": 0
+      },
+      {
+        "app_name": "Minicalc_gtk.py",
+        "bounds": {
+          "height": 180,
+          "width": 320,
+          "x": 1051,
+          "y": 670
+        },
+        "height": 180,
+        "is_on_screen": true,
+        "pid": 784481,
+        "title": "ICU Focus Guard",
+        "width": 320,
+        "window_id": 6291463,
+        "x": 1051,
+        "y": 670,
+        "z_index": 1
+      },
+      {
+        "app_name": "App",
+        "bounds": {
+          "height": 820,
+          "width": 1280,
+          "x": 1,
+          "y": 175
+        },
+        "height": 820,
+        "is_on_screen": true,
+        "pid": 784507,
+        "title": "Copilot",
+        "width": 1280,
+        "window_id": 10485763,
+        "x": 1,
+        "y": 175,
+        "z_index": 2
+      }
+    ]
+  }
+}

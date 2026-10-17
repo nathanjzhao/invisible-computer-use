@@ -1,0 +1,276 @@
+--- a/taiku-observer/src/recorder.rs
++++ b/taiku-observer/src/recorder.rs
+@@ -5,7 +5,7 @@
+ use std::fs::{create_dir_all, File, OpenOptions};
+ use std::io::{BufWriter, Write};
+ use std::path::{Path, PathBuf};
+-use std::sync::atomic::{AtomicBool, Ordering};
++use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+ use std::sync::{Arc, Mutex, MutexGuard};
+ 
+ use serde::Serialize;
+@@ -93,6 +93,7 @@
+     /// diverge from the manifest's anchor list / a later reader see unindexed tail).
+     finalized: AtomicBool,
+     audio_started: Mutex<Option<std::time::Instant>>,
++    audio_limit_ms: AtomicU64,
+ }
+ 
+ /// One row in frames/index.jsonl.
+@@ -174,8 +175,14 @@
+             audio_meta: Mutex::new(Vec::new()),
+             finalized: AtomicBool::new(false),
+             audio_started: Mutex::new(None),
++            audio_limit_ms: AtomicU64::new(0),
+         };
+         Ok(Arc::new(rec))
++    }
++
++    pub fn set_audio_limit_ms(&self, value: u64) { self.audio_limit_ms.store(value,Ordering::SeqCst); }
++    pub fn audio_limit_ms(&self) -> Option<u64> {
++        let value=self.audio_limit_ms.load(Ordering::SeqCst);(value>0).then_some(value)
+     }
+ 
+     /// First real audio delivery, shared by the explicit bounded session only.
+--- a/taiku-observer/src/audio_only.rs
++++ b/taiku-observer/src/audio_only.rs
+@@ -11,6 +11,7 @@
+ pub fn run_millis(out: &Path, sources: Sources, milliseconds: u64) -> io::Result<()> {
+     if !(100..=3_600_000).contains(&milliseconds) { return Err(io::Error::new(io::ErrorKind::InvalidInput, "duration must be 100..3600000 milliseconds")); }
+     let rec = Recorder::create(out, &format!("audio-{}", uuid::Uuid::new_v4()), MasterClock::new())?;
++    rec.set_audio_limit_ms(milliseconds);
+     rec.write_event(&Event::new(rec.clock.now_mono_ns(), "observer.audio_scope", serde_json::json!({
+         "microphone":sources.microphone(), "system":sources.system(), "max_seconds":milliseconds.div_ceil(1000), "max_duration_ms":milliseconds,
+         "other_sensors":false
+--- a/taiku-observer/src/audio_opus_ogg.rs
++++ b/taiku-observer/src/audio_opus_ogg.rs
+@@ -161,6 +161,8 @@
+     granule: u64,
+     /// total output samples-per-channel (for duration).
+     out_samples: u64,
++    max_samples: Option<u64>,
++    accepted_samples: u64,
+ }
+ 
+ impl OpusOggWriter {
+@@ -220,14 +222,30 @@
+             pending: Vec::with_capacity(FRAME_PER_CH * 2 * 2),
+             granule: 0,
+             out_samples: 0,
++            max_samples: None,
++            accepted_samples: 0,
+         })
++    }
++
++    /// Bound persisted PCM samples before encoding. Unbounded sessions keep their existing layout.
++    pub fn set_max_duration_ms(&mut self, milliseconds: u64) -> std::io::Result<()> {
++        if !(100..=3_600_000).contains(&milliseconds) || self.accepted_samples!=0 || !self.pending.is_empty() {
++            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,"Audio sample limit must be set before capture"));
++        }
++        self.max_samples=Some(milliseconds*48);Ok(())
+     }
+ 
+     /// Feed interleaved i16 PCM at the device rate AND the device channel count;
+     /// narrows to the encoded channel count, resamples, encodes whole frames.
+     pub fn write_pcm_i16(&mut self, pcm: &[i16]) -> std::io::Result<()> {
++        if self.max_samples.is_some_and(|limit|self.accepted_samples>=limit) { return Ok(()); }
+         let narrowed = map_channels(pcm, self.in_channels, self.channels);
++        let before=self.pending.len();
+         self.resampler.process(narrowed.as_ref(), &mut self.pending);
++        let available=((self.pending.len()-before)/self.channels) as u64;
++        let keep=self.max_samples.map_or(available,|limit|available.min(limit-self.accepted_samples));
++        self.pending.truncate(before+keep as usize*self.channels);
++        self.accepted_samples+=keep;
+         let frame_len = FRAME_PER_CH * self.channels;
+         while self.pending.len() >= frame_len {
+             // Drain one frame without reallocating the tail each time.
+@@ -246,7 +264,8 @@
+                         )
+                         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+                 }
+-                Err(_) => break, // encoder error: stop this source cleanly
++                Err(error) if self.max_samples.is_some() => return Err(std::io::Error::other(format!("opus: {error}"))),
++                Err(_) => break, // legacy unbounded stream behavior
+             }
+         }
+         Ok(())
+@@ -255,6 +274,7 @@
+     /// Flush any partial final frame (zero-padded), mark end-of-stream, and return
+     /// the recorded duration in seconds.
+     pub fn finalize(&mut self) -> std::io::Result<f64> {
++        if self.max_samples.is_some() { return self.finalize_bounded(); }
+         let frame_len = FRAME_PER_CH * self.channels;
+         if !self.pending.is_empty() {
+             self.pending.resize(frame_len, 0); // zero-pad the tail to a full frame
+@@ -294,6 +314,27 @@
+         self.writer.inner_mut().flush()?;
+         Ok(self.out_samples as f64 / OPUS_RATE as f64)
+     }
++    fn finalize_bounded(&mut self) -> std::io::Result<f64> {
++        // Opus lookahead is codec padding, never extra captured content. The
++        // final granule includes pre-skip so decoding returns exactly the PCM
++        // sample count admitted before the recording limit.
++        let target=self.accepted_samples+u64::from(PRE_SKIP);
++        let frame_len=FRAME_PER_CH*self.channels;
++        while self.granule<target {
++            let count=self.pending.len().min(frame_len);
++            let mut frame:Vec<i16>=self.pending.drain(..count).collect();frame.resize(frame_len,0);
++            let mut packet=[0u8;4000];
++            let bytes=self.enc.encode(&frame,&mut packet).map_err(|e|std::io::Error::other(format!("opus: {e}")))?;
++            self.granule+=FRAME_PER_CH as u64;
++            let last=self.granule>=target;
++            self.writer.write_packet(packet[..bytes].to_vec(),self.serial,
++                if last{PacketWriteEndInfo::EndStream}else{PacketWriteEndInfo::NormalPacket},
++                if last{target}else{self.granule}).map_err(std::io::Error::other)?;
++        }
++        use std::io::Write;self.writer.inner_mut().flush()?;
++        Ok(self.accepted_samples as f64/OPUS_RATE as f64)
++    }
++
+ }
+ 
+ 
+@@ -321,6 +362,53 @@
+         dir
+     }
+ 
++    fn decoded_frames(path: &Path, channels: usize) -> Vec<i16> {
++        let mut reader=ogg::PacketReader::new(std::io::BufReader::new(std::fs::File::open(path).unwrap()));
++        let head=reader.read_packet().unwrap().unwrap();
++        let skip=u16::from_le_bytes([head.data[10],head.data[11]]) as usize;
++        let mut decoder=opus::Decoder::new(48_000,if channels==1{opus::Channels::Mono}else{opus::Channels::Stereo}).unwrap();
++        reader.read_packet().unwrap().unwrap();
++        let mut pcm=Vec::new();let mut final_granule=None;let mut buffer=vec![0i16;5760*channels];
++        while let Some(packet)=reader.read_packet().unwrap() {
++            let frames=decoder.decode(&packet.data,&mut buffer,false).unwrap();pcm.extend_from_slice(&buffer[..frames*channels]);
++            if packet.last_in_stream(){final_granule=Some(packet.absgp_page() as usize);}
++        }
++        let final_granule=final_granule.unwrap();assert!(final_granule*channels<=pcm.len());
++        pcm.truncate(final_granule*channels);pcm.drain(..skip*channels);pcm
++    }
++    #[test]
++    fn bounded_capture_discards_samples_after_the_limit_before_encoding() {
++        let dir=scratch_dir("bounded-stereo");let path=dir.join("audio.opus");
++        let mut writer=OpusOggWriter::create(&path,48_000,2).unwrap();writer.set_max_duration_ms(100).unwrap();
++        let input:Vec<i16>=(0..9600).flat_map(|i| {
++            let hz=if i<4800{440.}else{880.};let x=(12000.*(2.*std::f64::consts::PI*hz*i as f64/48_000.).sin()) as i16;[x,x]
++        }).collect();
++        writer.write_pcm_i16(&input).unwrap();writer.write_pcm_i16(&input[9600..]).unwrap();
++        assert!((writer.finalize().unwrap()-0.1).abs()<1e-12);
++        let pcm=decoded_frames(&path,2);assert_eq!(pcm.len(),4800*2);
++        let window:Vec<f64>=pcm.chunks_exact(2).map(|x|x[0] as f64/32768.).collect();
++        let amp=|hz:f64|{let(a,b)=window.iter().enumerate().fold((0.,0.),|(a,b),(i,x)|{let p=2.*std::f64::consts::PI*hz*i as f64/48_000.;(a+x*p.cos(),b+x*p.sin())});2.*a.hypot(b)/window.len() as f64};
++        assert!(amp(440.)>0.1);assert!(amp(880.)<0.02);std::fs::remove_dir_all(dir).unwrap();
++    }
++    #[test]
++    fn bounded_odd_milliseconds_and_partial_final_frame_are_exact() {
++        for (limit,input_frames,expected) in [(1001,96_000,48_048),(100,1250,1250),(100,0,0)] {
++            let dir=scratch_dir("bounded-mono");let path=dir.join("audio.opus");
++            let mut writer=OpusOggWriter::create(&path,48_000,1).unwrap();writer.set_max_duration_ms(limit).unwrap();
++            writer.write_pcm_i16(&vec![3000;input_frames]).unwrap();
++            assert!((writer.finalize().unwrap()-expected as f64/48_000.).abs()<1e-12);
++            assert_eq!(decoded_frames(&path,1).len(),expected);std::fs::remove_dir_all(dir).unwrap();
++        }
++    }
++    #[test]
++    fn bounded_limit_cannot_be_changed_after_capture_starts() {
++        let dir=scratch_dir("bounded-config");let path=dir.join("audio.opus");
++        let mut writer=OpusOggWriter::create(&path,48_000,1).unwrap();
++        for invalid in [0,99,3_600_001] {assert!(writer.set_max_duration_ms(invalid).is_err());}
++        writer.set_max_duration_ms(100).unwrap();writer.write_pcm_i16(&[1,2,3]).unwrap();
++        assert!(writer.set_max_duration_ms(200).is_err());writer.finalize().unwrap();std::fs::remove_dir_all(dir).unwrap();
++    }
++
+     #[test]
+     fn resampler_passthrough_at_48k() {
+         let mut r = LinearResampler::new(48_000, 1);
+--- a/taiku-observer/src/audio_backend.rs
++++ b/taiku-observer/src/audio_backend.rs
+@@ -218,7 +218,12 @@
+ 
+         let path = dir.join(file);
+         let writer = match OpusOggWriter::create(&path, device_rate, device_channels) {
+-            Ok(w) => Arc::new(Mutex::new(w)),
++            Ok(mut w) => {
++                if let Some(limit)=rec.audio_limit_ms() {
++                    if let Err(e)=w.set_max_duration_ms(limit) { return touch_unavailable(rec,name,&format!("audio sample limit: {e}")); }
++                }
++                Arc::new(Mutex::new(w))
++            },
+             Err(e) => return touch_unavailable(rec, name, &format!("opus/ogg writer: {e}")),
+         };
+ 
+--- a/taiku-observer/src/audio_loopback_linux.rs
++++ b/taiku-observer/src/audio_loopback_linux.rs
+@@ -285,7 +285,15 @@
+ 
+     let path = dir.join(FILE);
+     let writer = match super::OpusOggWriter::create(&path, PAREC_RATE, PAREC_CHANNELS as u16) {
+-        Ok(w) => std::sync::Arc::new(std::sync::Mutex::new(w)),
++        Ok(mut w) => {
++            if let Some(limit)=rec.audio_limit_ms() {
++                if let Err(e)=w.set_max_duration_ms(limit) {
++                    let _=child.kill();let _=child.wait();
++                    return super::emit_source_unavailable(rec,NAME,&format!("audio sample limit: {e}"));
++                }
++            }
++            std::sync::Arc::new(std::sync::Mutex::new(w))
++        },
+         Err(e) => {
+             let _ = child.kill();
+             let _ = child.wait();
+--- a/taiku-observer/src/audio_loopback_macos.rs
++++ b/taiku-observer/src/audio_loopback_macos.rs
+@@ -89,6 +89,7 @@
+             .arg(&out)
+             .arg("--secs")
+             .arg("3600")
++            .args(rec.audio_limit_ms().into_iter().flat_map(|value|[String::from("--max-duration-ms"),value.to_string()]))
+             .stdin(Stdio::null())
+             .stdout(Stdio::piped())
+             .stderr(Stdio::null())
+--- a/taiku-observer-audio-helper/src/main.rs
++++ b/taiku-observer-audio-helper/src/main.rs
+@@ -38,12 +38,19 @@
+     }
+     let secs: u64 = arg("--secs", "600").parse().unwrap_or(600);
+ 
++    let limit = arg("--max-duration-ms", "");
++    let limit = if limit.is_empty() { None } else {
++        match limit.parse::<u64>() {
++            Ok(value) if (100..=3_600_000).contains(&value) => Some(value),
++            _ => { println!("UNAVAILABLE invalid audio sample limit"); std::process::exit(2); }
++        }
++    };
+     #[cfg(target_os = "macos")]
+-    macos::run(&out, secs);
++    macos::run(&out, secs, limit);
+ 
+     #[cfg(not(target_os = "macos"))]
+     {
+-        let _ = secs;
++        let _ = (secs, limit);
+         println!("UNAVAILABLE not macOS");
+     }
+ }
+@@ -74,7 +81,7 @@
+         std::process::exit(0);
+     }
+ 
+-    pub fn run(out: &str, secs: u64) {
++    pub fn run(out: &str, secs: u64, limit: Option<u64>) {
+         // SIGTERM/SIGINT from the agent → stop flag (the main loop finalizes cleanly).
+         unsafe {
+             libc::signal(libc::SIGTERM, on_signal as usize);
+@@ -113,7 +120,10 @@
+             SAMPLE_RATE,
+             CHANNELS as u16,
+         ) {
+-            Ok(w) => Arc::new(Mutex::new(Some(w))),
++            Ok(mut w) => {
++                if let Some(value)=limit { if let Err(e)=w.set_max_duration_ms(value) { unavailable(&format!("audio sample limit: {e}")); } }
++                Arc::new(Mutex::new(Some(w)))
++            },
+             Err(e) => unavailable(&format!("opus/ogg writer: {e}")),
+         };
+ 

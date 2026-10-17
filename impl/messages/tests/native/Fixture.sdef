@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dictionary xmlns:xi="http://www.w3.org/2003/XInclude">
+<xi:include href="file:///System/Library/ScriptingDefinitions/CocoaStandard.sdef" xpointer="xpointer(/dictionary/suite)"/>
+<suite name="Messages Fixture" code="icht">
+
+<enumeration name="service type" code="styp"><enumerator name="iMessage" code="sims"/><enumerator name="SMS" code="ssms"/><enumerator name="RCS" code="srcs"/></enumeration>
+<enumeration name="connection status" code="ssta"><enumerator name="connected" code="conn"/><enumerator name="disconnected" code="dcon"/></enumeration>
+<class-extension extends="application"><cocoa class="FixtureApplication"/><element type="account"><cocoa key="accounts"/></element><element type="chat"><cocoa key="chats"/></element></class-extension>
+<command name="send" code="ichtsend"><cocoa class="FixtureSendCommand"/><direct-parameter><type type="file"/><type type="text"/></direct-parameter><parameter name="to" code="TO  "><cocoa key="to"/><type type="participant"/><type type="chat"/></parameter></command>
+<class name="account" code="icsv"><cocoa class="FixtureAccount"/>
+<property name="id" code="ID  " type="text" access="r"><cocoa key="identifier"/></property>
+<property name="enabled" code="enbl" type="boolean" access="r"/>
+<property name="connection status" code="ssta" type="connection status" access="r"><cocoa key="connectionStatus"/></property>
+<property name="service type" code="styp" type="service type" access="r"><cocoa key="serviceType"/></property>
+<element type="chat"><cocoa key="chats"/></element><element type="participant"><cocoa key="participants"/></element></class>
+<class name="participant" code="pres"><cocoa class="FixtureParticipant"/>
+<property name="id" code="ID  " type="text" access="r"><cocoa key="identifier"/></property>
+<property name="name" code="pnam" type="text" access="r"><cocoa key="handle"/></property>
+<property name="handle" code="hndl" type="text" access="r"/>
+</class>
+<class name="chat" code="imct"><cocoa class="FixtureChat"/>
+<property name="id" code="ID  " type="text" access="r"><cocoa key="identifier"/></property>
+<property name="name" code="pnam" type="text"/>
+<property name="account" code="icsv" type="account" access="r"/>
+<element type="participant"><cocoa key="participants"/></element>
+</class>
+</suite></dictionary>

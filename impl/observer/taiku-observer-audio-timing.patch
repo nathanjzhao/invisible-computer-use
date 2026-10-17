@@ -1,0 +1,166 @@
+--- a/taiku-observer/src/main.rs
++++ b/taiku-observer/src/main.rs
+@@ -136,7 +136,8 @@
+     Audio {
+         #[arg(long)] out: PathBuf,
+         #[arg(long, value_enum)] source: audio_backend::Sources,
+-        #[arg(long, default_value_t = 60, value_parser = clap::value_parser!(u64).range(1..=3600))] secs: u64,
++        #[arg(long, conflicts_with = "max_duration_ms", value_parser = clap::value_parser!(u64).range(1..=3600))] secs: Option<u64>,
++        #[arg(long, conflicts_with = "secs", value_parser = clap::value_parser!(u64).range(100..=3_600_000))] max_duration_ms: Option<u64>,
+     },
+     /// Record screen frames + process events onto one master timeline.
+     Record {
+@@ -462,8 +463,9 @@
+     qos::set_process_eco();
+     let cli = Cli::parse();
+     match cli.cmd {
+-        Cmd::Audio {out, source, secs} => {
+-            if let Err(error) = audio_only::run(&out, source, secs) {
++        Cmd::Audio {out, source, secs, max_duration_ms} => {
++            let milliseconds = max_duration_ms.unwrap_or_else(|| secs.unwrap_or(60) * 1000);
++            if let Err(error) = audio_only::run_millis(&out, source, milliseconds) {
+                 eprintln!("audio recording failed: {error}");
+                 std::process::exit(1);
+             }
+--- a/taiku-observer/src/audio_only.rs
++++ b/taiku-observer/src/audio_only.rs
+@@ -2,11 +2,17 @@
+ use crate::{audio_backend::{self, Sources}, clock::MasterClock, recorder::Recorder, schema::Event};
+ use std::{io::{self, BufRead}, path::Path, sync::{Arc, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
+ 
++#[allow(dead_code)]
+ pub fn run(out: &Path, sources: Sources, seconds: u64) -> io::Result<()> {
+     if !(1..=3600).contains(&seconds) { return Err(io::Error::new(io::ErrorKind::InvalidInput, "duration must be 1..3600 seconds")); }
++    run_millis(out, sources, seconds * 1000)
++}
++
++pub fn run_millis(out: &Path, sources: Sources, milliseconds: u64) -> io::Result<()> {
++    if !(100..=3_600_000).contains(&milliseconds) { return Err(io::Error::new(io::ErrorKind::InvalidInput, "duration must be 100..3600000 milliseconds")); }
+     let rec = Recorder::create(out, &format!("audio-{}", uuid::Uuid::new_v4()), MasterClock::new())?;
+     rec.write_event(&Event::new(rec.clock.now_mono_ns(), "observer.audio_scope", serde_json::json!({
+-        "microphone":sources.microphone(), "system":sources.system(), "max_seconds":seconds,
++        "microphone":sources.microphone(), "system":sources.system(), "max_seconds":milliseconds.div_ceil(1000), "max_duration_ms":milliseconds,
+         "other_sensors":false
+     })));
+     let stop=Arc::new(AtomicBool::new(false));
+@@ -23,9 +29,11 @@
+     let capture=rec.clone(); let stopped=stop.clone();
+     let worker=std::thread::spawn(move || audio_backend::run_sources(capture.clone(),capture.dir.clone(),stopped,sources));
+     println!("{}",serde_json::json!({"recording_directory":rec.dir,"microphone":sources.microphone(),"system":sources.system()}));
+-    let deadline=Instant::now()+Duration::from_secs(seconds);
+-    while Instant::now()<deadline && !stop.load(Ordering::SeqCst) && !worker.is_finished() {
+-        std::thread::sleep(Duration::from_millis(25));
++    let waiting_since = Instant::now();
++    let duration = Duration::from_millis(milliseconds);
++    while !stop.load(Ordering::SeqCst) && !worker.is_finished() {
++        if capture_expired(rec.audio_elapsed(), waiting_since.elapsed(), duration) { break; }
++        std::thread::sleep(Duration::from_millis(5));
+     }
+     stop.store(true,Ordering::SeqCst);
+     let deadline=Instant::now()+Duration::from_secs(5);
+@@ -37,8 +45,28 @@
+     Ok(())
+ }
+ 
++fn capture_expired(audio_elapsed: Option<Duration>, startup_elapsed: Duration, limit: Duration) -> bool {
++    match audio_elapsed {
++        Some(elapsed) => elapsed >= limit,
++        None => startup_elapsed >= Duration::from_secs(10),
++    }
++}
++
+ #[cfg(test)] mod tests {
+     use super::*;
++    #[test] fn startup_delay_does_not_consume_a_short_capture() {
++        let limit=Duration::from_millis(100);
++        assert!(!capture_expired(None,Duration::from_secs(2),limit));
++        assert!(!capture_expired(Some(Duration::from_millis(99)),Duration::from_secs(2),limit));
++        assert!(capture_expired(Some(limit),Duration::from_secs(2),limit));
++        assert!(capture_expired(None,Duration::from_secs(10),limit));
++    }
++    #[test] fn millisecond_bounds_fail_before_opening_any_sensor() {
++        for value in [0,1,99,3_600_001,u64::MAX] {
++            assert!(run_millis(Path::new("/no-recording-here"),Sources::Both,value).is_err());
++        }
++    }
++
+     #[test] fn source_selection_never_implies_the_other_source() {
+         assert!(Sources::Microphone.microphone()); assert!(!Sources::Microphone.system());
+         assert!(Sources::System.system()); assert!(!Sources::System.microphone());
+--- a/taiku-observer/src/audio_backend.rs
++++ b/taiku-observer/src/audio_backend.rs
+@@ -109,6 +109,7 @@
+     file: &str,
+     extra: serde_json::Value,
+ ) {
++    rec.mark_audio_started();
+     let mut payload = serde_json::json!({ "name": name, "file": file, "opus_rate": OPUS_RATE });
+     if let (Some(dst), serde_json::Value::Object(src)) = (payload.as_object_mut(), extra) {
+         dst.extend(src);
+@@ -221,18 +222,13 @@
+             Err(e) => return touch_unavailable(rec, name, &format!("opus/ogg writer: {e}")),
+         };
+ 
+-        super::emit_source_start(
+-            rec,
+-            first_ns_setup,
+-            name,
+-            file,
+-            serde_json::json!({
+-                "device_rate": device_rate,
+-                "device_channels": device_channels,
+-                "channels": channels,
+-                "format": format!("{sample_format:?}"),
+-            }),
+-        );
++        let rec_cb = rec.clone();
++        let source_name = name.to_owned();
++        let source_file = file.to_owned();
++        let source_metadata = serde_json::json!({
++            "device_rate": device_rate, "device_channels": device_channels,
++            "channels": channels, "format": format!("{sample_format:?}"),
++        });
+ 
+         // The cpal callback hands us samples in the device's native format; convert
+         // each to i16 interleaved and push to the writer. A poisoned/closed writer
+@@ -252,7 +248,9 @@
+             // delivered (set-once), so playback aligns to when audio actually began.
+             if let Ok(mut fs) = first_sample_cb.lock() {
+                 if fs.is_none() {
+-                    *fs = Some(clock_cb.now_mono_ns());
++                    let now = clock_cb.now_mono_ns();
++                    *fs = Some(now);
++                    super::emit_source_start(&rec_cb, now, &source_name, &source_file, source_metadata.clone());
+                 }
+             }
+             if let Ok(mut g) = w_cb.lock() {
+--- a/taiku-observer/src/recorder.rs
++++ b/taiku-observer/src/recorder.rs
+@@ -92,6 +92,7 @@
+     /// appending a row AFTER the manifest was computed (which would make events.jsonl
+     /// diverge from the manifest's anchor list / a later reader see unindexed tail).
+     finalized: AtomicBool,
++    audio_started: Mutex<Option<std::time::Instant>>,
+ }
+ 
+ /// One row in frames/index.jsonl.
+@@ -172,8 +173,19 @@
+             video_meta: Mutex::new(None),
+             audio_meta: Mutex::new(Vec::new()),
+             finalized: AtomicBool::new(false),
++            audio_started: Mutex::new(None),
+         };
+         Ok(Arc::new(rec))
++    }
++
++    /// First real audio delivery, shared by the explicit bounded session only.
++    pub fn mark_audio_started(&self) {
++        if !self.finalized.load(Ordering::SeqCst) {
++            lock_recover(&self.audio_started).get_or_insert_with(std::time::Instant::now);
++        }
++    }
++    pub fn audio_elapsed(&self) -> Option<std::time::Duration> {
++        lock_recover(&self.audio_started).map(|at| at.elapsed())
+     }
+ 
+     /// Append an Event to events.jsonl (flushed per line so a crash keeps data).

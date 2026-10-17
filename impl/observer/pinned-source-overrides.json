@@ -1,0 +1,27 @@
+[
+  {
+    "path": "taiku-observer/Cargo.lock",
+    "revision": "2e4af6895c98d11cf5c8c9b67068b5cb058f89ae",
+    "sha256": "f3382b12cffc23d4da260a1e49eb7f5b5b62bf5eae181e51d3fe2f64080779c6"
+  },
+  {
+    "path": "taiku-observer/Cargo.toml",
+    "revision": "2e4af6895c98d11cf5c8c9b67068b5cb058f89ae",
+    "sha256": "150190d067da029a079ea0cfbdea432d2af124211e22deb0a0e3ff2fa28aec89"
+  },
+  {
+    "path": "taiku-observer-audio-helper/Cargo.toml",
+    "revision": "d8d87c39ed30e4eff81188b290ace0e0a657eeaf",
+    "sha256": "2f3422790ada78a74fbb216e7583e0bbd4876de173506579b9a2aa34d3dc1333"
+  },
+  {
+    "path": "taiku-observer-audio-helper/Cargo.lock",
+    "revision": "5b4ca857caed88e24f8894891b90dba3d5c4cdc9",
+    "sha256": "fd3731e0e76cd1e99ed3a0805aa0d5648bc42cb8ec8890d48bd56d63618da468"
+  },
+  {
+    "path": "taiku-observer-audio-helper/src/main.rs",
+    "revision": "c4273825baacdbb8ba437b0481922d80a4e7c0e3",
+    "sha256": "9c9c32f2b7db2b3856464d218c4787db06e659a2492f1c67115f20b7c6653f4d"
+  }
+]

@@ -1,0 +1,22 @@
+Guards of the elevated update install (item 3), each removed once. Run 2026-10-05 on macOS arm64, `cargo test --lib elevated_update`
+and `npx vitest run src/updater.test.ts`. Green baseline: 4 of 4 Rust tests, 13 of 13 vitest tests.
+
+Rust (app/src-tauri/src/elevated_update.rs)
+  cancelled arm of classify() disabled (ERROR_CANCELLED falls to the generic text)
+      FAILED a_cancelled_or_refused_prompt_keeps_the_app_and_says_so (panicked at elevated_update.rs:133)
+  Launch::Finished(0) widened to Launch::Finished(_) (any installer exit counts as installed)
+      FAILED only_an_installer_that_exited_zero_counts_as_installed
+  installer_parameters() without /AllUsers
+      FAILED the_installer_is_asked_for_all_users_and_the_plugin_switches
+
+TypeScript (app/src/updater.ts)
+  withOwnInstall always returns the plugin's update (if (false) return update)
+      FAILED uses the backend's install only when the backend says it owns this install
+  the "kept" branch disabled (a cancelled install still relaunches)
+      FAILED keeps the app running, relaunches nothing and says why when the elevation was cancelled
+  relaunch after an install the installer already restarted
+      FAILED does not relaunch after an install the installer already restarted
+
+Windows code (run_elevated) was type-checked, not run, against windows-sys 0.61 with
+`cargo +1.97.1 check --target x86_64-pc-windows-msvc` on the module in a scratch crate (the whole app cannot be checked
+for that target from macOS: ring needs MSVC headers). It runs for the first time on the host.
