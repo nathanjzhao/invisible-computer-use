@@ -107,6 +107,15 @@ jobs:
         working-directory: app
         run: npm ci
 
+      # The native cua-driver build (impl/native/apply-and-build.sh) invokes cl.exe,
+      # so the Windows job needs the MSVC toolchain on PATH. This exports the dev-shell
+      # env (cl.exe/link.exe, INCLUDE/LIB) to GITHUB_ENV/PATH for every later step.
+      - name: Set up MSVC developer shell (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Windows build prerequisites
         if: runner.os == 'Windows'
         shell: pwsh
