@@ -62,6 +62,11 @@
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg5REQ2OTgyMDg2NkQ0RTAKUldUZzFHWUlnbW5kaWM0YlE2VWErQzFHMXFLbXl3TGVKcCs0eHI5dWVRVDA3RHhwZTB5K1ZBU0IK",
       "requireSignedVersion": true
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": ["icu"]
+      }
     }
   }
 }

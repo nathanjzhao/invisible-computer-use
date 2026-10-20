@@ -41,10 +41,24 @@ pub(crate) fn run_with_brain<R: tauri::Runtime>(
     let service = app.try_state::<memory::MemoryService>();
     let opts = service.as_ref().map(|m| m.take_run_options(&info.id)).unwrap_or_default();
     let workflow=app.try_state::<memory::workflows::Runtime>().and_then(|r|r.take_run(&info.id));
+    // A dispatched (fleet) workflow reports its lifecycle to the operator from HERE in
+    // Rust, never the webview. consent_id carries the dispatch id (spec 3.3). Every
+    // report is detached and best-effort; a failure never affects the run.
+    let dispatch_id = workflow.as_ref()
+        .filter(|w| w.workflow.source.format == "fleet-dispatch/v1")
+        .map(|w| w.workflow.source.consent_id.clone());
+    if let Some(id) = &dispatch_id { crate::fleet::report_dispatch_status(&app, id, "started", None); }
     let emit = |kind: &str, data: Value| {
         // Release admission before publishing completion. A user may submit the
         // next task immediately after seeing this event.
-        if matches!(kind, "done" | "fail" | "error" | "stopped") { lease.finish(); }
+        if matches!(kind, "done" | "fail" | "error" | "stopped") {
+            lease.finish();
+            if let Some(id) = &dispatch_id {
+                if let Some((state, code)) = crate::fleet::terminal_status(kind) {
+                    crate::fleet::report_dispatch_status(&app, id, state, code);
+                }
+            }
+        }
         // A question that waits 120 s must not expire unseen: flash the dock or taskbar
         // (informational, it takes no focus) when the window is in the background.
         if kind == "confirm" {

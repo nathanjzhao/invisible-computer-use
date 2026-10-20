@@ -40,6 +40,7 @@ mod transport;
 #[cfg(test)]
 mod updater_tests;
 mod run_control;
+mod fleet;
 
 /// Tests that re-run this test binary as a child each start an owned fake
 /// driver, which has the product's 3 s startup deadline. Run those children
@@ -113,6 +114,7 @@ struct TaskRunner<R: tauri::Runtime>(TaskBody<R>);
 /// the owned driver so no queued worker can reach it or relaunch it.
 fn close_for_exit<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
     let _ = app.state::<RunManager>().shutdown();
+    if let Some(fleet)=app.try_state::<fleet::Service>() { fleet.shutdown(); }
     if let Some(audio)=app.try_state::<audio::Service>() { audio.shutdown(); }
     if let Some(history)=app.try_state::<history::Service>() { history.shutdown(); }
     // End in-flight CLI and helper trees before waiting for the driver drain.
@@ -291,8 +293,19 @@ fn workflow_cancel(state:tauri::State<'_,memory::workflows::Runtime>,request_id:
 fn workflow_save<R:tauri::Runtime>(app:tauri::AppHandle<R>,request:memory::workflows::SaveRequest)->Result<memory::workflows::Listed,String>{
     let history=app.state::<history::Service>();
     let store=history.store.as_ref().ok_or("History is unavailable")?;
-    store.with_review_lock(||app.state::<memory::workflows::Runtime>().save(app.state::<memory::MemoryService>().inner(),request)
-        .map_err(|e|computer_history::Error::new("workflowSave",e))).map_err(|e|e.to_string())
+    // I3: a dispatched routine may only be saved with a LIVE `accepted` from the
+    // operator. A withdrawn/expired offer answers 409; refuse and discard the draft.
+    // (confirm_dispatch_accept is a no-op for a locally-recorded draft.)
+    if let Err(e)=fleet::confirm_dispatch_accept(&app,&request.request_id){
+        app.state::<memory::workflows::Runtime>().cancel(&request.request_id);
+        return Err(e);
+    }
+    let dispatch_id=app.state::<memory::workflows::Runtime>().draft_dispatch_id(&request.request_id);
+    let result=store.with_review_lock(||app.state::<memory::workflows::Runtime>().save(app.state::<memory::MemoryService>().inner(),request)
+        .map_err(|e|computer_history::Error::new("workflowSave",e))).map_err(|e|e.to_string());
+    // A local save failure after acceptance is reported so the operator sees it.
+    if result.is_err() { if let Some(id)=&dispatch_id { fleet::report_local_failure(&app,id); } }
+    result
 }
 #[tauri::command]
 fn workflow_list(state:tauri::State<'_,memory::MemoryService>)->Vec<memory::workflows::Listed>{state.workflow_list()}
@@ -550,7 +563,20 @@ async fn cua_launch_app(app: String) -> Result<Value, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    configure_commands(tauri::Builder::default())
+    let builder = configure_commands(tauri::Builder::default());
+    // The single-instance plugin must be the first plugin registered: a second launch (for
+    // example clicking an icu:// invite link while the app is already open) forwards its argv to
+    // the running instance instead of starting a second copy. Its `deep-link` feature means the
+    // forwarded icu:// URL reaches the deep-link plugin's on_open_url handler below.
+    #[cfg(desktop)]
+    let builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+        if let Some(window) = app.get_webview_window("main") { let _ = window.set_focus(); }
+    }));
+    builder
+        // icu:// is the invite deep link (icu://enroll?invite=...&h=...). The scheme is declared
+        // for bundling in tauri.conf.json (macOS Info.plist / Windows registry) and claimed at
+        // runtime in setup() for dev builds and Linux.
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         // Auto-update: checks the configured endpoint on startup; the frontend
         // surfaces "update available" and installs on confirm. Desktop only.
@@ -569,6 +595,17 @@ pub fn run() {
             let history_app=app.handle().clone();
             app.state::<history::Service>().start(move|context,timestamp,payload|history_app.state::<memory::MemoryService>().record_history_context(context,timestamp,payload));
             fit_main_window(app);
+            // Ingest icu://enroll invite links. Redeem and the device token stay in Rust
+            // (fleet.rs); the webview only ever sees a refreshed fleet status.
+            #[cfg(desktop)]
+            {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                let _ = app.deep_link().register_all();
+                let enroll_app = app.handle().clone();
+                app.deep_link().on_open_url(move |event| {
+                    for url in event.urls() { fleet::ingest_enroll_url(&enroll_app, url.as_str()); }
+                });
+            }
             Ok(())
         })
         // Serve window/desktop frames as raw image bytes over a custom protocol,
@@ -730,6 +767,7 @@ fn configure_commands_with<R: tauri::Runtime>(builder: tauri::Builder<R>, runner
     builder.manage(RunManager::default()).manage(TaskRunner(runner)).manage(run_control::Confirmations::default())
         .manage(audio::Service::default())
         .manage(history).manage(memories).manage(memory::workflows::Runtime::default())
+        .manage(fleet::Service::default())
         .invoke_handler(tauri::generate_handler![
             computer_history_status,
             computer_history_configure,
@@ -790,6 +828,12 @@ fn configure_commands_with<R: tauri::Runtime>(builder: tauri::Builder<R>, runner
             workflow_save,
             workflow_list,
             workflow_delete,
+            fleet::fleet_status,
+            fleet::fleet_set_exec_optin,
+            fleet::fleet_decline,
+            fleet::fleet_unlink,
+            fleet::fleet_stage,
+            fleet::fleet_enroll,
             audio_start,
             audio_stop,
             audio_status,
