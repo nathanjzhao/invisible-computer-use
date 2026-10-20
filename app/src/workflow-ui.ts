@@ -4,11 +4,14 @@ export type WorkflowPlan = {
   title:string; description:string; parameters:{key:string;label:string;description:string}[];
   steps:{description:string;evidence_lines:number[]}[]; verification:string;
 };
-export type Workflow = {id:string;app_name:string;app_key:string;plan:WorkflowPlan};
+export type Workflow = {id:string;app_name:string;app_key:string;plan:WorkflowPlan;source?:{format?:string}};
 export type ListedWorkflow = {workflow:Workflow;sha256:string};
 export type WorkflowInvocation = {id:string;expected_sha256:string;values:Record<string,string>;approved:boolean};
 type Invoke = <T>(command:string,args?:Record<string,unknown>)=>Promise<T>;
 type Generated = {request_id:string;proposal_sha256:string;plan:WorkflowPlan};
+// A staged routine from a fleet offer arrives on this event (fleet-ui.ts) with the
+// operator label so the consent line can name who offered it.
+type StagedDetail = {generated:Generated;issuerLabel?:string};
 
 export function wireWorkflows(root:HTMLElement,invoke:Invoke,onUse:(entry:ListedWorkflow,request:WorkflowInvocation)=>void) {
   const get=<T extends HTMLElement>(id:string)=>root.querySelector<T>(`#${id}`)!;
@@ -37,6 +40,26 @@ export function wireWorkflows(root:HTMLElement,invoke:Invoke,onUse:(entry:Listed
   draft.oninput=event=>{if(event.target===consent)return;consent.checked=false;save.disabled=true;};
   consent.onchange=()=>{save.disabled=!proposal||!consent.checked;};
   generate.onclick=()=>root.dispatchEvent(new CustomEvent("icu-workflow-request"));
+  const DEFAULT_CONSENT="I reviewed this workflow and want to save it for reuse.";
+  // Fill the existing draft form from a Generated proposal and reveal it. Shared by the
+  // recording path (icu-workflow-source) and the fleet-offer path (icu-workflow-staged);
+  // `consentLabel` lets a dispatched routine name who offered it.
+  const renderDraft=(response:Generated,consentLabel:string)=>{
+    proposal=response;title.value=response.plan.title;description.value=response.plan.description;verification.value=response.plan.verification;
+    draftParameters.replaceChildren();draftSteps.replaceChildren();
+    for(const parameter of response.plan.parameters){
+      const row=document.createElement("p");row.textContent=`Input: ${parameter.label}. ${parameter.description}`;draftParameters.append(row);
+    }
+    for(const [index,step] of response.plan.steps.entries()){
+      const row=document.createElement("li"),text=document.createElement("textarea"),source=document.createElement("small");
+      text.value=step.description;text.rows=2;text.maxLength=800;text.setAttribute("aria-label",`Workflow step ${index+1}`);
+      source.textContent=`Recorded observations: ${step.evidence_lines.join(", ")}`;row.append(text,source);draftSteps.append(row);
+    }
+    consent.checked=false;save.disabled=true;
+    if(consent.nextSibling)consent.nextSibling.textContent=` ${consentLabel}`;
+    draft.hidden=false;
+    if(!root.closest<HTMLElement>("#memory-pop")?.hidden){draft.scrollIntoView?.({block:"start"});title.focus();}
+  };
   root.addEventListener("icu-workflow-source",async event=>{
     stop();const epoch=generation;const requestId=`wf-${crypto.randomUUID()}`;active=requestId;cancel.hidden=false;
     message.textContent="Drafting a reusable workflow from the reviewed observations…";
@@ -44,21 +67,20 @@ export function wireWorkflows(root:HTMLElement,invoke:Invoke,onUse:(entry:Listed
     try{
       const response=await invoke<Generated>("workflow_generate",{request:{request_id:requestId,recording}});
       if(epoch!==generation)return;
-      proposal=response;title.value=response.plan.title;description.value=response.plan.description;verification.value=response.plan.verification;
-      for(const parameter of response.plan.parameters){
-        const row=document.createElement("p");row.textContent=`Input: ${parameter.label}. ${parameter.description}`;draftParameters.append(row);
-      }
-      for(const [index,step] of response.plan.steps.entries()){
-        const row=document.createElement("li"),text=document.createElement("textarea"),source=document.createElement("small");
-        text.value=step.description;text.rows=2;text.maxLength=800;text.setAttribute("aria-label",`Workflow step ${index+1}`);
-        source.textContent=`Recorded observations: ${step.evidence_lines.join(", ")}`;row.append(text,source);draftSteps.append(row);
-      }
-      draft.hidden=false;
-      if(!root.closest<HTMLElement>("#memory-pop")?.hidden){
-        draft.scrollIntoView?.({block:"start"});title.focus();
-      }
+      renderDraft(response,DEFAULT_CONSENT);
       message.textContent="Review the draft and its result check. Saving does not run it.";
     }catch(error){if(epoch===generation){stop();message.textContent=String(error);}}
+  });
+  // A routine staged from a fleet offer (fleet-ui.ts already called fleet_stage and has
+  // a Generated draft in the Runtime). Show it in the same review form; the only run
+  // trigger remains the user pressing Send after Save and Choose.
+  root.addEventListener("icu-workflow-staged",event=>{
+    const detail=(event as CustomEvent<StagedDetail>).detail;
+    stop();active=detail.generated.request_id;cancel.hidden=false;
+    if(root instanceof HTMLDetailsElement)root.open=true;
+    const who=detail.issuerLabel?`from ${detail.issuerLabel} `:"";
+    renderDraft(detail.generated,`I reviewed this routine ${who}and want to save it on this computer so I can run it.`);
+    message.textContent="Review this routine from your organization. Saving does not run it.";
   });
   save.onclick=async()=>{
     if(!proposal||!consent.checked)return;
@@ -95,6 +117,7 @@ export function wireWorkflows(root:HTMLElement,invoke:Invoke,onUse:(entry:Listed
       for(const entry of entries){
         const row=document.createElement("div");row.className="mem-row";
         const label=document.createElement("span");label.textContent=`${entry.workflow.plan.title} (${entry.workflow.app_name})`;
+        if(entry.workflow.source?.format==="fleet-dispatch/v1"){const badge=document.createElement("span");badge.className="muted fleet-badge";badge.textContent=" From your organization";label.append(badge);}
         const use=document.createElement("button");use.type="button";use.className="ghost";use.textContent=`Choose ${entry.workflow.plan.title}`;use.onclick=()=>select(entry);
         const remove=document.createElement("button");remove.type="button";remove.className="ghost";remove.textContent=`Delete ${entry.workflow.plan.title}`;
         remove.onclick=async()=>{try{await invoke("workflow_delete",{id:entry.workflow.id,expectedSha256:entry.sha256});await refresh();}catch(error){message.textContent=String(error);}};

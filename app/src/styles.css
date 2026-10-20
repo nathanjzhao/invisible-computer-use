@@ -101,6 +101,59 @@ button.mem-chip:hover { border-color: var(--line-strong); }
 #workflow-draft-steps small { display: block; color: var(--ink-muted); margin-top: 3px; }
 #workflow-list .mem-row { flex-wrap: wrap; }
 #workflow-list .mem-row > span { flex-basis: 100%; }
+/* routines from your organization — invite-first onboarding (UI-SPEC.md) */
+#fleet-body { display: flex; flex-direction: column; gap: 9px; }
+.org-steps { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--ink-faint); margin: 2px 0 4px; }
+.org-step { position: relative; padding-left: 15px; }
+.org-step::before { content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 7px; height: 7px; border-radius: 50%; background: var(--s3); }
+.org-step.active { color: var(--ink); }
+.org-step.active::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.org-step.done::before { background: var(--ok); }
+.org-step:not(:first-child)::after { content: ""; position: absolute; left: -10px; top: 50%; width: 8px; height: 1px; background: var(--line-strong); }
+.org-heading { margin: 0; font-size: 13px; font-weight: 650; color: var(--ink); letter-spacing: -0.01em; }
+
+.invite-row { display: flex; gap: 7px; align-items: stretch; }
+.invite-row input { flex: 1; min-width: 0; background: var(--s1); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; font: inherit; outline: none; }
+.invite-row input:focus { border-color: var(--accent); }
+.btn-primary { flex: none; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 7px 14px; font: inherit; font-weight: 600; cursor: pointer; transition: background .16s var(--ease); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-strong); }
+.btn-primary:disabled { opacity: .5; cursor: default; }
+.recovery { margin: 0; }
+
+.org-advanced { border-top: 1px solid var(--line-soft); padding-top: 7px; margin-top: 2px; }
+.org-advanced summary { cursor: pointer; color: var(--ink-muted); font-size: 12px; }
+.org-advanced label { display: block; margin-top: 7px; }
+.org-advanced input { width: 100%; margin-top: 4px; background: var(--s1); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; font: inherit; outline: none; }
+.org-advanced input:focus { border-color: var(--accent); }
+.validate { margin: 5px 0 7px; }
+.validate.ok { color: var(--ok); }
+
+/* phase 1: segmented approval code (manual path only) */
+.pair-code-card { display: flex; flex-direction: column; gap: 9px; align-items: center; background: var(--s2); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.code-boxes { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px; }
+.code-group { display: flex; gap: 5px; }
+.code-box { width: 26px; height: 34px; display: grid; place-items: center; background: var(--s1); border: 1px solid var(--line-strong); border-radius: 7px; font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--ink); }
+.code-dash { color: var(--ink-faint); font-size: 18px; }
+.code-actions { display: flex; gap: 7px; }
+.code-guard { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--ink-2); font-size: 12px; }
+.org-waiting { display: flex; align-items: center; gap: 7px; margin: 0; color: var(--ink-2); }
+.livedot { animation: livepulse 1.6s ease-in-out infinite; }
+
+/* phase 2: connected + offers */
+.org-guarantee { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; background: var(--s2); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.offer-card { display: flex; flex-direction: column; gap: 8px; background: var(--s2); border: 1px solid var(--line); border-radius: var(--radius); padding: 13px; animation: popin .13s ease-out; }
+.offer-title { margin: 0; font-size: 13px; font-weight: 650; color: var(--ink); }
+.offer-issuer { margin: 0; overflow-wrap: anywhere; }
+.offer-steps { list-style: none; margin: 0; padding: 7px; display: flex; flex-direction: column; gap: 2px; background: var(--s1); border-radius: 8px; }
+.offer-steps .pick-row { cursor: default; }
+.offer-steps .pick-row:hover { background: transparent; }
+.offer-steps .pick-text { display: flex; flex-direction: column; min-width: 0; }
+.offer-steps .pick-name { max-width: 100%; }
+.win-pick { display: flex; flex-direction: column; gap: 4px; }
+.win-pick select { width: 100%; min-width: 0; background: var(--s1); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; font: inherit; }
+.offer-deadline { margin: 0; font-size: 11.5px; }
+.offer-actions { display: flex; gap: 7px; align-items: center; }
+.staged-note { margin: 2px 0 0; color: var(--accent); font-size: 12px; }
 .history-summary-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 280px; overflow: auto; font: inherit; }
 #memory-source[hidden] { display: none; }
 #history-summary-list details { border-top: 1px solid var(--line); padding: 9px 0; }

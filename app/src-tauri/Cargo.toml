@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "0.1.0"
+version = "0.2.0"
 description = "Desktop window control and live task monitoring"
 authors = ["Nathan Zhao"]
 edition = "2021"
@@ -37,6 +37,7 @@ sha2 = "0.10"
 base64 = "0.22"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
 ureq = { version = "2", features = ["json"] }
+url = "2"
 tauri-plugin-updater = "2.12.0"
 tauri-plugin-process = "2.3.1"
 cua-driver-contract = { path = "../../vendor-cua/libs/cua-driver/rust/crates/cua-driver-contract" }
@@ -50,6 +51,7 @@ unicode-security = "0.1"
 ogg = "0.9"
 opus = "0.4"
 pulldown-cmark = { version = "0.13", default-features = false }
+tauri-plugin-deep-link = "2.4.10"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
@@ -66,6 +68,12 @@ windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Securit
 
 [target.'cfg(target_os = "linux")'.dependencies]
 gio = "0.18"
+# tauri-plugin-deep-link 2.6.2 builds an `ini::ParseOption` struct literal with only the two
+# fields present through rust-ini 0.21.1 (enabled_quote, enabled_escape); rust-ini 0.21.2 and
+# 0.21.3 added two more non-defaulted public fields, which breaks that literal (E0063). rust-ini
+# is a Linux-only transitive dep of deep-link (its .desktop scheme registration), so pin it here
+# until deep-link updates. Remove this once deep-link sets the new fields or uses ..Default.
+rust-ini = "=0.21.1"
 
 [dev-dependencies]
 minisign = "0.7"
@@ -74,6 +82,9 @@ tauri = { version = "2", features = ["test"] }
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 flate2 = "1"
 tar = "0.4"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = { version = "2.4.5", features = ["deep-link"] }
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

@@ -1,4 +1,4 @@
-import { toggleUtilityPanel, wireUtilityPanelKeyboard } from "./panel-navigation";
+import { toggleUtilityPanel, showUtilityPanel, wireUtilityPanelKeyboard } from "./panel-navigation";
 import { wireRunPreferences } from "./run-preferences";
 import { takeForegroundChoice, resetForegroundChoice } from "./foreground-choice";
 import { renderSavedTasks, type SavedTask } from "./task-progress-ui";
@@ -16,6 +16,7 @@ import { confirmHtml, confirmedText, memoryChip, memoryLine, memoryListHtml, pro
 import { memorySettingsForm } from "./memory-settings-form";
 import { wireTrajectoryImport } from "./trajectory-ui";
 import { wireWorkflows, type WorkflowInvocation } from "./workflow-ui";
+import { wireFleet } from "./fleet-ui";
 import { windowLabel } from "./window-label";
 import { wireAudio } from "./audio-ui";
 import { wireHistory } from "./history-ui";
@@ -1000,8 +1001,16 @@ function wireMemory() {
   wireHistory(document, invoke);
   wireHistorySummaries(document,invoke);
   wireHistoryDeletion(document,invoke);
+  // Routines from your organization: the chip and offers card. Nothing here runs a
+  // routine; staging bridges into the workflow draft form via icu-workflow-staged.
+  const fleet=wireFleet(document,invoke);
+  void listen<{kind?:string;data?:{message?:string}}>("fleet",e=>void fleet.onEvent(e.payload));
+  $("#fleet-chip").addEventListener("click",()=>{
+    showUtilityPanel(document,"memory-pop");void refreshMemory();void fleet.refresh();
+    $("#fleet-offers").scrollIntoView?.({block:"start"});
+  });
   $("#memory-chip").addEventListener("click", () => {
-    if (toggleUtilityPanel(document,"memory-pop")) void refreshMemory();
+    if (toggleUtilityPanel(document,"memory-pop")) { void refreshMemory(); void fleet.refresh(); }
   });
   $("#memory-pause").addEventListener("click", async () => {
     if (!memoryStatus) return;

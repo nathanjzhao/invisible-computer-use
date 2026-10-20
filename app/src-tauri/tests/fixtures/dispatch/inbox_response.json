@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "dispatch_id": "dp-9b1d3c5e-7a42-4f08-b6c1-2e8f0a4d7c13",
+      "spec_json": "{\"v\":1,\"dispatch_id\":\"dp-9b1d3c5e-7a42-4f08-b6c1-2e8f0a4d7c13\",\"issued_at\":\"2026-10-18T17:04:05+00:00\",\"issuer\":{\"label\":\"ops@acme.example\",\"note\":\"Please run this before the Monday standup.\"},\"source\":{\"workflow_id\":\"wf-3fa9c1d2b7e4\",\"window_days\":30,\"runs\":12,\"sessions\":9,\"median_duration_s\":84,\"first_seen_ms\":1789982100000,\"last_seen_ms\":1792255200000},\"title\":\"Export the weekly support report\",\"description\":\"Seen 12 times in 9 sessions over the last 30 days, usually in about 1m 24s.\",\"verification\":\"A new tab named with the current week appears in the Weekly support report sheet.\",\"parameters\":[],\"steps\":[{\"app\":\"Google Chrome\",\"place\":\"Zendesk\",\"location\":\"zendesk.com/agent/reports\",\"web\":true,\"action\":null},{\"app\":\"Google Chrome\",\"place\":\"Zendesk\",\"location\":\"zendesk.com/agent/reports/:id\",\"web\":true,\"action\":\"Export\"},{\"app\":\"Google Chrome\",\"place\":\"Google Sheets\",\"location\":\"docs.google.com/spreadsheets/:id\",\"web\":true,\"action\":\"Import\"}]}",
+      "spec_sha256": "c1d36fe486a44ac06277ee71823e5f326f3a66b457cf1844bafbbf6ca8fbed71",
+      "expires_in_s": 259200
+    }
+  ],
+  "poll_after_s": 30
+}

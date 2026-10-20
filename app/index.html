@@ -23,6 +23,7 @@
         </label>
         <button id="model-key-button" class="status mem-chip" type="button" title="Connect a model with an API key">Model key</button>
         <button id="memory-chip" class="status mem-chip" title="Memory settings and stored memories"><span id="memory-dot" class="dot"></span><span id="memory-text">Memory</span></button>
+        <button id="fleet-chip" class="status mem-chip" type="button" title="Routines offered by your organization" hidden><span class="dot ok"></span><span id="fleet-chip-text">Routines</span></button>
         <button id="audio-button" class="status mem-chip" type="button" aria-expanded="false">Audio</button>
         <button id="history-button" class="status mem-chip" type="button" aria-expanded="false">History</button>
         <div class="status"><span id="driver-dot" class="dot"></span><span id="driver-text">connecting…</span></div>
@@ -83,6 +84,12 @@
           <p id="memory-source-status" role="status"></p>
           <pre id="memory-source-text" class="history-summary-text"></pre>
           <button id="memory-source-close" class="ghost" type="button">Close source</button>
+        </section>
+        <section id="fleet-offers" class="mem-settings" aria-label="Routines from your organization">
+          <strong>Routines from your organization</strong>
+          <div id="fleet-body"></div>
+          <p id="fleet-status" class="muted" role="status"></p>
+          <details id="fleet-activity-wrap" hidden><summary>Recent activity</summary><div id="fleet-activity" class="muted"></div></details>
         </section>
         <details id="trajectory-tools" class="mem-settings">
           <summary>Learn from a recording</summary>

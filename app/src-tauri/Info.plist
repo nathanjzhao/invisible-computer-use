@@ -7,4 +7,15 @@
   <string>Capture selected windows, or system sound when you start an audio recording.</string>
   <key>NSAppleEventsUsageDescription</key>
   <string>Read the active Chrome tab and private-window state when you enable browser history capture.</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>com.nathanzhao.app.enroll</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>icu</string>
+      </array>
+    </dict>
+  </array>
 </dict></plist>

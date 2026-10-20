@@ -751,11 +751,44 @@ pub mod private {
     //! Memory is a record of what the user did, so on Unix its folders are created 0700 and
     //! its files 0600 regardless of the umask. The default root sits under a 0700 home, but a
     //! custom `ICU_MEMORY_ROOT` (a shared or synced folder) does not, so the store sets the
-    //! modes itself. Windows has no mode bits; there the user profile's ACL is what applies.
+    //! modes itself. Windows has no mode bits, so an explicit DACL (the current user plus
+    //! LocalSystem, inheritance removed) is set instead, matching the 0700/0600 intent even
+    //! when the data dir lives somewhere permissive (a redirected or synced profile).
     use std::path::Path;
 
     pub const DIR_MODE: u32 = 0o700;
     pub const FILE_MODE: u32 = 0o600;
+
+    /// The current process user as an SID string (cached). Used to grant that user, and
+    /// only that user plus LocalSystem, access to the private files on Windows.
+    #[cfg(windows)]
+    fn current_user_sid() -> Option<String> {
+        use std::sync::OnceLock;
+        static SID: OnceLock<Option<String>> = OnceLock::new();
+        SID.get_or_init(|| {
+            let out = std::process::Command::new("whoami").args(["/user", "/fo", "csv", "/nh"]).output().ok()?;
+            if !out.status.success() { return None; }
+            let text = String::from_utf8_lossy(&out.stdout);
+            let sid = text.trim().rsplit(',').next()?.trim().trim_matches('"').to_string();
+            sid.starts_with("S-1-").then_some(sid)
+        }).clone()
+    }
+
+    /// Restrict `path` to the current user + LocalSystem with inheritance removed. Best
+    /// effort: if it fails the file keeps its inherited ACL, no worse than before. `dir`
+    /// adds container and object inheritance so files created inside inherit the same rule.
+    #[cfg(windows)]
+    fn win_secure(path: &Path, dir: bool) {
+        let Some(sid) = current_user_sid() else { return };
+        let perm = if dir { "(OI)(CI)(F)" } else { "(F)" };
+        let _ = std::process::Command::new("icacls")
+            .arg(path)
+            .arg("/inheritance:r")
+            .arg("/grant:r")
+            .arg(format!("*{sid}:{perm}"))
+            .arg(format!("*S-1-5-18:{perm}"))
+            .output();
+    }
 
     /// Create `dir` and any missing parents 0700, and bring `dir` itself to 0700.
     pub fn create_dir(dir: &Path) -> Result<(), String> {
@@ -769,7 +802,12 @@ pub mod private {
             std::fs::set_permissions(dir, std::fs::Permissions::from_mode(DIR_MODE)).map_err(|e| e.to_string())
         }
         #[cfg(not(unix))]
-        b.create(dir).map_err(|e| e.to_string())
+        {
+            b.create(dir).map_err(|e| e.to_string())?;
+            #[cfg(windows)]
+            win_secure(dir, true);
+            Ok(())
+        }
     }
 
     fn open(path: &Path, append: bool) -> Result<std::fs::File, String> {
@@ -778,6 +816,8 @@ pub mod private {
         if append { o.append(true); } else { o.write(true).truncate(true); }
         #[cfg(unix)]
         std::os::unix::fs::OpenOptionsExt::mode(&mut o, FILE_MODE);
+        #[cfg(windows)]
+        let existed = path.exists();
         let f = o.open(path).map_err(|e| e.to_string())?;
         // the mode above applies only when the file is created; an existing one is tightened here
         #[cfg(unix)]
@@ -786,6 +826,10 @@ pub mod private {
             if f.metadata().map_err(|e| e.to_string())?.permissions().mode() & 0o777 != FILE_MODE {
                 f.set_permissions(std::fs::Permissions::from_mode(FILE_MODE)).map_err(|e| e.to_string())?;
             }
+        }
+        #[cfg(windows)]
+        {
+            if !append || !existed { win_secure(path, false); }
         }
         Ok(f)
     }

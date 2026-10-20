@@ -1,12 +1,12 @@
 //! Reviewed workflows are reusable context for fresh native tasks. They never
 //! contain native action tokens, window IDs, coordinates or retained approvals.
 use super::{write_json, MemoryService};
-use crate::trajectory::{self, ImportRequest, Provenance};
+use crate::trajectory::{self, Actor, ImportRequest, Provenance};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
-use std::sync::{atomic::{AtomicBool, Ordering}, Arc, Mutex};
+use std::sync::{atomic::{AtomicBool, AtomicU64, Ordering}, Arc, Mutex};
 
 const MAX_FILE: u64 = 256 * 1024;
 const MAX_SOURCE_CHARS: usize = 240_000;
@@ -97,8 +97,92 @@ pub struct SaveRequest {
     pub approved: bool,
 }
 
+/// A routine offered to this machine by a fleet operator (DispatchSpecV1, spec 3.1).
+/// This is server-authored, UNTRUSTED data: every field is capped and the bytes are
+/// re-hashed before use. Field declaration order IS the wire key order; the compact
+/// `serde_json` serialization must reproduce the operator's `spec_json` byte for byte.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DispatchSpec {
+    pub v: u32,
+    pub dispatch_id: String,
+    pub issued_at: String,
+    pub issuer: Issuer,
+    pub source: DispatchSource,
+    pub title: String,
+    pub description: String,
+    pub verification: String,
+    /// Always empty in v1; the app declines a non-empty list as invalid.
+    pub parameters: Vec<serde_json::Value>,
+    pub steps: Vec<DispatchStep>,
+}
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Issuer {
+    pub label: String,
+    /// Display-only on the offer card. Never copied into the Plan or model context.
+    pub note: Option<String>,
+}
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DispatchSource {
+    pub workflow_id: String,
+    pub window_days: u32,
+    pub runs: u64,
+    pub sessions: u64,
+    pub median_duration_s: u64,
+    pub first_seen_ms: Option<u64>,
+    pub last_seen_ms: Option<u64>,
+}
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DispatchStep {
+    pub app: String,
+    pub place: String,
+    pub location: String,
+    pub web: bool,
+    pub action: Option<String>,
+}
+
+/// Why staging a dispatched routine could not produce a reviewable draft. The fleet
+/// layer turns a rejected spec into a server `declined` status; a `Busy` draft-limit
+/// condition is local only (the user cancels another draft and clicks Review again),
+/// so it is never reported to the server.
+#[derive(Debug, PartialEq)]
+pub enum StageError {
+    UnsupportedVersion,
+    InvalidSpec(&'static str),
+    Busy(String),
+}
+impl StageError {
+    /// The `declined` result code to report, or None for a transient local condition.
+    pub fn decline_code(&self) -> Option<&'static str> {
+        match self {
+            StageError::UnsupportedVersion => Some("unsupported_version"),
+            StageError::InvalidSpec(_) => Some("invalid_spec"),
+            StageError::Busy(_) => None,
+        }
+    }
+}
+impl std::fmt::Display for StageError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            StageError::UnsupportedVersion => write!(f, "This routine uses an unsupported format version."),
+            StageError::InvalidSpec(what) => write!(f, "This routine is not valid to run on this computer ({what})."),
+            StageError::Busy(message) => write!(f, "{message}"),
+        }
+    }
+}
+
+/// The in-memory origin of a draft: a locally recorded demonstration, or a routine
+/// offered by a fleet operator. `save` rechecks each kind differently (see :282).
+enum DraftSource {
+    Recording(ImportRequest),
+    Dispatch(DispatchSpec),
+}
+
 struct Draft {
-    recording: ImportRequest,
+    input: DraftSource,
     generation: u64,
     proposal_sha256: String,
     source: Provenance,
@@ -178,6 +262,113 @@ Recorded window identifiers are provenance only, never reusable targets. \
 If a material step is unsupported, return {\"needs_clarification\":\"a concise explanation\"} instead of inventing it. \
 Describe a visible outcome check. Do not execute anything. The user will review and approve this draft separately.";
 
+/// A locally-minted `wf-<uuid v4>` request id for a dispatched routine. The local
+/// saved-workflow id is NEVER the operator's `dispatch_id` (spec 3.3). The app has no
+/// `uuid`/`rand` crate; 16 bytes derived from time, pid and a monotonic counter are
+/// collision-safe for a local file name (this id is not a secret or a capability).
+fn new_wf_id() -> String {
+    static CTR: AtomicU64 = AtomicU64::new(0);
+    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos()).unwrap_or(0);
+    let seed = format!("{nanos}-{}-{}", std::process::id(), CTR.fetch_add(1, Ordering::Relaxed));
+    let digest = Sha256::digest(seed.as_bytes());
+    let mut b = [0u8; 16];
+    b.copy_from_slice(&digest[..16]);
+    b[6] = (b[6] & 0x0f) | 0x40; // version 4
+    b[8] = (b[8] & 0x3f) | 0x80; // RFC 4122 variant
+    format!("wf-{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+        b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7],b[8],b[9],b[10],b[11],b[12],b[13],b[14],b[15])
+}
+
+/// Days since the Unix epoch for a proleptic Gregorian date (Howard Hinnant's
+/// algorithm). Used only to turn the dispatch `issued_at` into provenance seconds.
+fn days_from_civil(y: i64, m: i64, d: i64) -> i64 {
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = (if y >= 0 { y } else { y - 399 }) / 400;
+    let yoe = y - era * 400;
+    let doy = (153 * (if m > 2 { m - 3 } else { m + 9 }) + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    era * 146097 + doe - 719468
+}
+
+/// Parse an RFC 3339 timestamp (`chrono`'s `to_rfc3339` output: `Z` or `+HH:MM`
+/// offset, optional fractional seconds) to Unix seconds. Returns None on anything
+/// malformed, so a bad `issued_at` declines the offer rather than panicking.
+fn rfc3339_to_unix(s: &str) -> Option<i64> {
+    let b = s.as_bytes();
+    if b.len() < 19 { return None; }
+    let field = |a: usize, z: usize| s.get(a..z).and_then(|t| t.parse::<i64>().ok());
+    if b[4] != b'-' || b[7] != b'-' || !(b[10] == b'T' || b[10] == b't') || b[13] != b':' || b[16] != b':' {
+        return None;
+    }
+    let (year, month, day) = (field(0, 4)?, field(5, 7)?, field(8, 10)?);
+    let (hour, min, sec) = (field(11, 13)?, field(14, 16)?, field(17, 19)?);
+    if !(1..=12).contains(&month) || !(1..=31).contains(&day) || hour > 23 || min > 59 || sec > 60 {
+        return None;
+    }
+    let mut i = 19;
+    if b.get(i) == Some(&b'.') {
+        i += 1;
+        while i < b.len() && b[i].is_ascii_digit() { i += 1; }
+    }
+    let tz = &s[i..];
+    let offset = if tz == "Z" || tz == "z" {
+        0
+    } else if tz.len() == 6 && (tz.as_bytes()[0] == b'+' || tz.as_bytes()[0] == b'-') && tz.as_bytes()[3] == b':' {
+        let oh = tz.get(1..3).and_then(|t| t.parse::<i64>().ok())?;
+        let om = tz.get(4..6).and_then(|t| t.parse::<i64>().ok())?;
+        let sign = if tz.as_bytes()[0] == b'+' { 1 } else { -1 };
+        sign * (oh * 3600 + om * 60)
+    } else {
+        return None;
+    };
+    Some(days_from_civil(year, month, day) * 86400 + hour * 3600 + min * 60 + sec - offset)
+}
+
+/// Re-enforce the shared field limits (spec 3.4) on an untrusted spec at parse time.
+/// The server checks these at create; the app never trusts that and checks again.
+fn check_spec(spec: &DispatchSpec) -> Result<(), StageError> {
+    use self::StageError::InvalidSpec;
+    let len = |s: &str| s.chars().count();
+    let within = |s: &str, lo: usize, hi: usize| { let n = len(s); n >= lo && n <= hi };
+    if !within(&spec.title, 1, 100) { return Err(InvalidSpec("title")); }
+    if !within(&spec.description, 1, 600) { return Err(InvalidSpec("description")); }
+    if !within(&spec.verification, 1, 800) { return Err(InvalidSpec("verification")); }
+    if !within(&spec.issuer.label, 1, 120) { return Err(InvalidSpec("issuer label")); }
+    if spec.issuer.note.as_deref().is_some_and(|n| len(n) > 280) { return Err(InvalidSpec("issuer note")); }
+    if !spec.parameters.is_empty() { return Err(InvalidSpec("parameters")); }
+    if spec.steps.is_empty() || spec.steps.len() > 64 { return Err(InvalidSpec("steps")); }
+    for step in &spec.steps {
+        if step.app.is_empty() || len(&step.app) > 80 { return Err(InvalidSpec("step app")); }
+        if len(&step.place) > 80 { return Err(InvalidSpec("step place")); }
+        if len(&step.location) > 240 { return Err(InvalidSpec("step location")); }
+        if step.action.as_deref().is_some_and(|a| len(a) > 120) { return Err(InvalidSpec("step action")); }
+    }
+    Ok(())
+}
+
+/// The reviewable description for one dispatched step (spec 3.3). Tries the fullest
+/// wording first and falls back, dropping untrusted content, so that one step whose
+/// server-authored place/location/action trips `text_ok` (a secret shape, a control
+/// character) never blocks the whole routine from review. The last candidate names
+/// no server content and always passes.
+fn step_description(index: usize, step: &DispatchStep) -> String {
+    let n = index + 1;
+    let candidates = match &step.action {
+        Some(action) => [
+            format!("In {} ({}): click \"{}\"", step.place, step.location, action),
+            format!("In {}: click \"{}\"", step.place, action),
+            format!("Step {n} in {}", step.place),
+        ],
+        None => [
+            format!("In {} ({}): work in this view", step.place, step.location),
+            format!("In {}: work in this view", step.place),
+            format!("Step {n} in {}", step.place),
+        ],
+    };
+    candidates.into_iter().find(|c| text_ok(c, 800)).unwrap_or_else(|| format!("Step {n}"))
+}
+
 impl Runtime {
     pub fn cancel(&self, id: &str) -> bool {
         let mut ops = self.operations.lock().unwrap_or_else(|e| e.into_inner());
@@ -194,6 +385,26 @@ impl Runtime {
     }
     pub fn take_run(&self, id: &str) -> Option<Invocation> {
         self.runs.lock().unwrap_or_else(|e| e.into_inner()).remove(id)
+    }
+    /// The operator dispatch id behind a draft, if that draft came from a fleet offer.
+    /// `workflow_save` uses this to require a live `accepted` before saving (I3).
+    pub fn draft_dispatch_id(&self, request_id: &str) -> Option<String> {
+        let ops = self.operations.lock().unwrap_or_else(|e| e.into_inner());
+        ops.get(request_id).and_then(|op| op.draft.as_ref()).and_then(|draft| match &draft.input {
+            DraftSource::Dispatch(spec) => Some(spec.dispatch_id.clone()),
+            DraftSource::Recording(_) => None,
+        })
+    }
+    /// Cancel every staged dispatch draft (the user turned execution opt-in off, or
+    /// unlinked). A recording draft is untouched.
+    pub fn discard_dispatch_drafts(&self) {
+        let ids: Vec<String> = {
+            let ops = self.operations.lock().unwrap_or_else(|e| e.into_inner());
+            ops.iter()
+                .filter(|(_, op)| op.draft.as_ref().is_some_and(|d| matches!(d.input, DraftSource::Dispatch(_))))
+                .map(|(id, _)| id.clone()).collect()
+        };
+        for id in ids { self.cancel(&id); }
     }
     pub fn generate(&self, memory: &MemoryService, request: GenerateRequest,
                     mut complete: impl FnMut(&str, &str) -> Result<String, String>) -> Result<Generated, String> {
@@ -262,12 +473,103 @@ impl Runtime {
             let mut ops = self.operations.lock().unwrap_or_else(|e| e.into_inner());
             let op = ops.get_mut(&request.request_id).filter(|op| !op.cancelled.load(Ordering::SeqCst))
                 .ok_or("Workflow draft cancelled")?;
-            op.draft = Some(Draft { recording: request.recording.clone(), generation, proposal_sha256,
+            op.draft = Some(Draft { input: DraftSource::Recording(request.recording.clone()), generation, proposal_sha256,
                                    source: imported.provenance, app_name: imported.app_name });
             Ok(response)
         })();
         if result.is_err() { self.cancel(&request.request_id); }
         result
+    }
+    /// Turn an operator-offered routine into a reviewable draft, WITHOUT a model call
+    /// and WITHOUT running anything (spec 3.3). Builds the Plan and a synthetic
+    /// `Provenance` deterministically from the spec, runs the same `validate` a
+    /// recording draft passes, and registers a `Draft` under the existing draft limits.
+    /// `app_key`/`app_name` come from the window the user picked, never from the spec.
+    /// Call this ONLY when the user clicks Review (a fresh id each time re-stages).
+    pub fn stage_dispatch(&self, memory: &MemoryService, spec: DispatchSpec, app_key: String, app_name: String)
+        -> Result<Generated, StageError> {
+        if spec.v != 1 { return Err(StageError::UnsupportedVersion); } // I9
+        check_spec(&spec)?;
+        // The exact bytes whose digest the operator published. Re-hash these (never a
+        // re-serialization of something else) so the save-time recheck is meaningful.
+        let spec_json = serde_json::to_string(&spec).map_err(|_| StageError::InvalidSpec("encoding"))?;
+        if spec_json.len() > 65536 { return Err(StageError::InvalidSpec("spec_too_large")); }
+        let spec_sha256 = sha(spec_json.as_bytes());
+        let issued_at = rfc3339_to_unix(&spec.issued_at).ok_or(StageError::InvalidSpec("issued_at"))?;
+        let n = spec.steps.len();
+        let source = Provenance {
+            source_event_hashes: BTreeMap::new(),
+            observed_domains: vec![],
+            includes_values: false,
+            reviewed_bytes: Some(spec_json.len() as u64),
+            first_unix_ms: spec.source.first_seen_ms,
+            last_unix_ms: spec.source.last_seen_ms,
+            incomplete_observations: 0,
+            capture_gap_events: 0,
+            capture_loss_unknown: false,
+            batch_id: None,
+            chunk_index: 0,
+            chunk_count: 1,
+            total_events: n,
+            format: "fleet-dispatch/v1".into(),
+            actor: Actor::Human,
+            recording_sha256: spec_sha256.clone(),
+            manifest_sha256: spec_sha256,
+            app: app_key,
+            project: "fleet".into(),
+            consent_id: spec.dispatch_id.clone(),
+            clock: "none".into(),
+            first_mono_ns: 0,
+            last_mono_ns: 0,
+            started_utc: issued_at,
+            ended_utc: issued_at,
+            source_lines: (1..=n).collect(),
+            observed_events: n,
+            omitted_events: 0,
+        };
+        let plan = Plan {
+            title: spec.title.clone(),
+            description: spec.description.clone(),
+            parameters: vec![],
+            steps: spec.steps.iter().enumerate()
+                .map(|(i, step)| Step { description: step_description(i, step), evidence_lines: vec![i + 1] })
+                .collect(),
+            verification: spec.verification.clone(),
+        };
+        // Defense in depth: the same gate a recording draft passes. The wording
+        // fallback above guarantees each step's description is clean, so a rejection
+        // here means a title/description/verification shape the server let through.
+        validate(&plan, &source).map_err(|_| StageError::InvalidSpec("plan"))?;
+        let proposal_sha256 = sha(&serde_json::to_vec(&plan).map_err(|_| StageError::InvalidSpec("encoding"))?);
+        let request_id = new_wf_id();
+        let generation = memory.generation();
+        {
+            let mut ops = self.operations.lock().unwrap_or_else(|e| e.into_inner());
+            ops.retain(|_, op| {
+                let keep = op.started.elapsed().as_secs() <= DRAFT_LIFETIME as u64;
+                if !keep { op.cancelled.store(true, Ordering::SeqCst); }
+                keep
+            });
+            if ops.len() >= MAX_DRAFTS {
+                return Err(StageError::Busy("Finish or cancel the existing workflow draft first".into()));
+            }
+            let mut used = self.used_requests.lock().unwrap_or_else(|e| e.into_inner());
+            if used.len() >= 4096 || !used.insert(request_id.clone()) {
+                return Err(StageError::Busy("This session reached its workflow request limit".into()));
+            }
+            ops.insert(request_id.clone(), Operation {
+                cancelled: Arc::new(AtomicBool::new(false)),
+                started: std::time::Instant::now(),
+                draft: Some(Draft {
+                    input: DraftSource::Dispatch(spec),
+                    generation,
+                    proposal_sha256: proposal_sha256.clone(),
+                    source: source.clone(),
+                    app_name: app_name.clone(),
+                }),
+            });
+        }
+        Ok(Generated { request_id, plan, proposal_sha256, app_name, source })
     }
     /// The caller holds the History review barrier, then this method takes the
     /// memory lock. No model or native action runs inside either lock.
@@ -279,7 +581,20 @@ impl Runtime {
         let draft = op.draft.as_ref().ok_or("Workflow draft is not ready")?;
         if draft.proposal_sha256 != request.expected_proposal_sha256 { return Err("The reviewed workflow draft changed".into()); }
         validate(&request.plan, &draft.source)?;
-        trajectory::import(&draft.recording)?;
+        // Integrity recheck before the write. A recording is re-read from disk (its
+        // bytes must still match the reviewed preview); a dispatched routine has no
+        // disk source, so its spec must still serialize to the digest frozen at
+        // staging. The live-`accepted` gate (I3) is enforced by the `workflow_save`
+        // command before this method runs.
+        match &draft.input {
+            DraftSource::Recording(recording) => { trajectory::import(recording)?; }
+            DraftSource::Dispatch(spec) => {
+                let canonical = serde_json::to_vec(spec).map_err(|e| e.to_string())?;
+                if sha(&canonical) != draft.source.recording_sha256 {
+                    return Err("The offered routine changed; review it again".into());
+                }
+            }
+        }
         let _guard = memory.store()?;
         if memory.generation() != draft.generation { return Err("Memory was deleted while the workflow was being reviewed".into()); }
         let workflow = Workflow { version: 1, id: request.request_id.clone(), created: super::now(),
@@ -538,5 +853,131 @@ mod tests {
         let brain=Propose{action:crate::brain::Action::Type{text:"late input".into()},calls:Mutex::new(vec![]),after:Box::new(move||MemoryService::open(root.clone()).workflow_delete(&id,&hash).unwrap())};
         crate::agent::run_remembered_with_workflow(&run,&brain,&|_,_|{},&||Ok(state.clone()),&|_,_|{dispatched.fetch_add(1,Ordering::SeqCst);Ok(())},&||false,None,Some((&m,&options)),&crate::gate::NoOne,Some(&invocation));
         assert_eq!(dispatched.load(Ordering::SeqCst),0);
+    }
+
+    // --- Dispatched routines (observe-to-act bridge, spec 3.3) ---
+    fn dispatch_step(app:&str,place:&str,location:&str,web:bool,action:Option<&str>)->DispatchStep{
+        DispatchStep{app:app.into(),place:place.into(),location:location.into(),web,action:action.map(Into::into)}
+    }
+    fn sample_spec()->DispatchSpec{
+        DispatchSpec{
+            v:1,dispatch_id:"dp-9b1d3c5e-7a42-4f08-b6c1-2e8f0a4d7c13".into(),
+            issued_at:"2026-10-18T17:04:05+00:00".into(),
+            issuer:Issuer{label:"ops@acme.example".into(),note:Some("Please run this before the Monday standup.".into())},
+            source:DispatchSource{workflow_id:"wf-3fa9c1d2b7e4".into(),window_days:30,runs:12,sessions:9,median_duration_s:84,first_seen_ms:Some(1789982100000),last_seen_ms:Some(1792255200000)},
+            title:"Export the weekly support report".into(),
+            description:"Seen 12 times in 9 sessions over the last 30 days, usually in about 1m 24s.".into(),
+            verification:"A new tab named with the current week appears in the Weekly support report sheet.".into(),
+            parameters:vec![],
+            steps:vec![
+                dispatch_step("Google Chrome","Zendesk","zendesk.com/agent/reports",true,None),
+                dispatch_step("Google Chrome","Zendesk","zendesk.com/agent/reports/:id",true,Some("Export")),
+                dispatch_step("Google Chrome","Google Sheets","docs.google.com/spreadsheets/:id",true,Some("Import")),
+            ],
+        }
+    }
+    #[test]
+    fn rfc3339_parses_offsets_and_fractions(){
+        assert_eq!(rfc3339_to_unix("1970-01-01T00:00:00Z"),Some(0));
+        assert_eq!(rfc3339_to_unix("2026-10-18T17:04:05+00:00"),Some(1792343045));
+        assert_eq!(rfc3339_to_unix("2026-10-18T17:04:05Z"),Some(1792343045));
+        // Fractional seconds are ignored; a -05:00 wall clock is five hours later in UTC.
+        assert_eq!(rfc3339_to_unix("2026-10-18T12:04:05.250-05:00"),Some(1792343045));
+        assert_eq!(rfc3339_to_unix("not-a-timestamp"),None);
+        assert_eq!(rfc3339_to_unix("2026-13-01T00:00:00Z"),None);
+    }
+    #[test]
+    fn stage_dispatch_builds_a_reviewable_plan_without_running(){
+        let f=Fixture::new();let m=f.memory();let rt=Runtime::default();
+        let g=rt.stage_dispatch(&m,sample_spec(),"com.google.Chrome".into(),"Google Chrome".into()).unwrap();
+        // The synthetic provenance matches spec 3.3 exactly.
+        assert_eq!(g.source.format,"fleet-dispatch/v1");
+        assert_eq!(g.source.app,"com.google.Chrome");
+        assert_eq!(g.source.project,"fleet");
+        assert_eq!(g.source.consent_id,"dp-9b1d3c5e-7a42-4f08-b6c1-2e8f0a4d7c13");
+        assert_eq!(g.source.actor,Actor::Human);
+        assert_eq!(g.source.clock,"none");
+        assert_eq!(g.source.first_mono_ns,0);assert_eq!(g.source.last_mono_ns,0);
+        assert_eq!(g.source.source_lines,vec![1,2,3]);
+        assert_eq!(g.source.started_utc,1792343045);
+        assert_eq!(g.source.ended_utc,1792343045);
+        assert_eq!(g.source.first_unix_ms,Some(1789982100000));
+        assert_eq!(g.source.last_unix_ms,Some(1792255200000));
+        assert_eq!(g.source.observed_events,3);assert_eq!(g.source.total_events,3);assert_eq!(g.source.omitted_events,0);
+        assert_eq!(g.source.chunk_count,1);
+        assert!(!g.source.includes_values);
+        // The local id is a fresh wf-uuid, NEVER the operator's dispatch id (spec 3.3).
+        assert!(g.request_id.starts_with("wf-"));
+        assert_ne!(g.request_id,"dp-9b1d3c5e-7a42-4f08-b6c1-2e8f0a4d7c13");
+        assert!(id_ok(&g.request_id));
+        assert_eq!(g.app_name,"Google Chrome");
+        assert_eq!(g.plan.title,"Export the weekly support report");
+        assert_eq!(g.plan.parameters.len(),0);
+        assert_eq!(g.plan.steps.len(),3);
+        assert_eq!(g.plan.steps[0].description,"In Zendesk (zendesk.com/agent/reports): work in this view");
+        assert_eq!(g.plan.steps[1].description,"In Zendesk (zendesk.com/agent/reports/:id): click \"Export\"");
+        assert_eq!(g.plan.steps[0].evidence_lines,vec![1]);
+        assert_eq!(g.plan.steps[2].evidence_lines,vec![3]);
+        assert!(validate(&g.plan,&g.source).is_ok());
+        // Staging saves nothing; approval + save make it a usable workflow.
+        assert!(m.workflow_list().is_empty());
+        let saved=rt.save(&m,SaveRequest{request_id:g.request_id.clone(),expected_proposal_sha256:g.proposal_sha256.clone(),plan:g.plan.clone(),approved:true}).unwrap();
+        assert_eq!(saved.workflow.app_key,"com.google.Chrome");
+        assert_eq!(saved.workflow.source.format,"fleet-dispatch/v1");
+        assert_eq!(m.workflow_list().len(),1);
+    }
+    #[test]
+    fn stage_dispatch_requires_approval_to_save(){ // part of I3: approved:true is required
+        let f=Fixture::new();let m=f.memory();let rt=Runtime::default();
+        let g=rt.stage_dispatch(&m,sample_spec(),"com.google.Chrome".into(),"Google Chrome".into()).unwrap();
+        assert!(rt.save(&m,SaveRequest{request_id:g.request_id,expected_proposal_sha256:g.proposal_sha256,plan:g.plan,approved:false}).is_err());
+        assert!(m.workflow_list().is_empty());
+    }
+    #[test]
+    fn stage_dispatch_refuses_unknown_version(){ // I9 (fail-on-purpose: drop the `spec.v != 1` guard and this passes a v2 spec)
+        let f=Fixture::new();let m=f.memory();let rt=Runtime::default();
+        let mut spec=sample_spec();spec.v=2;
+        match rt.stage_dispatch(&m,spec,"com.google.Chrome".into(),"Google Chrome".into()) {
+            Err(e)=>assert_eq!(e.decline_code(),Some("unsupported_version")),
+            Ok(_)=>panic!("a v2 spec must not stage"),
+        }
+        // Sanity: a v1 spec stages without error.
+        assert!(rt.stage_dispatch(&m,sample_spec(),"com.google.Chrome".into(),"Google Chrome".into()).is_ok());
+    }
+    #[test]
+    fn validate_rejects_evidence_outside_the_source(){ // I10 (fail-on-purpose: the evidence_lines ⊄ source_lines check in `validate`)
+        let f=Fixture::new();let m=f.memory();let rt=Runtime::default();
+        let g=rt.stage_dispatch(&m,sample_spec(),"com.google.Chrome".into(),"Google Chrome".into()).unwrap();
+        assert!(validate(&g.plan,&g.source).is_ok());
+        let mut tampered=g.plan.clone();
+        tampered.steps[0].evidence_lines=vec![g.source.source_lines.len()+1];
+        assert!(validate(&tampered,&g.source).is_err());
+    }
+    #[test]
+    fn step_wording_falls_back_when_server_text_trips_the_secret_filter(){ // fail-on-purpose: remove the fallback tiers in step_description and this step fails validate
+        // A hostile operator hides a secret-shaped string in a step's fields. The
+        // routine must still stage: the wording drops past every untrusted field to a
+        // clean "Step N" so one step never blocks review.
+        let f=Fixture::new();let m=f.memory();let rt=Runtime::default();
+        let mut spec=sample_spec();
+        spec.steps[0].place="password=PRIVATE_VALUE_91".into();
+        spec.steps[0].location="sk-proj-1234567890abcdefghijklmnopqrstuv".into();
+        spec.steps[0].action=Some("key=PRIVATE_VALUE_92".into());
+        let g=rt.stage_dispatch(&m,spec,"com.google.Chrome".into(),"Google Chrome".into()).unwrap();
+        assert_eq!(g.plan.steps[0].description,"Step 1");
+        assert!(text_ok(&g.plan.steps[0].description,800));
+        assert!(validate(&g.plan,&g.source).is_ok());
+    }
+    #[test]
+    fn stage_dispatch_rejects_bad_fields(){
+        let f=Fixture::new();let m=f.memory();let rt=Runtime::default();
+        let mut spec=sample_spec();spec.parameters=vec![json!({"key":"x"})];
+        assert!(matches!(rt.stage_dispatch(&m,spec,"com.google.Chrome".into(),"Google Chrome".into()),Err(StageError::InvalidSpec("parameters"))));
+        let mut spec=sample_spec();spec.title=String::new();
+        assert!(matches!(rt.stage_dispatch(&m,spec,"com.google.Chrome".into(),"Google Chrome".into()),Err(StageError::InvalidSpec("title"))));
+        let mut spec=sample_spec();spec.steps.clear();
+        assert!(matches!(rt.stage_dispatch(&m,spec,"com.google.Chrome".into(),"Google Chrome".into()),Err(StageError::InvalidSpec("steps"))));
+        let mut spec=sample_spec();spec.issued_at="whenever".into();
+        assert!(matches!(rt.stage_dispatch(&m,spec,"com.google.Chrome".into(),"Google Chrome".into()),Err(StageError::InvalidSpec("issued_at"))));
     }
 }
