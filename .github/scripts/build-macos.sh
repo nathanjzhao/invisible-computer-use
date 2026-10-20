@@ -17,7 +17,21 @@ ARCH_SUFFIX=aarch64
 VERSION="$(node -p "require('./app/src-tauri/tauri.conf.json').version")"
 OUT="$ROOT/dist-release/${PLATFORM:?}"
 mkdir -p "$OUT"
-APP="$ROOT/app/src-tauri/target/release/bundle/macos/Copilot.app"
+
+# Cross-compile when the requested target is not the host arch. The Intel (x86_64)
+# app is now built on an arm64 runner (the macos-13 Intel image was retired, and the
+# newer macos-15-intel linker rejects a duplicate CoreMedia.swift object that both
+# the apple_cf and screencapturekit vendored crates embed; the arm64 linker accepts
+# it). tauri writes a cross build under target/<triple>/release. Native when matched.
+TGT="${RUST_TARGET:?}"
+case "$TGT" in x86_64-*) TGT_ARCH=x86_64 ;; arm64-*|aarch64-*) TGT_ARCH=arm64 ;; *) TGT_ARCH="$(uname -m)" ;; esac
+if [ "$TGT_ARCH" = "$(uname -m)" ]; then
+  export ICU_BUILD_TARGET=""
+  APP="$ROOT/app/src-tauri/target/release/bundle/macos/Copilot.app"
+else
+  export ICU_BUILD_TARGET="$TGT"
+  APP="$ROOT/app/src-tauri/target/$TGT/release/bundle/macos/Copilot.app"
+fi
 
 if [ -n "${APPLE_DEV_ID_KEY_PEM:-}" ] && [ -n "${TAURI_SIGNING_PRIVATE_KEY:-}" ]; then
   TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
@@ -49,7 +63,7 @@ if [ -n "${APPLE_DEV_ID_KEY_PEM:-}" ] && [ -n "${TAURI_SIGNING_PRIVATE_KEY:-}" ]
   echo "signed + notarized macOS build staged in $OUT"
 else
   echo "::warning::macOS signing/updater secrets absent — building an unsigned .app (validation only)."
-  ( cd app && npm run tauri build -- --bundles app )
+  ( cd app && npm run tauri build -- --bundles app ${ICU_BUILD_TARGET:+--target "$ICU_BUILD_TARGET"} )
   ditto -c -k --keepParent "$APP" "$OUT/Copilot_${VERSION}_${ARCH_SUFFIX}.app.zip"
 fi
 
