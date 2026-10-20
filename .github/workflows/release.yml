@@ -68,12 +68,13 @@ jobs:
           - os: macos-14
             platform: darwin-aarch64
             rust_target: aarch64-apple-darwin
-          # Intel Mac: macos-13 (Xcode 15 lineage) keeps the linker that tolerates the
-          # duplicate CoreMedia.swift object embedded by both the apple_cf and
-          # screencapturekit crates in the vendored cua-driver. The newer macos-15-intel
-          # image ships a stricter ld that rejects it as a duplicate symbol (arm64 on
-          # macos-14 links the same two rlibs fine). Revert once the vendored dup is fixed.
-          - os: macos-13
+          # Intel Mac (x86_64) is cross-compiled on the arm64 runner. GitHub retired the
+          # macos-13 Intel image, and the macos-15-intel image's linker rejects a duplicate
+          # CoreMedia.swift object that both the apple_cf and screencapturekit vendored
+          # crates embed; the arm64 runner's linker accepts the same rlibs (the native arm64
+          # build passes). build-macos.sh detects target != host and passes --target. Revert
+          # to a native Intel runner once the vendored duplicate is fixed upstream.
+          - os: macos-14
             platform: darwin-x86_64
             rust_target: x86_64-apple-darwin
           - os: windows-latest

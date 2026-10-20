@@ -48,10 +48,15 @@ PW="$PW" openssl pkcs12 -export -inkey "$KEY" -in "$TMP/cert.pem" -certfile "$TM
   -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg sha1 -passout env:PW -out "$TMP/id.p12"
 
 cd "$ROOT/app"
+# Cross-compile support: when ICU_BUILD_TARGET is set (e.g. building the x86_64 app
+# on an arm64 runner), pass --target and read the bundle from target/<triple>/release.
+# Left empty for a native local build, which keeps target/release unchanged.
+TARGET_FLAGS=""; BUNDLE_SUB="release"
+if [ -n "${ICU_BUILD_TARGET:-}" ]; then TARGET_FLAGS="--target $ICU_BUILD_TARGET"; BUNDLE_SUB="$ICU_BUILD_TARGET/release"; fi
 APPLE_CERTIFICATE="$(base64 -i "$TMP/id.p12")" APPLE_CERTIFICATE_PASSWORD="$PW" APPLE_SIGNING_IDENTITY="$IDENTITY" \
-  npm run tauri build -- --bundles app --config '{"bundle":{"createUpdaterArtifacts":false}}'
+  npm run tauri build -- --bundles app $TARGET_FLAGS --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
-APP="$ROOT/app/src-tauri/target/release/bundle/macos/Copilot.app"
+APP="$ROOT/app/src-tauri/target/$BUNDLE_SUB/bundle/macos/Copilot.app"
 codesign --verify --deep --strict "$APP"
 ditto -c -k --keepParent "$APP" "$TMP/notarize.zip"
 xcrun notarytool submit "$TMP/notarize.zip" --key "$P8" --key-id "$KEY_ID" --issuer "$ISSUER" --wait --timeout 30m
