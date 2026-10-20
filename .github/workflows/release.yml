@@ -68,13 +68,15 @@ jobs:
           - os: macos-14
             platform: darwin-aarch64
             rust_target: aarch64-apple-darwin
-          # Intel Mac (x86_64) is cross-compiled on the arm64 runner. GitHub retired the
-          # macos-13 Intel image, and the macos-15-intel image's linker rejects a duplicate
-          # CoreMedia.swift object that both the apple_cf and screencapturekit vendored
-          # crates embed; the arm64 runner's linker accepts the same rlibs (the native arm64
-          # build passes). build-macos.sh detects target != host and passes --target. Revert
-          # to a native Intel runner once the vendored duplicate is fixed upstream.
-          - os: macos-14
+          # Intel Mac (x86_64) builds natively on the macos-15-intel runner. The macos-13
+          # Intel image was retired, and this image's DEFAULT Xcode (26.x) ships a linker
+          # that rejects a duplicate CoreMedia.swift object both the apple_cf and
+          # screencapturekit vendored crates embed (ld: duplicate symbol CoreMediaBridge...).
+          # The "Select Xcode 16 (Intel)" step below switches to Xcode 16.x, whose linker
+          # accepts the same rlibs, so the native build links clean (proven on run
+          # 39405000858). Drop that step once the vendored duplicate is fixed upstream
+          # (cua-driver rebase onto 0.37.0).
+          - os: macos-15-intel
             platform: darwin-x86_64
             rust_target: x86_64-apple-darwin
           - os: windows-latest
@@ -130,6 +132,24 @@ jobs:
           choco install 7zip -y --no-progress
           # The Azure Artifact Signing client needs the .NET 8 runtime (x64).
           choco install dotnet-8.0-runtime -y --no-progress
+
+      # The macos-15-intel image default is Xcode 26.x, whose linker rejects a duplicate
+      # CoreMedia.swift object the vendored apple_cf + screencapturekit crates both embed.
+      # Xcode 16.x's linker accepts it, so the native x86_64 build links clean. arm64 links
+      # fine on its default Xcode, so scope this to the Intel leg. Glob-safe under
+      # -e -o pipefail (each substitution ends in || true before the fallback).
+      - name: Select Xcode 16 (Intel)
+        if: matrix.platform == 'darwin-x86_64'
+        shell: bash
+        run: |
+          set -x
+          ls -d /Applications/Xcode*.app || true
+          OLD=$(ls -d /Applications/Xcode_16*.app 2>/dev/null | sort -V | head -1 || true)
+          [ -n "$OLD" ] || OLD=$(ls -d /Applications/Xcode_1*.app 2>/dev/null | sort -V | head -1 || true)
+          [ -n "$OLD" ] || { echo "no Xcode 16 found on runner"; exit 1; }
+          echo "Selecting $OLD"
+          sudo xcode-select -s "$OLD/Contents/Developer"
+          xcodebuild -version
 
       # ---- macOS: build, Developer ID sign + notarize + staple, then the updater artifact ----
       - name: Build + sign (macOS)
