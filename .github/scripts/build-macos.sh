@@ -18,11 +18,13 @@ VERSION="$(node -p "require('./app/src-tauri/tauri.conf.json').version")"
 OUT="$ROOT/dist-release/${PLATFORM:?}"
 mkdir -p "$OUT"
 
-# Cross-compile when the requested target is not the host arch. The Intel (x86_64)
-# app is now built on an arm64 runner (the macos-13 Intel image was retired, and the
-# newer macos-15-intel linker rejects a duplicate CoreMedia.swift object that both
-# the apple_cf and screencapturekit vendored crates embed; the arm64 linker accepts
-# it). tauri writes a cross build under target/<triple>/release. Native when matched.
+# Cross-compile when the requested target is not the host arch (keeps this script
+# usable from an arm64 runner). The release workflow builds the Intel (x86_64) app
+# natively on macos-15-intel after selecting Xcode 16, whose linker tolerates a
+# duplicate CoreMedia.swift object the apple_cf + screencapturekit vendored crates
+# both embed (the image's default Xcode 26 linker rejects it), so this path runs
+# native there. tauri writes a cross build under target/<triple>/release; native
+# builds use target/release.
 TGT="${RUST_TARGET:?}"
 case "$TGT" in x86_64-*) TGT_ARCH=x86_64 ;; arm64-*|aarch64-*) TGT_ARCH=arm64 ;; *) TGT_ARCH="$(uname -m)" ;; esac
 if [ "$TGT_ARCH" = "$(uname -m)" ]; then
